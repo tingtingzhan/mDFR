@@ -110,20 +110,20 @@ santos2ELISpot <- function(
   f_sort <- call('~', call('+', f_design[[3L]], f_design[[2L]])) # ~Hr + Subj + antigen
   # only symbol `f_design[[2L]]` supported, for now!!
   
-  data <- sort_by.data.frame(data, y = eval(f_sort))
-  .rowNamesDF(data) <- NULL
+  ret <- sort_by.data.frame(data, y = eval(f_sort))
+  .rowNamesDF(ret) <- NULL
   
-  nm <- names(data)
+  nm <- names(ret)
   nm0 <- grepl(pattern = ptn0, x = nm)
   nm1 <- grepl(pattern = ptn1, x = nm)
-  y0 <- as.matrix.data.frame(unname(data[nm0]))
-  y1 <- as.matrix.data.frame(unname(data[nm1]))
-  data[nm0 | nm1] <- NULL
-  data$y1 <- y1
-  data$y0 <- y0
-  attr(data, which = 'design') <- f_design
-  class(data) <- c('elispot', class(data))
-  return(data)
+  y0 <- as.matrix.data.frame(unname(ret[nm0]))
+  y1 <- as.matrix.data.frame(unname(ret[nm1]))
+  ret[nm0 | nm1] <- NULL
+  ret$y1 <- y1
+  ret$y0 <- y0
+  attr(ret, which = 'design') <- f_design
+  class(ret) <- c('elispot', class(ret))
+  return(ret)
 }
 
 

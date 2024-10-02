@@ -49,11 +49,13 @@ mDFR.test <- function(
   # based on permutation
   dd1 <- cbind(data1$y1, data1$y0)
   dd0 <- cbind(data0$y1, data0$y0)
-  ids1 <- combn_elispot(data1)
-  ids0 <- combn_elispot(data0)
+  n1 <- length(ids1 <- combn_elispot(data1))
+  n0 <- length(ids0 <- combn_elispot(data0))
   resamp <- NULL
-  for (id1 in ids1) {
-    for (id0 in ids0) {
+  for (i1 in seq_len(n1)) {
+    id1 <- ids1[[i1]]
+    for (i0 in seq_len(n0)) {
+      id0 <- ids0[[i0]]
       new_ <- tryCatch(expr = santosTm(
         y11 = dd1[, id1, drop = FALSE], 
         y10 = dd1[, -id1, drop = FALSE], 
@@ -61,8 +63,10 @@ mDFR.test <- function(
         y00 = dd0[, -id0, drop = FALSE], 
         null.value = null.value), error = function(e) NULL)
       resamp <- cbind(resamp, new_)
+      message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' resample done!   ', sep = '', appendLF = FALSE)
     }
   } # slow, but not too slow at all
+  message()
   # end of permutation
   
   # combine `data1` and `data0` for output
@@ -169,6 +173,7 @@ santosT <- function(y1, y0, null.value) {
 #' Function [santosTm] returns a \link[base]{numeric} \link[base]{vector}.
 #' 
 #' @importFrom DanielBiostatistics10th Gosset_Welch
+#' @importFrom matrixStats rowVars
 #' @importFrom stats var
 #' @export
 santosTm <- function(
@@ -181,21 +186,28 @@ santosTm <- function(
     ...
 ) {
   
-  m11 <- rowMeans(y11, na.rm = TRUE)
-  n11 <- rowSums(!is.na(y11))
-  vr11 <- apply(y11, MARGIN = 1L, FUN = var, na.rm = TRUE)
+  # this is super time-sensitive!!!
   
-  m01 <- rowMeans(y01, na.rm = TRUE)
-  n01 <- rowSums(!is.na(y01))
-  vr01 <- apply(y01, MARGIN = 1L, FUN = var, na.rm = TRUE)
+  d11 <- dim(y11)
+  m11 <- .rowMeans(y11, m = d11[1L], n = d11[2L], na.rm = TRUE)
+  n11 <- .rowSums(!is.na(y11), m = d11[1L], n = d11[2L], na.rm = TRUE)
+  vr11 <- rowVars(y11, na.rm = TRUE)
+  # ?matrixStats::rowVars is the fastest solution I know of!!!
   
-  m10 <- rowMeans(y10, na.rm = TRUE)
-  n10 <- rowSums(!is.na(y10))
-  vr10 <- apply(y10, MARGIN = 1L, FUN = var, na.rm = TRUE)
+  d01 <- dim(y01)
+  m01 <- .rowMeans(y01, m = d01[1L], n = d01[2L], na.rm = TRUE)
+  n01 <- .rowSums(!is.na(y01), m = d01[1L], n = d01[2L], na.rm = TRUE)
+  vr01 <- rowVars(y01, na.rm = TRUE)
   
-  m00 <- rowMeans(y00, na.rm = TRUE)
-  n00 <- rowSums(!is.na(y00))
-  vr00 <- apply(y00, MARGIN = 1L, FUN = var, na.rm = TRUE)
+  d10 <- dim(y10)
+  m10 <- .rowMeans(y10, m = d10[1L], n = d10[2L], na.rm = TRUE)
+  n10 <- .rowSums(!is.na(y10), m = d10[1L], n = d10[2L], na.rm = TRUE)
+  vr10 <- rowVars(y10, na.rm = TRUE)
+  
+  d00 <- dim(y00)
+  m00 <- .rowMeans(y00, m = d00[1L], n = d00[2L], na.rm = TRUE)
+  n00 <- .rowSums(!is.na(y00), m = d00[1L], n = d00[2L], na.rm = TRUE)
+  vr00 <- rowVars(y00, na.rm = TRUE)
   
   # time 1, treatment vs. control
   df1 <- Gosset_Welch(v1 = vr11, v0 = vr10, n1 = n11, n0 = n10)

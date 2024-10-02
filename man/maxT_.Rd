@@ -27,6 +27,6 @@ Westfall & Young's max\eqn{T} algorithm, as described in Box 2, page 82 of \doi{
 \references{
 Peter H. Westfall, S. Stanley Young (1993). \emph{Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment}. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing\%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
 
-S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). \emph{Multiple Hypothesis Testing in Microarray Experiments}, Statistical Science 18(1), 71-103
+S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). \emph{Multiple Hypothesis Testing in Microarray Experiments},
 \doi{10.1214/ss/1056397487}
 }

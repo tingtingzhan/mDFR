@@ -21,7 +21,7 @@
 #' @references
 #' Peter H. Westfall, S. Stanley Young (1993). *Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment*. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
 #' 
-#' S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). *Multiple Hypothesis Testing in Microarray Experiments*, Statistical Science 18(1), 71-103 
+#' S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). *Multiple Hypothesis Testing in Microarray Experiments*, 
 #' \doi{10.1214/ss/1056397487}
 #' 
 #' 
@@ -32,7 +32,9 @@ maxT_ <- function(t., T., two.sided = TRUE) {
   if (!is.matrix(T.)) stop('`T.` must be matrix')
   dm <- dim(T.)
   if (dm[1L] != m) stop('nrow(T.) need to be length(t.)')
-  if (anyNA(t.) || anyNA(T.)) stop('do not allow NA in `t.` or `T.`')
+  
+  if (anyNA(T.)) stop('Does not allow missingness in `T.`')
+  if (anyNA(t.)) stop('Does not allow missingness in `t.`')
   
   # I am not sure if parameter `two.sided` is appropriate
   # Moodie's code does *not* have ?base::abs
