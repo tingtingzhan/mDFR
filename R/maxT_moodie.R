@@ -1,49 +1,10 @@
 
 
-#' @title Distribution Free Resampling
-#' 
-#' @description ..
-#' 
-#' @param data an `elispot`
-#' 
-#' @param ... additional parameters for function [split.elispot] and [maxT_moodie]
-#' 
-#' @references 
-#' Original algorithm by Zoe Moodie on March 16, 2010, and
-#' her 2006 papers \doi{10.1016/j.jim.2006.07.015},
-#' and an empirical study \doi{10.1007/s00262-010-0875-4}.
-#' 
-#' \url{https://rundfr.fredhutch.org}
-#' 
-#' @examples 
-#' (m0 = moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')) # no log
-#' (r1a = DFR(m0, null.value = 0))
-#' (r2a = DFR(log(m0, base = 10), null.value = log10(2), resample = 'boot'))
-#' 
-#' @export
-DFR <- function(data, ...) {
-  ds <- split.elispot(data, ...)
-  ret0 <- lapply(ds, FUN = function(i, ...) {
-    maxT_moodie(i, ...)
-  }, ...)
-  ret <- do.call(rbind.data.frame, args = c(ret0, list(make.row.names = FALSE)))
-  # stopifnot(identical(class(ret), c('DFR', 'data.frame')))
-  return(ret)
-}
-
-#' @export
-print.DFR <- function(x, digits = 3L, row.names = FALSE, ...) {
-  x0 <- x
-  x0$y1 <- x0$y0 <- NULL
-  print.data.frame(x0, digits = digits, row.names = FALSE, ...)
-}
-
-
 #' @title maxT_moodie
 #' 
 #' @description Resampling-based \eqn{p}-value adjustment
 #' 
-#' @param data an `elispot`
+#' @param data an `elispot` object
 #' 
 #' @param resample \link[base]{character} scalar, `'combn'` (default) or `'boot'`
 #' 
@@ -62,23 +23,24 @@ print.DFR <- function(x, digits = 3L, row.names = FALSE, ...) {
 #' The purpose of this parameter is solely to re-create Moodie's results.
 #' The end user is advised to leave this parameter missing.
 #' 
-#' @param two.sided see [maxT_]
-#' 
 #' @param ... potential parameters
 #' 
 #' @details ..
 #' 
 #' @references 
-#' ISBN: 978-0-471-55761-6
+#' 
+#' Original algorithm by Zoe Moodie on March 16, 2010, and
+#' her 2006 papers \doi{10.1016/j.jim.2006.07.015},
+#' and an empirical study \doi{10.1007/s00262-010-0875-4}.
 #' 
 #' \url{https://rundfr.fredhutch.org}
+#' 
 #' 
 #' @export
 maxT_moodie <- function(
     data, resample = c('combn', 'boot'),
     null.value,
     R = 1e3L, seed_, # only for `resample == 'boot'`
-    two.sided = FALSE,
     ...
 ) {
   
@@ -108,13 +70,13 @@ maxT_moodie <- function(
     bt0 <- t.default(apply(data$y0, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bcmeans`
     resamp <- (bt1 - m1) - (bt0 - m0)
   })
+
+  ret <- maxT(t. = t_, T. = resamp, ...)
   
-  ret <- data.frame(
-    data,
-    tstat = t_,
-    adjp = maxT_(t. = t_, T. = resamp, two.sided = two.sided)
-  )
-  class(ret) <- c('DFR', class(ret))
+  data$y1 <- data$y0 <- NULL
+  class(data) <- 'data.frame' # 'elispot' is not specified in slot `@design` of \linkS4class{maxT}
+  ret@design <- data
+  
   return(ret)
 
 }
@@ -130,4 +92,6 @@ combn_elispot <- function(data) {
   if (length(ret) < 20L) stop('Too few combn replicates to use this method (< 20).')
   return(ret)
 }
+
+
 

@@ -139,9 +139,9 @@ santos2ELISpot <- function(
 #' 
 #' @param base \link[base]{numeric} scalar, see \link[base]{log}
 #' 
-#' @param f see \link[base]{split.data.frame}, default 
+# @param f see \link[base]{split.data.frame}, default 
 #' 
-#' @param ... additional parameters, currently not in use
+# @param ... additional parameters, currently not in use
 #' 
 #' @note
 #' Unfortunately \link[base]{log10} and \link[base]{log1p} are not an S3 generics.
@@ -152,11 +152,6 @@ santos2ELISpot <- function(
 #' 
 #' Function [log.elispot] returns an `elispot`.
 #' 
-#' Function [split.elispot] returns a \link[base]{list} of `elispot`s.
-#' 
-#' @examples 
-#' (zoe1 = log(moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')))
-#' split(zoe1)
 #' @name elispot_S3
 #' @export log.elispot
 #' @export
@@ -171,13 +166,13 @@ log.elispot <- function(x, base = exp(1)) {
 }
 
 
-#' @rdname elispot_S3
-#' @export split.elispot
-#' @export
-split.elispot <- function(x, f = eval(call('~', attr(x, which = 'design')[[3L]])), ...) {
-  split.data.frame(x, f = f) # , ...
-  # do not include `...` !! saves a lot of head ache :)
-}
+# @rdname elispot_S3
+# @export split.elispot
+# @export
+#split.elispot <- function(x, f = eval(call('~', attr(x, which = 'design')[[3L]])), ...) {
+#  split.data.frame(x, f = f) # , ...
+#  # do not include `...` !! saves a lot of head ache :)
+#}
 
 
 

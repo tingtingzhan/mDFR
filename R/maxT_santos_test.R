@@ -1,30 +1,4 @@
 
-#' @title Modified Distribution Free Resampling
-#' 
-#' @description ..
-#' 
-#' @param data an `elispot`
-#' 
-#' @param ... potential parameters
-#' 
-#' @examples 
-#' mDFR(santos1, null.value = 1)
-#' mDFR(santos1, null.value = 2)
-#' 
-#' @references 
-#' 
-#' Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
-#' 
-#' @export
-mDFR <- function(data, ...) {
-  ds <- split.elispot(data, ...)
-  ret0 <- lapply(ds, FUN = function(i, ...) {
-    maxT_santos(i, ...)
-  }, ...)
-  ret <- do.call(rbind.data.frame, args = c(ret0, list(make.row.names = FALSE)))
-  # stopifnot(identical(class(ret), c('DFR', 'data.frame')))
-  return(ret)
-}
 
 #' @title Modified Distribution Free Resampling, at Two Timepoints
 #' 
@@ -37,21 +11,43 @@ mDFR <- function(data, ...) {
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
+#' @examples
+#' # to recreate Figure 2B
+#' ds = split(santos1, f = ~ Hr + antigen)
+#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
+#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
+#' 
 #' @export
-mDFR.test <- function(
+maxT_santos_test <- function(
     data1, data0, 
     null.value = 1,
     ...
 ) {
   
+  if (nrow(data1) != nrow(data0)) {
+    # timepoint1 and timepoint2 may not have same subjects!!
+    d_1 <- data1; d_1$y1 <- d_1$y0 <- NULL
+    d_0 <- data0; d_0$y1 <- d_0$y0 <- NULL
+    tmp <- mapply(FUN = intersect, d_1, d_0)
+    d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
+    data1 <- merge.data.frame(d_share, data1, by = names(d_share), all.x = TRUE)
+    data0 <- merge.data.frame(d_share, data0, by = names(d_share), all.x = TRUE)
+  }
+  
+  data1$y1 <- data1$y1[, colSums(!is.na(data1$y1)) > 0L, drop = FALSE]
+  data1$y0 <- data1$y0[, colSums(!is.na(data1$y0)) > 0L, drop = FALSE]
+  data0$y1 <- data0$y1[, colSums(!is.na(data0$y1)) > 0L, drop = FALSE]
+  data0$y0 <- data0$y0[, colSums(!is.na(data0$y0)) > 0L, drop = FALSE]
+  
   t_ <- santosTm(data1 = data1, data0 = data0, null.value = null.value)
   
-  # based on permutation
+  # based on permutation (remove all NA columns)
   dd1 <- cbind(data1$y1, data1$y0)
   dd0 <- cbind(data0$y1, data0$y0)
   n1 <- length(ids1 <- combn_elispot(data1))
   n0 <- length(ids0 <- combn_elispot(data0))
-  resamp <- NULL
+  
+  resamp_ <- list()
   for (i1 in seq_len(n1)) {
     id1 <- ids1[[i1]]
     for (i0 in seq_len(n0)) {
@@ -62,12 +58,23 @@ mDFR.test <- function(
         y01 = dd0[, id0, drop = FALSE], 
         y00 = dd0[, -id0, drop = FALSE], 
         null.value = null.value), error = function(e) NULL)
-      resamp <- cbind(resamp, new_)
+      resamp_ <- c(resamp_, list(new_)) # ?base::cbind might be slow after `resamp_` gets big
       message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' resample done!   ', sep = '', appendLF = FALSE)
     }
+    # gc() # not needed!!
   } # slow, but not too slow at all
   message()
+  
+  id <- sapply(resamp_, FUN = anyNA)
+  if (any(id)) {
+    message(sprintf(fmt = '%.1f%% resample copies with NA t-statistics are omitted', 1e2*mean.default(id)))
+    resamp_ <- resamp_[!id]
+  }
+  
+  resamp <- do.call(cbind, args = resamp_)
   # end of permutation
+  
+  ret <- maxT(t. = t_, T. = resamp, ...)
   
   # combine `data1` and `data0` for output
   d1 <- data1; d1$y0 <- d1$y1 <- NULL
@@ -78,74 +85,14 @@ mDFR.test <- function(
     if (all(c1 == c0)) return(c1)
     return(paste(c1, c0, sep = ' vs. '))
   }, c1 = d1, c0 = d0, SIMPLIFY = FALSE)
+  tmp <- lapply(d, FUN = unique.default)
   
-  ret <- data.frame(
-    d, # ?base::data.frame handles ?base::list correctly
-    tstat = t_,
-    adjp = maxT_(t. = t_, T. = resamp)
-  )
-  class(ret) <- c('DFR', class(ret))
+  ret@design <- as.data.frame.list(d)
+  ret@name <- paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')  
   return(ret)
   
 }
 
-
-
-
-# @rdname maxT_santos
-# @export 
-maxT_santos <- function(
-    data, 
-    null.value = 1, 
-    ...
-) {
-  
-  t_ <- santosT(y1 = data$y1, y0 = data$y0, null.value = null.value)
-  
-  # based on permutation
-    dd <- cbind(data$y1, data$y0)
-    ids <- combn_elispot(data)
-    resamp <- do.call(cbind, args = lapply(ids, FUN = function(i) {
-      santosT(y1 = dd[, i, drop = FALSE], y0 = dd[, -i, drop = FALSE], null.value = null.value)
-    }))
-  # end of permutation
-  
-  ret <- data.frame(
-    data,
-    tstat = t_,
-    adjp = maxT_(t. = t_, T. = resamp)
-  )
-  class(ret) <- c('DFR', class(ret))
-  return(ret)
-
-}
-
-
-#' @title Santos' \eqn{T}-statistic, at given time point
-#' 
-#' @description
-#' Equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
-#' 
-#' @param y1,y0 \link[base]{numeric} \link[base]{matrix}-es, treatment and control responses, respectively
-#' 
-#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \mu_0\bar{x}_0 = 0}
-#' 
-#' @returns
-#' Function [santosT] returns a \link[base]{numeric} \link[base]{vector}.
-#' 
-#' @importFrom stats var
-#' @export
-santosT <- function(y1, y0, null.value) {
-  m1 <- rowMeans(y1, na.rm = TRUE)
-  m0 <- rowMeans(y0, na.rm = TRUE)
-  n1 <- rowSums(!is.na(y1))
-  n0 <- rowSums(!is.na(y0))
-  vr1 <- apply(y1, MARGIN = 1L, FUN = var, na.rm = TRUE)
-  vr0 <- apply(y0, MARGIN = 1L, FUN = var, na.rm = TRUE)
-  sd_pooled <- pmax(sqrt(30)/10, # 'the maximum standard deviation of an n = 6 binary set' # ???
-                    sqrt( ((n1-1L)*vr1 + (n0-1L)*vr0) / (n1+n0-2L)))
-  (m1 - null.value * m0) / sd_pooled
-}
 
 
 
@@ -223,8 +170,5 @@ santosTm <- function(
   ((m11 - null.value * m10) - (m01 - null.value * m00)) / sd_pooled
   
 }
-
-
-
 
 
