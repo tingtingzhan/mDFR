@@ -8,7 +8,7 @@
 \method{log}{elispot}(x, base = exp(1))
 }
 \arguments{
-\item{x}{an \code{elispot}}
+\item{x}{an \code{elispot} object}
 
 \item{base}{\link[base]{numeric} scalar, see \link[base]{log}}
 }

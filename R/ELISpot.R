@@ -134,13 +134,9 @@ santos2ELISpot <- function(
 #' @description
 #' `elispot` dispatches for S3 generics \link[base]{log}, \link[base]{split}.
 #' 
-#' @param x an `elispot`
+#' @param x an `elispot` object
 #' 
 #' @param base \link[base]{numeric} scalar, see \link[base]{log}
-#' 
-# @param f see \link[base]{split.data.frame}, default 
-#' 
-# @param ... additional parameters, currently not in use
 #' 
 #' @note
 #' Unfortunately \link[base]{log10} and \link[base]{log1p} are not an S3 generics.
@@ -165,13 +161,6 @@ log.elispot <- function(x, base = exp(1)) {
 }
 
 
-# @rdname elispot_S3
-# @export split.elispot
-# @export
-#split.elispot <- function(x, f = eval(call('~', attr(x, which = 'design')[[3L]])), ...) {
-#  split.data.frame(x, f = f) # , ...
-#  # do not include `...` !! saves a lot of head ache :)
-#}
 
 
 
