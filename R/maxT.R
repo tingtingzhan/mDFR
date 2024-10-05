@@ -217,6 +217,9 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' 
 #' @param object a \linkS4class{maxT} object
 #' 
+#' @param conf.level \link[base]{double} scalar, 
+#' confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
+#' 
 #' @param vertical \link[base]{logical} scalar, whether the
 #' labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
 #' default `TRUE`
@@ -236,6 +239,9 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' \item values of the decreasing-ordered statistics
 #' \item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
 #' }
+#' Tests with \eqn{\tilde{p}^*_{r_j}\leq\alpha} is considered significant
+#' and colored pink (hex color `#F8766D`), otherwise non-significant and colored blue (hex color `#00BFC4`)
+#' 
 #' See full details of these notations in documentations of function [maxT].
 #' 
 #' @returns
@@ -246,7 +252,7 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' @importFrom scales hue_pal
 #' @export autoplot.maxT
 #' @export
-autoplot.maxT <- function(object, vertical = TRUE, ...) {
+autoplot.maxT <- function(object, conf.level = .95, vertical = TRUE, ...) {
   p_perm <- object@p_perm
   p_mono <- object@p_mono
   tr <- object@tr
@@ -254,7 +260,7 @@ autoplot.maxT <- function(object, vertical = TRUE, ...) {
   dm <- dim(U)
   
   col0 <- hue_pal()(n = 2L)
-  col <- ifelse(p_mono <= .05, yes = col0[1L], no = col0[2L])
+  col <- ifelse(p_mono <= (1-conf.level), yes = col0[1L], no = col0[2L])
   
   tseq <- seq_along(tr)
   
@@ -279,13 +285,13 @@ autoplot.maxT <- function(object, vertical = TRUE, ...) {
       labels = sprintf(fmt = '%.2f%% (%.2f%%)', 1e2*p_perm, 1e2*p_mono), # '\u27a4' is a beautiful arrow
       sec.axis = sec_axis(
         transform = ~.,
-        name = 'Original Test Statistic',
+        name = sprintf(fmt = 'Original Test-Statistic, %s Sided', ifelse(object@two.sided, 'Two', 'One')),
         breaks = tseq,
         labels = sprintf(fmt = '%.2f', tr)
       )
     )
   
-  U_lab <- 'Successive Maxima of\nPermuted Test Statistic'
+  U_lab <- sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(object@two.sided, 'Two', 'One'))
   
   # https://github.com/kassambara/survminer/pull/503
   # 'the function ?ggtext::element_markdown is now used in place of ?ggplot2::element_text to handle vectorized colors'

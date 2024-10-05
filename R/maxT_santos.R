@@ -33,13 +33,15 @@ maxT_santos <- function(data, ...) {
   data$y1 <- data$y1[, colSums(!is.na(data$y1)) > 0L, drop = FALSE]
   data$y0 <- data$y0[, colSums(!is.na(data$y0)) > 0L, drop = FALSE]
   
-  t_ <- santosT(y1 = data$y1, y0 = data$y0, ...)
+  tmp <- santosT(y1 = data$y1, y0 = data$y0, ...)
+  t_ <- attr(tmp, which = 'statistic', exact = TRUE) / attr(tmp, which = 'stderr', exact = TRUE)
   
   # based on permutation
   dd <- cbind(data$y1, data$y0)
   ids <- perm_elispot(data)
   T_ <- do.call(cbind, args = lapply(ids, FUN = function(i) {
-    santosT(y1 = dd[, i, drop = FALSE], y0 = dd[, -i, drop = FALSE], ...)
+    tmp <- santosT(y1 = dd[, i, drop = FALSE], y0 = dd[, -i, drop = FALSE], ...)
+    attr(tmp, which = 'statistic', exact = TRUE) / attr(tmp, which = 'stderr', exact = TRUE)
   }))
   # end of permutation
   
@@ -77,19 +79,36 @@ maxT_santos <- function(data, ...) {
 #' @returns
 #' Function [santosT] returns a \link[base]{numeric} \link[base]{vector}.
 #' 
+#' @importFrom DanielBiostatistics10th Gosset_Welch
 #' @importFrom matrixStats rowVars
 #' @importFrom stats var
 #' @export
-santosT <- function(y1, y0, null.value, ...) {
-  m1 <- rowMeans(y1, na.rm = TRUE)
-  m0 <- rowMeans(y0, na.rm = TRUE)
-  n1 <- rowSums(!is.na(y1))
-  n0 <- rowSums(!is.na(y0))
+santosT <- function(
+    y1, y0, 
+    null.value = 1,
+    ...
+) {
+  d1 <- dim(y1)
+  m1 <- .rowMeans(y1, m = d1[1L], n = d1[2L], na.rm = TRUE)
+  n1 <- .rowSums(!is.na(y1), m = d1[1L], n = d1[2L], na.rm = TRUE)
   vr1 <- rowVars(y1, na.rm = TRUE)
+  # ?matrixStats::rowVars is the fastest solution I know of!!!
+  
+  d0 <- dim(y0)
+  m0 <- .rowMeans(y0, m = d0[1L], n = d0[2L], na.rm = TRUE)
+  n0 <- .rowSums(!is.na(y0), m = d0[1L], n = d0[2L], na.rm = TRUE)
   vr0 <- rowVars(y0, na.rm = TRUE)
-  sd_pooled <- pmax(sqrt(30)/10, # 'the maximum standard deviation of an n = 6 binary set' # ???
-                    sqrt( ((n1-1L)*vr1 + (n0-1L)*vr0) / (n1+n0-2L)))
-  (m1 - null.value * m0) / sd_pooled
+  
+  ### Equation (3) of \doi{10.3390/cells4010001} is wrong!!!! 
+  ### 'the maximum standard deviation of an n = 6 binary set' # ???
+  # sd_pooled <- pmax(sqrt(30)/10, sqrt( ((n1-1L)*vr1 + (n0-1L)*vr0) / (n1+n0-2L)))
+  ### reason 1: need to multiply by `null.value`
+  ### reason 2: should not assume equal.variance between `y1` and `y0`
+  
+  ret <- Gosset_Welch(v1 = vr1, v0 = vr0, c0 = null.value, n1 = n1, n0 = n0)
+  # sd_pooled <- attr(ret, which = 'stderr', exact = TRUE) # this is correct!!
+  attr(ret, which = 'statistic') <- (m1 - null.value * m0)
+  return(ret)
 }
 
 

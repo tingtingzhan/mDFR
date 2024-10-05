@@ -4,33 +4,10 @@
 \alias{santosTm}
 \title{Santos' \eqn{T}-statistic, between time point}
 \usage{
-santosTm(
-  data1,
-  data0,
-  null.value = 1,
-  y11 = data1$y1,
-  y01 = data0$y1,
-  y10 = data1$y0,
-  y00 = data0$y0,
-  ...
-)
+santosTm(tm1, tm0)
 }
 \arguments{
-\item{data1, data0}{(optional) two \code{elispot} objects,
-at two time points \eqn{t_1} and \eqn{t_0}, respectively}
-
-\item{null.value}{\link[base]{numeric} scalar \eqn{c},
-as in \eqn{H_0: (\bar{x}_{1,t_1} - c\cdot\bar{x}_{0,t_1}) - (\bar{x}_{1,t_0} - c\cdot\bar{x}_{0,t_0}) = 0}}
-
-\item{y11}{\link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} treatment response}
-
-\item{y01}{\link[base]{numeric} \link[base]{matrix}, time \eqn{t_0} treatment response}
-
-\item{y10}{\link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} control response}
-
-\item{y00}{\link[base]{numeric} \link[base]{matrix}, time \eqn{t_0} control response}
-
-\item{...}{additional parameters, currently not in use}
+\item{tm1, tm0}{returns from function \link{santosT} at two time points \eqn{t_1} and \eqn{t_2}}
 }
 \value{
 Function \link{santosTm} returns a \link[base]{numeric} \link[base]{vector}.

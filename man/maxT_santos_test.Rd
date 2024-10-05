@@ -10,7 +10,7 @@ maxT_santos_test(data1, data0, ...)
 \item{data1, data0}{two \code{elispot} objects,
 at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 
-\item{...}{additional parameters, such as \code{null.value} in function \link{santosTm} and
+\item{...}{additional parameters, such as \code{null.value} in function \link{santosT} and
 \code{two.sided} in function \link{maxT}}
 }
 \description{

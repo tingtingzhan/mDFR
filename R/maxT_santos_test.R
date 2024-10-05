@@ -8,7 +8,7 @@
 #' @param data1,data0 two `elispot` objects, 
 #' at two time points \eqn{t_1} and \eqn{t_0}, respectively
 #' 
-#' @param ... additional parameters, such as `null.value` in function [santosTm] and
+#' @param ... additional parameters, such as `null.value` in function [santosT] and
 #' `two.sided` in function [maxT]
 #' 
 #' @examples
@@ -39,31 +39,28 @@ maxT_santos_test <- function(
   data0$y1 <- data0$y1[, colSums(!is.na(data0$y1)) > 0L, drop = FALSE]
   data0$y0 <- data0$y0[, colSums(!is.na(data0$y0)) > 0L, drop = FALSE]
   
-  t_ <- santosTm(data1 = data1, data0 = data0, ...)
+  t_ <- santosTm(tm1 = santosT(y1 = data1$y1, y0 = data1$y0, ...), 
+                 tm0 = santosT(y1 = data0$y1, y0 = data0$y0, ...))
   
   # based on permutation (remove all NA columns)
-  dd1 <- cbind(data1$y1, data1$y0)
-  dd0 <- cbind(data0$y1, data0$y0)
   n1 <- length(ids1 <- perm_elispot(data1))
   n0 <- length(ids0 <- perm_elispot(data0))
   
+  fn <- function(data, id) {
+    santosT(y1 = data[, id, drop = FALSE], y0 = data[, -id, drop = FALSE], ...)
+  }
+  tm1 <- lapply(ids1, FUN = fn, data = cbind(data1$y1, data1$y0))
+  tm0 <- lapply(ids0, FUN = fn, data = cbind(data0$y1, data0$y0))
+  
   T_ <- list()
   for (i1 in seq_len(n1)) {
-    id1 <- ids1[[i1]]
     for (i0 in seq_len(n0)) {
-      id0 <- ids0[[i0]]
-      new_ <- tryCatch(expr = santosTm(
-        y11 = dd1[, id1, drop = FALSE], 
-        y10 = dd1[, -id1, drop = FALSE], 
-        y01 = dd0[, id0, drop = FALSE], 
-        y00 = dd0[, -id0, drop = FALSE], 
-        ...
-      ), error = function(e) NULL)
-      T_ <- c(T_, list(new_)) # ?base::cbind might be slow after `T_` gets big
+      T_ <- c(T_, list(santosTm(tm1 = tm1[[i1]], tm0 = tm0[[i0]]))) # ?base::cbind might be slow after `T_` gets big
       message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' permutation done!   ', sep = '', appendLF = FALSE)
     }
-    # gc() # not needed!!
-  } # slow, but not too slow at all
+  }
+  # I don't know how to message if using ?base::mapply
+  # .. and even ?base::.mapply may not be much faster than this for-loop
   message()
   # end of permutation
   
@@ -102,75 +99,27 @@ maxT_santos_test <- function(
 #' @description
 #' Equation (6) and (7) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
-#' @param data1,data0 (optional) two `elispot` objects, 
-#' at two time points \eqn{t_1} and \eqn{t_0}, respectively
-#' 
-#' @param null.value \link[base]{numeric} scalar \eqn{c},
-#' as in \eqn{H_0: (\bar{x}_{1,t_1} - c\cdot\bar{x}_{0,t_1}) - (\bar{x}_{1,t_0} - c\cdot\bar{x}_{0,t_0}) = 0}
-#' 
-#' @param y11 \link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} treatment response 
-#' 
-#' @param y01 \link[base]{numeric} \link[base]{matrix}, time \eqn{t_0} treatment response 
-#' 
-#' @param y10 \link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} control response 
-#' 
-#' @param y00 \link[base]{numeric} \link[base]{matrix}, time \eqn{t_0} control response 
-#' 
-#' @param ... additional parameters, currently not in use
+#' @param tm1,tm0 returns from function [santosT] at two time points \eqn{t_1} and \eqn{t_2}
 #' 
 #' @returns
 #' Function [santosTm] returns a \link[base]{numeric} \link[base]{vector}.
 #' 
-#' @importFrom DanielBiostatistics10th Gosset_Welch
-#' @importFrom matrixStats rowVars
-#' @importFrom stats var
 #' @export
 santosTm <- function(
-    data1, data0, 
-    null.value = 1,
-    y11 = data1$y1, # time t1, treatment
-    y01 = data0$y1, # time t0, treatment
-    y10 = data1$y0, # time t1, control
-    y00 = data0$y0, # time t0, control
-    ...
+    tm1, tm0
 ) {
-  
-  # this is super time-sensitive!!!
-  
-  d11 <- dim(y11)
-  m11 <- .rowMeans(y11, m = d11[1L], n = d11[2L], na.rm = TRUE)
-  n11 <- .rowSums(!is.na(y11), m = d11[1L], n = d11[2L], na.rm = TRUE)
-  vr11 <- rowVars(y11, na.rm = TRUE)
-  # ?matrixStats::rowVars is the fastest solution I know of!!!
-  
-  d01 <- dim(y01)
-  m01 <- .rowMeans(y01, m = d01[1L], n = d01[2L], na.rm = TRUE)
-  n01 <- .rowSums(!is.na(y01), m = d01[1L], n = d01[2L], na.rm = TRUE)
-  vr01 <- rowVars(y01, na.rm = TRUE)
-  
-  d10 <- dim(y10)
-  m10 <- .rowMeans(y10, m = d10[1L], n = d10[2L], na.rm = TRUE)
-  n10 <- .rowSums(!is.na(y10), m = d10[1L], n = d10[2L], na.rm = TRUE)
-  vr10 <- rowVars(y10, na.rm = TRUE)
-  
-  d00 <- dim(y00)
-  m00 <- .rowMeans(y00, m = d00[1L], n = d00[2L], na.rm = TRUE)
-  n00 <- .rowSums(!is.na(y00), m = d00[1L], n = d00[2L], na.rm = TRUE)
-  vr00 <- rowVars(y00, na.rm = TRUE)
-  
-  # time 1, treatment vs. control
-  df1 <- Gosset_Welch(v1 = vr11, v0 = vr10, c0 = null.value, n1 = n11, n0 = n10)
-  v1 <- attr(df1, which = 'stderr2', exact = TRUE)
-  
-  # time 0, treatment vs. control
-  df0 <- Gosset_Welch(v1 = vr01, v0 = vr00, c0 = null.value, n1 = n01, n0 = n00)
-  v0 <- attr(df0, which = 'stderr2', exact = TRUE)
-  
+  v1 <- attr(tm1, which = 'stderr2', exact = TRUE)
+  v0 <- attr(tm0, which = 'stderr2', exact = TRUE)
+  stat1 <- attr(tm1, which = 'statistic', exact = TRUE)
+  stat0 <- attr(tm0, which = 'statistic', exact = TRUE)
   sd_pooled <- pmax(sqrt(30)/10, # copy what authors did for equation (3)
-                    sqrt( (df1*v1 + df0*v0) / (df1+df0)))
-  
-  ((m11 - null.value * m10) - (m01 - null.value * m00)) / sd_pooled
-  
+                    sqrt( (tm1*v1 + tm0*v0) / (tm1+tm0)))
+  (stat1 - stat0) / sd_pooled
 }
+
+
+
+
+
 
 

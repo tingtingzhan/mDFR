@@ -4,7 +4,7 @@
 \alias{santosT}
 \title{Santos' \eqn{T}-statistic, at given time point}
 \usage{
-santosT(y1, y0, null.value, ...)
+santosT(y1, y0, null.value = 1, ...)
 }
 \arguments{
 \item{y1, y0}{\link[base]{numeric} \link[base]{matrix}-es,

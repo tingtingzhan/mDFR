@@ -4,10 +4,13 @@
 \alias{autoplot.maxT}
 \title{Visualize Westfall & Young's \link{maxT} Algorithm}
 \usage{
-\method{autoplot}{maxT}(object, vertical = TRUE, ...)
+\method{autoplot}{maxT}(object, conf.level = 0.95, vertical = TRUE, ...)
 }
 \arguments{
 \item{object}{a \linkS4class{maxT} object}
+
+\item{conf.level}{\link[base]{double} scalar,
+confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
 
 \item{vertical}{\link[base]{logical} scalar, whether the
 labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
@@ -34,5 +37,8 @@ Printed on opposing axis are
 \item values of the decreasing-ordered statistics
 \item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
 }
+Tests with \eqn{\tilde{p}^*_{r_j}\leq\alpha} is considered significant
+and colored pink (hex color \verb{#F8766D}), otherwise non-significant and colored blue (hex color \verb{#00BFC4})
+
 See full details of these notations in documentations of function \link{maxT}.
 }
