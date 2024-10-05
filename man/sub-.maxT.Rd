@@ -13,14 +13,14 @@
 indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}}
 }
 \value{
-Function \link{sub-.maxT} returns a \linkS4class{maxT} object.
+Function \verb{[.maxT} returns a \linkS4class{maxT} object.
 }
 \description{
 Subset of Hypothesis in Westfall & Young's \linkS4class{maxT} Algorithm
 }
 \details{
-Function \link{sub-.maxT} performs Westfall & Young's \link{maxT} algorithm
-on a subset of test statistic \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
+Function \verb{[.maxT} performs Westfall & Young's \link{maxT} algorithm
+on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
 and their corresponding test statistics
 \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
 in each permuted copy \eqn{b}, \eqn{b=1,\cdots,B}.

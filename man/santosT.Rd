@@ -4,12 +4,16 @@
 \alias{santosT}
 \title{Santos' \eqn{T}-statistic, at given time point}
 \usage{
-santosT(y1, y0, null.value)
+santosT(y1, y0, null.value, ...)
 }
 \arguments{
-\item{y1, y0}{\link[base]{numeric} \link[base]{matrix}-es, treatment and control responses, respectively}
+\item{y1, y0}{\link[base]{numeric} \link[base]{matrix}-es,
+treatment and control responses (from an \code{elispot} object), respectively}
 
-\item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \mu_0\bar{x}_0 = 0}}
+\item{null.value}{\link[base]{numeric} scalar \eqn{c},
+as in \eqn{H_0: \bar{x}_1 - c\cdot\bar{x}_0 = 0}}
+
+\item{...}{additional parameters, currently not in use}
 }
 \value{
 Function \link{santosT} returns a \link[base]{numeric} \link[base]{vector}.

@@ -4,14 +4,14 @@
 \alias{maxT_santos_test}
 \title{Modified Distribution Free Resampling, at Two Timepoints}
 \usage{
-maxT_santos_test(data1, data0, null.value = 1, ...)
+maxT_santos_test(data1, data0, ...)
 }
 \arguments{
-\item{data1, data0}{\code{elispot}s at two time points \eqn{t_1} and \eqn{t_0}, respectively}
+\item{data1, data0}{two \code{elispot} objects,
+at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 
-\item{null.value}{..}
-
-\item{...}{additional parameters, currently not in use}
+\item{...}{additional parameters, such as \code{null.value} in function \link{santosTm} and
+\code{two.sided} in function \link{maxT}}
 }
 \description{
 ..
@@ -20,6 +20,7 @@ maxT_santos_test(data1, data0, null.value = 1, ...)
 # to recreate Figure 2B
 ds = split(santos1, f = ~ Hr + antigen)
 maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
+maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, null.value = 10)
 maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
 
 }

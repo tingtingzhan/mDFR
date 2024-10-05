@@ -4,14 +4,13 @@
 \alias{maxT_santos}
 \title{Modified Distribution Free Resampling}
 \usage{
-maxT_santos(data, null.value = 1, ...)
+maxT_santos(data, ...)
 }
 \arguments{
 \item{data}{an \code{elispot}}
 
-\item{null.value}{..}
-
-\item{...}{potential parameters}
+\item{...}{additional parameters, such as \code{null.value} in function \link{santosT},
+and \code{two.sided} for function \link{maxT}}
 }
 \description{
 ..
@@ -23,10 +22,14 @@ maxT_santos(data, null.value = 1, ...)
 #  .. at that time point.'
 # paper page 8, layout of Figure 2B 
 # these are reasons why we use `f = ~ Hr + antigen`
-lapply(split(santos1, f = ~ Hr + antigen), FUN = maxT_santos, null.value = 1)
-lapply(split(santos1, f = ~ Hr + antigen), FUN = maxT_santos, null.value = 2)
-lapply(split(santos2, f = ~ Hr + antigen), FUN = maxT_santos, null.value = 1)
-lapply(split(santos2, f = ~ Hr + antigen), FUN = maxT_santos, null.value = 2)
+st1 = split(santos1, f = ~ Hr + antigen)
+st2 = split(santos2, f = ~ Hr + antigen)
+maxT_santos(st1[[1L]], null.value = 1)
+maxT_santos(st1[[1L]], null.value = 2)
+lapply(st1, FUN = maxT_santos, null.value = 1)
+lapply(st1, FUN = maxT_santos, null.value = 2)
+lapply(st2, FUN = maxT_santos, null.value = 1)
+lapply(st2, FUN = maxT_santos, null.value = 2)
 
 }
 \references{

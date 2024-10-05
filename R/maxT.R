@@ -5,12 +5,12 @@
 #' Westfall & Young's [maxT] algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 #' 
 #' @param t. \link[base]{double} \link[base]{vector},
-#' test statistic \eqn{t_1,\cdots,t_m} 
+#' test statistics \eqn{t_1,\cdots,t_m} 
 #' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 #' in the original data
 #' 
 #' @param T. \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
-#' test statistic \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
+#' test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
 #' for permutation \eqn{b=1,\cdots,B}
 #' 
 #' @param two.sided \link[base]{logical} scalar,
@@ -18,10 +18,12 @@
 #' Default `TRUE` as in \doi{10.1214/ss/1056397487},
 #' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
 #' 
+#' @param ... additional parameters, currently not in use
+#' 
 #' @details
 #' In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m} 
 #' for each hypothesis \eqn{H_j}, \eqn{j=1,\cdots,m},
-#' as well as the *decreasing order statistic* \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that 
+#' as well as the *decreasing order statistics* \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that 
 #' \deqn{
 #' \begin{cases}
 #' |t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\
@@ -100,7 +102,7 @@ setClass(Class = 'maxT', slots = c(
 
 #' @rdname maxT
 #' @export
-maxT <- function(t., T., two.sided = TRUE) {
+maxT <- function(t., T., two.sided = TRUE, ...) {
   
   t.orig <- t.
   T.orig <- T.
@@ -312,8 +314,8 @@ autoplot.maxT <- function(object, vertical = TRUE, ...) {
 #' indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}
 #' 
 #' @details
-#' Function [sub-.maxT] performs Westfall & Young's [maxT] algorithm  
-#' on a subset of test statistic \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
+#' Function `[.maxT` performs Westfall & Young's [maxT] algorithm  
+#' on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
 #' and their corresponding test statistics 
 #' \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
 #' in each permuted copy \eqn{b}, \eqn{b=1,\cdots,B}.
@@ -322,7 +324,7 @@ autoplot.maxT <- function(object, vertical = TRUE, ...) {
 #' **not** of permutations copies \eqn{b=1,\cdots,B}.
 #' 
 #' @returns 
-#' Function [sub-.maxT] returns a \linkS4class{maxT} object.
+#' Function `[.maxT` returns a \linkS4class{maxT} object.
 #' 
 #' @export
 '[.maxT' <- function(x, i) {

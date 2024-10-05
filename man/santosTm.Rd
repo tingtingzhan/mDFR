@@ -16,9 +16,11 @@ santosTm(
 )
 }
 \arguments{
-\item{data1, data0}{\code{elispot}s at two time points \eqn{t_1} and \eqn{t_0}, respectively}
+\item{data1, data0}{(optional) two \code{elispot} objects,
+at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 
-\item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}}
+\item{null.value}{\link[base]{numeric} scalar \eqn{c},
+as in \eqn{H_0: (\bar{x}_{1,t_1} - c\cdot\bar{x}_{0,t_1}) - (\bar{x}_{1,t_0} - c\cdot\bar{x}_{0,t_0}) = 0}}
 
 \item{y11}{\link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} treatment response}
 

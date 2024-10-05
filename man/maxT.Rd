@@ -6,22 +6,24 @@
 \alias{maxT-class}
 \title{Westfall & Young's \link{maxT} Algorithm}
 \usage{
-maxT(t., T., two.sided = TRUE)
+maxT(t., T., two.sided = TRUE, ...)
 }
 \arguments{
 \item{t.}{\link[base]{double} \link[base]{vector},
-test statistic \eqn{t_1,\cdots,t_m}
+test statistics \eqn{t_1,\cdots,t_m}
 for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 in the original data}
 
 \item{T.}{\link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
-test statistic \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
+test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
 for permutation \eqn{b=1,\cdots,B}}
 
 \item{two.sided}{\link[base]{logical} scalar,
 whether to perform a two sided test.
 Default \code{TRUE} as in \doi{10.1214/ss/1056397487},
 while Moodie's (\url{https://rundfr.fredhutch.org}) use \code{FALSE}}
+
+\item{...}{additional parameters, currently not in use}
 }
 \value{
 Function \link{maxT} returns an S4 \linkS4class{maxT} object.  See slots in section \strong{Slots}.
@@ -32,7 +34,7 @@ Westfall & Young's \link{maxT} algorithm, as described in Box 2, page 82 of \doi
 \details{
 In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m}
 for each hypothesis \eqn{H_j}, \eqn{j=1,\cdots,m},
-as well as the \emph{decreasing order statistic} \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that
+as well as the \emph{decreasing order statistics} \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that
 \deqn{
 \begin{cases}
 |t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\

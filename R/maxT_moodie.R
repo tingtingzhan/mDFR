@@ -6,7 +6,9 @@
 #' 
 #' @param data an `elispot` object
 #' 
-#' @param resample \link[base]{character} scalar, `'combn'` (default) or `'boot'`
+#' @param bootstrap \link[base]{logical} scalar, 
+#' whether to use bootstrap samples.
+#' Default `FALSE` indicating the use of permuted samples.
 #' 
 #' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \bar{x}_0 = \mu_0}
 #' 
@@ -15,7 +17,7 @@
 # When `log_base = NULL`, we are testing
 # \eqn{H_0: \mu_{e} - \mu_{c} = 0}, i.e., `null.value` is forced to be 0
 #' 
-#' @param R \link[base]{integer} scalar \eqn{R}, number of bootstrap copies if `resample = 'boot'`
+#' @param R \link[base]{integer} scalar \eqn{R}, number of bootstrap copies if `bootstrap = TRUE`
 #' 
 #' @param seed_ (optional) \link[base]{integer} scalar, random seed for `'boot'` resampling method.
 #' In Moodie's function `elsdfr2x()`, `seed_ = 9456845L` is used.
@@ -29,20 +31,19 @@
 #' 
 #' @references 
 #' 
-#' Original algorithm by Zoe Moodie on March 16, 2010, and
+#' Original algorithm by Zoe Moodie on March 16, 2010 \url{https://rundfr.fredhutch.org}, 
+#' and
 #' her 2006 papers \doi{10.1016/j.jim.2006.07.015},
 #' and an empirical study \doi{10.1007/s00262-010-0875-4}.
-#' 
-#' \url{https://rundfr.fredhutch.org}
 #' 
 #' 
 #' @example inst/moodie/maxT_moodie.R
 #' 
 #' @export
 maxT_moodie <- function(
-    data, resample = c('combn', 'boot'),
+    data, bootstrap = FALSE,
     null.value,
-    R = 1e3L, seed_, # only for `resample == 'boot'`
+    R = 1e3L, seed_, # only if (bootstrap)
     ...
 ) {
   
@@ -50,17 +51,19 @@ maxT_moodie <- function(
   m0 <- rowMeans(data$y0, na.rm = TRUE)
   t_ <- (m1 - m0) - null.value
   
-  switch(match.arg(resample), combn = { # moodie's [elsdfreq]
+  if (!bootstrap) { # moodie's [elsdfreq]
     dd <- cbind(data$y1, data$y0)
-    ids <- combn_elispot(data)
-    # permutations
+    ids <- perm_elispot(data)
     prm1 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)))
     prm0 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)))
-    resamp <- prm1 - prm0
+    #T_ <- prm1 - prm0 # moodie's
+    T_ <- (prm1 - prm0) - null.value # Tingting's
+    # moodie's [elsdfreq] example has `null.value = 0`
+    # Tingting thinks moodie's code is wrong
     
-  }, boot = { # moodie's [elsdfr2x]
+  } else { # moodie's [elsdfr2x]
     bmeans <- function(x, R) {
-      # moodie's functions [bf] and [bcf], re-written in a beautiful way
+      # moodie's functions [bf] and [bcf], re-written
       # `x` is numeric vector
       x0 <- x[!is.na(x)]
       if (!(nx <- length(x0))) stop('all-missing not allowed')
@@ -70,10 +73,12 @@ maxT_moodie <- function(
     if (!missing(seed_)) set.seed(seed = seed_) 
     bt1 <- t.default(apply(data$y1, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bemeans`
     bt0 <- t.default(apply(data$y0, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bcmeans`
-    resamp <- (bt1 - m1) - (bt0 - m0)
-  })
+    T_ <- (bt1 - m1) - (bt0 - m0) # moodie's
+    # Tingting does not understand this `T_`
+    
+  }
 
-  ret <- maxT(t. = t_, T. = resamp, ...)
+  ret <- maxT(t. = t_, T. = T_, ...)
   
   data$y1 <- data$y0 <- NULL
   class(data) <- 'data.frame' # 'elispot' is not specified in slot `@design` of \linkS4class{maxT}
@@ -83,17 +88,8 @@ maxT_moodie <- function(
 
 }
 
-# ?utils::combn is not S3 generic
-#' @importFrom utils combn
-combn_elispot <- function(data) {
-  # no randomness
-  n1 <- dim(data$y1)[2L]
-  n0 <- dim(data$y0)[2L]
-  # if ((n1 > 5L) && (n0 > 5L)) message('combn slow for large number of replicates!')
-  ret <- combn(n1 + n0, m = n1, simplify = FALSE)
-  if (length(ret) < 20L) stop('Too few combn replicates to use this method (< 20).')
-  return(ret)
-}
+
+
 
 
 

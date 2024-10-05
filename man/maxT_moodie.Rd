@@ -4,23 +4,18 @@
 \alias{maxT_moodie}
 \title{maxT_moodie}
 \usage{
-maxT_moodie(
-  data,
-  resample = c("combn", "boot"),
-  null.value,
-  R = 1000L,
-  seed_,
-  ...
-)
+maxT_moodie(data, bootstrap = FALSE, null.value, R = 1000L, seed_, ...)
 }
 \arguments{
 \item{data}{an \code{elispot} object}
 
-\item{resample}{\link[base]{character} scalar, \code{'combn'} (default) or \code{'boot'}}
+\item{bootstrap}{\link[base]{logical} scalar,
+whether to use bootstrap samples.
+Default \code{FALSE} indicating the use of permuted samples.}
 
 \item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \bar{x}_0 = \mu_0}}
 
-\item{R}{\link[base]{integer} scalar \eqn{R}, number of bootstrap copies if \code{resample = 'boot'}}
+\item{R}{\link[base]{integer} scalar \eqn{R}, number of bootstrap copies if \code{bootstrap = TRUE}}
 
 \item{seed_}{(optional) \link[base]{integer} scalar, random seed for \code{'boot'} resampling method.
 In Moodie's function \code{elsdfr2x()}, \code{seed_ = 9456845L} is used.
@@ -43,12 +38,11 @@ r1a = lapply(split(m0, f = ~ day + id), FUN = maxT_moodie, null.value = 0, two.s
 
 m1 = log(m0, base = 10) # [elsdfr2x] uses base-10
 r2a = lapply(split(m1, f = ~ day + id), FUN = maxT_moodie, null.value = log10(2), 
-             resample = 'boot', seed_ = 9456845L, two.sided = FALSE)
+             bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
 }
 \references{
-Original algorithm by Zoe Moodie on March 16, 2010, and
+Original algorithm by Zoe Moodie on March 16, 2010 \url{https://rundfr.fredhutch.org},
+and
 her 2006 papers \doi{10.1016/j.jim.2006.07.015},
 and an empirical study \doi{10.1007/s00262-010-0875-4}.
-
-\url{https://rundfr.fredhutch.org}
 }

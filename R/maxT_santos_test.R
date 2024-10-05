@@ -5,22 +5,22 @@
 #' @description
 #' ..
 #' 
-#' @param data1,data0 `elispot`s at two time points \eqn{t_1} and \eqn{t_0}, respectively
+#' @param data1,data0 two `elispot` objects, 
+#' at two time points \eqn{t_1} and \eqn{t_0}, respectively
 #' 
-#' @param null.value ..
-#' 
-#' @param ... additional parameters, currently not in use
+#' @param ... additional parameters, such as `null.value` in function [santosTm] and
+#' `two.sided` in function [maxT]
 #' 
 #' @examples
 #' # to recreate Figure 2B
 #' ds = split(santos1, f = ~ Hr + antigen)
 #' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
+#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, null.value = 10)
 #' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
 #' 
 #' @export
 maxT_santos_test <- function(
     data1, data0, 
-    null.value = 1,
     ...
 ) {
   
@@ -39,15 +39,15 @@ maxT_santos_test <- function(
   data0$y1 <- data0$y1[, colSums(!is.na(data0$y1)) > 0L, drop = FALSE]
   data0$y0 <- data0$y0[, colSums(!is.na(data0$y0)) > 0L, drop = FALSE]
   
-  t_ <- santosTm(data1 = data1, data0 = data0, null.value = null.value)
+  t_ <- santosTm(data1 = data1, data0 = data0, ...)
   
   # based on permutation (remove all NA columns)
   dd1 <- cbind(data1$y1, data1$y0)
   dd0 <- cbind(data0$y1, data0$y0)
-  n1 <- length(ids1 <- combn_elispot(data1))
-  n0 <- length(ids0 <- combn_elispot(data0))
+  n1 <- length(ids1 <- perm_elispot(data1))
+  n0 <- length(ids0 <- perm_elispot(data0))
   
-  resamp_ <- list()
+  T_ <- list()
   for (i1 in seq_len(n1)) {
     id1 <- ids1[[i1]]
     for (i0 in seq_len(n0)) {
@@ -57,24 +57,24 @@ maxT_santos_test <- function(
         y10 = dd1[, -id1, drop = FALSE], 
         y01 = dd0[, id0, drop = FALSE], 
         y00 = dd0[, -id0, drop = FALSE], 
-        null.value = null.value), error = function(e) NULL)
-      resamp_ <- c(resamp_, list(new_)) # ?base::cbind might be slow after `resamp_` gets big
-      message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' resample done!   ', sep = '', appendLF = FALSE)
+        ...
+      ), error = function(e) NULL)
+      T_ <- c(T_, list(new_)) # ?base::cbind might be slow after `T_` gets big
+      message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' permutation done!   ', sep = '', appendLF = FALSE)
     }
     # gc() # not needed!!
   } # slow, but not too slow at all
   message()
-  
-  id <- sapply(resamp_, FUN = anyNA)
-  if (any(id)) {
-    message(sprintf(fmt = '%.1f%% resample copies with NA t-statistics are omitted', 1e2*mean.default(id)))
-    resamp_ <- resamp_[!id]
-  }
-  
-  resamp <- do.call(cbind, args = resamp_)
   # end of permutation
   
-  ret <- maxT(t. = t_, T. = resamp, ...)
+  id <- vapply(T_, FUN = anyNA, FUN.VALUE = NA)
+  if (any(id)) {
+    # at least one hypothesis has permuted treatment or permuted control being all-equal
+    message(sprintf(fmt = '%.1f%% permutations with NA t-statistics are omitted', 1e2*mean.default(id)))
+    T_ <- T_[!id]
+  }
+
+  ret <- maxT(t. = t_, T. = do.call(cbind, args = T_), ...)
   
   # combine `data1` and `data0` for output
   d1 <- data1; d1$y0 <- d1$y1 <- NULL
@@ -102,9 +102,11 @@ maxT_santos_test <- function(
 #' @description
 #' Equation (6) and (7) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
-#' @param data1,data0 `elispot`s at two time points \eqn{t_1} and \eqn{t_0}, respectively
+#' @param data1,data0 (optional) two `elispot` objects, 
+#' at two time points \eqn{t_1} and \eqn{t_0}, respectively
 #' 
-#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}
+#' @param null.value \link[base]{numeric} scalar \eqn{c},
+#' as in \eqn{H_0: (\bar{x}_{1,t_1} - c\cdot\bar{x}_{0,t_1}) - (\bar{x}_{1,t_0} - c\cdot\bar{x}_{0,t_0}) = 0}
 #' 
 #' @param y11 \link[base]{numeric} \link[base]{matrix}, time \eqn{t_1} treatment response 
 #' 
@@ -157,11 +159,11 @@ santosTm <- function(
   vr00 <- rowVars(y00, na.rm = TRUE)
   
   # time 1, treatment vs. control
-  df1 <- Gosset_Welch(v1 = vr11, v0 = vr10, n1 = n11, n0 = n10)
+  df1 <- Gosset_Welch(v1 = vr11, v0 = vr10, c0 = null.value, n1 = n11, n0 = n10)
   v1 <- attr(df1, which = 'stderr2', exact = TRUE)
   
   # time 0, treatment vs. control
-  df0 <- Gosset_Welch(v1 = vr01, v0 = vr00, n1 = n01, n0 = n00)
+  df0 <- Gosset_Welch(v1 = vr01, v0 = vr00, c0 = null.value, n1 = n01, n0 = n00)
   v0 <- attr(df0, which = 'stderr2', exact = TRUE)
   
   sd_pooled <- pmax(sqrt(30)/10, # copy what authors did for equation (3)
