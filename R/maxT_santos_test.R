@@ -67,7 +67,7 @@ maxT_santos_test <- function(
   id <- vapply(T_, FUN = anyNA, FUN.VALUE = NA)
   if (any(id)) {
     # at least one hypothesis has permuted treatment or permuted control being all-equal
-    message(sprintf(fmt = '%.1f%% permutations with NA t-statistics are omitted', 1e2*mean.default(id)))
+    message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
     T_ <- T_[!id]
   }
 
@@ -94,7 +94,7 @@ maxT_santos_test <- function(
 
 
 
-#' @title Santos' \eqn{T}-statistic, between time point
+#' @title Santos' Test-Statistic, between time point
 #' 
 #' @description
 #' Equation (6) and (7) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.

@@ -50,6 +50,13 @@ maxT_santos <- function(data, ...) {
   data$y1 <- data$y0 <- NULL
   class(data) <- 'data.frame'
   ret@design <- data
+  
+  tmp <- lapply(data, FUN = function(i) {
+    if (is.factor(i)) i <- as.character.factor(i)
+    unique(i)
+  })
+  ret@name <- paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')  
+  
   return(ret)
 }
 
@@ -63,7 +70,7 @@ maxT_santos <- function(data, ...) {
 
 
 
-#' @title Santos' \eqn{T}-statistic, at given time point
+#' @title Santos' Test-Statistic, at given time point
 #' 
 #' @description
 #' Equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
