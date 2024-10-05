@@ -2,15 +2,18 @@
 % Please edit documentation in R/maxT.R
 \name{as.data.frame.maxT}
 \alias{as.data.frame.maxT}
-\title{as.data.frame.maxT}
+\title{Convert \linkS4class{maxT} to a \link[base]{data.frame}}
 \usage{
 \method{as.data.frame}{maxT}(x, ...)
 }
 \arguments{
-\item{x}{\linkS4class{maxT}}
+\item{x}{a \linkS4class{maxT} object}
 
-\item{...}{..}
+\item{...}{additional parameters, currently not in use}
+}
+\value{
+Function \link{as.data.frame.maxT} returns a \link[base]{data.frame}.
 }
 \description{
-as.data.frame.maxT
+Convert \linkS4class{maxT} to a \link[base]{data.frame}
 }

@@ -21,8 +21,7 @@
 #' Functions [moodie2ELISpot] and [santos2ELISpot] both return an `elispot`.
 #' 
 #' @examples 
-#' # ELISpot_Moodie(moodie, nameCtrl = 'negctl') # deprecated
-#' moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')
+#' # see ?maxT_moodie
 #' @references 
 #' \url{https://rundfr.fredhutch.org}
 #' 

@@ -2,17 +2,37 @@
 % Please edit documentation in R/maxT.R
 \name{autoplot.maxT}
 \alias{autoplot.maxT}
-\title{autoplot.maxT}
+\title{Visualize Westfall & Young's \link{maxT} Algorithm}
 \usage{
 \method{autoplot}{maxT}(object, vertical = TRUE, ...)
 }
 \arguments{
-\item{object}{\linkS4class{maxT}}
+\item{object}{a \linkS4class{maxT} object}
 
-\item{vertical}{\link[base]{logical} scalar}
+\item{vertical}{\link[base]{logical} scalar, whether the
+labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
+default \code{TRUE}}
 
-\item{...}{..}
+\item{...}{additional parameters, currently not in use}
+}
+\value{
+Function \link{autoplot.maxT} returns a \link[ggplot2]{ggplot} object.
 }
 \description{
-autoplot.maxT
+To visualize Westfall & Young's \link{maxT} algorithm using package \CRANpkg{ggplot2}.
+}
+\details{
+Function \link{autoplot.maxT} plots
+\itemize{
+\item the successive maxima
+\eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and
+\item the decreasing-ordered statistics \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test,
+or \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test
+}
+Printed on opposing axis are
+\itemize{
+\item values of the decreasing-ordered statistics
+\item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
+}
+See full details of these notations in documentations of function \link{maxT}.
 }

@@ -2,13 +2,16 @@
 % Please edit documentation in R/maxT.R
 \name{show,maxT-method}
 \alias{show,maxT-method}
-\title{show maxT}
+\title{\link[methods]{show} \linkS4class{maxT} object}
 \usage{
 \S4method{show}{maxT}(object)
 }
 \arguments{
-\item{object}{\linkS4class{maxT}}
+\item{object}{a \linkS4class{maxT} object}
+}
+\value{
+The \link[methods]{show} method of \linkS4class{maxT} object returns a \link[reactable]{reactable} object.
 }
 \description{
-show maxT
+\link[methods]{show} \linkS4class{maxT} object
 }

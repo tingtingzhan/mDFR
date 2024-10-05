@@ -9,9 +9,6 @@
 #' 
 #' @param ... potential parameters
 #' 
-#' @examples 
-#' # see santos_playground.R
-#' 
 #' @examples
 #' # paper page 5, 'The ELISPOT spot results were analyzed for statistical significance at 
 #' #  .. a given time point by comparing the number of spots for each of the tested peptides 

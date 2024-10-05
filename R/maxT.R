@@ -1,43 +1,58 @@
 
-#' @title Westfall & Young's max\eqn{T} Algorithm
+#' @title Westfall & Young's [maxT] Algorithm
 #' 
 #' @description
-#' Westfall & Young's max\eqn{T} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}
+#' Westfall & Young's [maxT] algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 #' 
-#' @param t. \link[base]{numeric} \link[base]{vector},
-#' test statistic \eqn{(t_1,\cdots,t_m)^t} 
-#' for each hypothesis \eqn{H_j, j = 1,\cdots,m},
+#' @param t. \link[base]{double} \link[base]{vector},
+#' test statistic \eqn{t_1,\cdots,t_m} 
+#' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 #' in the original data
 #' 
-#' @param T. \link[base]{numeric} \link[base]{matrix} of dimension \eqn{(m,B)},
-#' test statistic \eqn{(t_{1,b},\cdots,t_{m,b})^t}
+#' @param T. \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
+#' test statistic \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
 #' for permutation \eqn{b=1,\cdots,B}
 #' 
 #' @param two.sided \link[base]{logical} scalar,
-#' whether to take \link[base]{abs}olute of `t.` and `T.`
-#' before other calculations.
+#' whether to perform a two sided test.
 #' Default `TRUE` as in \doi{10.1214/ss/1056397487},
-#' while Moodie's algorithm (\url{https://rundfr.fredhutch.org}) does not have this step.
+#' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
 #' 
 #' @details
 #' In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m} 
 #' for each hypothesis \eqn{H_j}, \eqn{j=1,\cdots,m},
 #' as well as the *decreasing order statistic* \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that 
-#' \deqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} 
+#' \deqn{
+#' \begin{cases}
+#' |t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\
+#' t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m} & \text{for one-sided test}
+#' \end{cases}
+#' } 
 #' 
 #' In each permuted copy \eqn{b}, \eqn{b=1,\cdots,B},
 #' obtain the test statistics \eqn{t_{1,b},\cdots,t_{m,b}}
-#' and their **successive maxima** by the decreasing order statistic \eqn{\mathbf{r}} of the original data
+#' and their **successive maxima** for two-sided test
 #' \deqn{
 #' \begin{cases}
 #' u_{m,b} & = |t_{r_m,b}|\\
 #' u_{j,b} & = \text{max}\left\{u_{j+1,b}, |t_{r_j,b}|\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
 #' \end{cases}
 #' }
+#' or for one-sided test
+#' \deqn{
+#' \begin{cases}
+#' u_{m,b} & = t_{r_m,b}\\
+#' u_{j,b} & = \text{max}\left\{u_{j+1,b}, t_{r_j,b}\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
+#' \end{cases}
+#' }
 #' 
 #' The permutation adjusted \eqn{p}-values are
 #' \deqn{
-#' \tilde{p}_{r_j} = B^{-1}\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right)
+#' \tilde{p}_{r_j} = 
+#' \begin{cases}
+#' \dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right) & \text{for two-sided test}\\
+#' \dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq t_{r_j}\right) & \text{for one-sided test}
+#' \end{cases}
 #' }
 #' 
 #' To enforce the monotonicity constraints,
@@ -51,13 +66,14 @@
 #' @returns 
 #' Function [maxT] returns an S4 \linkS4class{maxT} object.  See slots in section **Slots**.
 #' 
-#' @slot t. \link[base]{double} \link[base]{vector}, original test statistics \eqn{t_1,\cdots,t_m}
-#' @slot tr \link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} if `!two.sided`, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} if `two.sided`
+#' 
+#' @slot t.,T. see parameter `t.` and `T.` in section **Arguments**
+#' @slot tr \link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test
 #' @slot U \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)}, successive maxima \eqn{u_{j,b}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}
 #' @slot p_perm \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}
 #' @slot p_mono \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
 #' @slot p. \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints, restored in the order of original test statistics \eqn{t_1,\cdots,t_m}
-#' @slot two.sided \link[base]{logical} scalar
+#' @slot two.sided see parameter `two.sided` in section **Arguments**
 #' @slot design (optional) \link[base]{data.frame}, study design
 #' @slot name (optional) \link[base]{character} scalar, study name
 #' 
@@ -72,7 +88,7 @@
 #' @importFrom methods setClass setMethod new show 
 #' @export
 setClass(Class = 'maxT', slots = c(
-  t. = 'numeric', 
+  t. = 'numeric', T. = 'matrix',
   tr = 'numeric', U = 'matrix',
   p_perm = 'numeric', p_mono = 'numeric', 
   p. = 'numeric',
@@ -87,6 +103,7 @@ setClass(Class = 'maxT', slots = c(
 maxT <- function(t., T., two.sided = TRUE) {
   
   t.orig <- t.
+  T.orig <- T.
   
   m <- length(t.)
   if (!is.matrix(T.)) stop('`T.` must be matrix')
@@ -142,7 +159,7 @@ maxT <- function(t., T., two.sided = TRUE) {
   } # R intro 101
   
   new(Class = 'maxT',
-      t. = t.orig, # not `t.` which may be \link[base]{abs}-ed if `two.sided`
+      t. = t.orig, T. = T.orig, # not `t.` and `T.`, which may be \link[base]{abs}-ed if `two.sided`
       tr = tr, U = U,
       p_perm = p_perm, p_mono = p_mono, 
       p. = p_mono[order(r)],
@@ -151,11 +168,14 @@ maxT <- function(t., T., two.sided = TRUE) {
 }
 
 
-#' @title as.data.frame.maxT
+#' @title Convert \linkS4class{maxT} to a \link[base]{data.frame}
 #' 
-#' @param x \linkS4class{maxT}
+#' @param x a \linkS4class{maxT} object
 #' 
-#' @param ... ..
+#' @param ... additional parameters, currently not in use
+#' 
+#' @returns 
+#' Function [as.data.frame.maxT] returns a \link[base]{data.frame}.
 #' 
 #' @method as.data.frame maxT
 #' @export as.data.frame.maxT
@@ -172,34 +192,55 @@ as.data.frame.maxT <- function(x, ...) {
 
 
 
-#' @title show maxT
+#' @title \link[methods]{show} \linkS4class{maxT} object
 #' 
-#' @param object \linkS4class{maxT}
+#' @param object a \linkS4class{maxT} object
+#' 
+#' @returns 
+#' The \link[methods]{show} method of \linkS4class{maxT} object returns a \link[reactable]{reactable} object.
 #' 
 #' @importFrom reactable reactable
 #' @export
 setMethod(f = show, signature = signature(object = 'maxT'), definition = function(object) {
-  print(reactable(as.data.frame.maxT(object)))
+  print(reactable(as.data.frame.maxT(object))) # ?htmlwidgets:::print.htmlwidget
 })
 
 
 
 
-
-
-
-
-
-
-#' @title autoplot.maxT
+#' @title Visualize Westfall & Young's [maxT] Algorithm
 #' 
-#' @param object \linkS4class{maxT}
+#' @description
+#' To visualize Westfall & Young's [maxT] algorithm using package \CRANpkg{ggplot2}.
 #' 
-#' @param vertical \link[base]{logical} scalar
+#' @param object a \linkS4class{maxT} object
 #' 
-#' @param ... ..
+#' @param vertical \link[base]{logical} scalar, whether the
+#' labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
+#' default `TRUE`
 #' 
-#' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line scale_x_continuous scale_y_continuous labs theme element_text sec_axis 
+#' @param ... additional parameters, currently not in use
+#' 
+#' @details
+#' Function [autoplot.maxT] plots 
+#' \itemize{
+#' \item the successive maxima 
+#' \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and 
+#' \item the decreasing-ordered statistics \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test,
+#' or \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test
+#' }
+#' Printed on opposing axis are
+#' \itemize{
+#' \item values of the decreasing-ordered statistics
+#' \item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
+#' }
+#' See full details of these notations in documentations of function [maxT].
+#' 
+#' @returns
+#' Function [autoplot.maxT] returns a \link[ggplot2]{ggplot} object.
+#' 
+#' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme
+#' @importFrom ggtext element_markdown
 #' @importFrom scales hue_pal
 #' @export autoplot.maxT
 #' @export
@@ -244,18 +285,47 @@ autoplot.maxT <- function(object, vertical = TRUE, ...) {
   
   U_lab <- 'Successive Maxima of\nPermuted Test Statistic'
   
+  # https://github.com/kassambara/survminer/pull/503
+  # 'the function ?ggtext::element_markdown is now used in place of ?ggplot2::element_text to handle vectorized colors'
+  
   if (vertical) {
     fig + labs(x = U_lab) + theme(
-      axis.text.y.left = element_text(colour = col),
-      axis.text.y.right = element_text(colour = col)
+      axis.text.y.left = element_markdown(colour = col),
+      axis.text.y.right = element_markdown(colour = col)
     )
   } else {
     fig + labs(y = U_lab) + theme(
-      axis.text.x.top = element_text(angle = 90, vjust = 0.5, color = col),
-      axis.text.x.bottom = element_text(angle = 90, vjust = 0.5, color = col)
+      axis.text.x.top = element_markdown(angle = 90, vjust = 0.5, color = col),
+      axis.text.x.bottom = element_markdown(angle = 90, vjust = 0.5, color = col)
     )
   }
     
 }
 
+
+
+#' @title Subset of Hypothesis in Westfall & Young's \linkS4class{maxT} Algorithm
+#' 
+#' @param x a \linkS4class{maxT} object
+#' 
+#' @param i \link[base]{logical} or \link[base]{integer} \link[base]{vector},
+#' indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}
+#' 
+#' @details
+#' Function [sub-.maxT] performs Westfall & Young's [maxT] algorithm  
+#' on a subset of test statistic \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
+#' and their corresponding test statistics 
+#' \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
+#' in each permuted copy \eqn{b}, \eqn{b=1,\cdots,B}.
+#' 
+#' In other words, we take the subset of hypothesis \eqn{j=1,\cdots,m},
+#' **not** of permutations copies \eqn{b=1,\cdots,B}.
+#' 
+#' @returns 
+#' Function [sub-.maxT] returns a \linkS4class{maxT} object.
+#' 
+#' @export
+'[.maxT' <- function(x, i) {
+  maxT(t. = x@t.[i], T. = x@T.[i, , drop = FALSE], two.sided = x@two.sided)
+}
 

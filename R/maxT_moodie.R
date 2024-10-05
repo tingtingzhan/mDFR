@@ -36,6 +36,8 @@
 #' \url{https://rundfr.fredhutch.org}
 #' 
 #' 
+#' @example inst/moodie/maxT_moodie.R
+#' 
 #' @export
 maxT_moodie <- function(
     data, resample = c('combn', 'boot'),

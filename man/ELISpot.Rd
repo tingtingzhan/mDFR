@@ -32,8 +32,7 @@ Functions \link{moodie2ELISpot} and \link{santos2ELISpot} both return an \code{e
 ..
 }
 \examples{
-# ELISpot_Moodie(moodie, nameCtrl = 'negctl') # deprecated
-moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')
+# see ?maxT_moodie
 # these are `santos1` and `santos2` in this package
 santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos1_raw)
 santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos2_raw)

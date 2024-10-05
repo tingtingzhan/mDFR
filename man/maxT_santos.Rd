@@ -17,8 +17,6 @@ maxT_santos(data, null.value = 1, ...)
 ..
 }
 \examples{
-# see santos_playground.R
-
 # paper page 5, 'The ELISPOT spot results were analyzed for statistical significance at 
 #  .. a given time point by comparing the number of spots for each of the tested peptides 
 #  .. (triplicates) with the background controls (no peptide added, six replicates) 

@@ -4,51 +4,66 @@
 \name{maxT}
 \alias{maxT}
 \alias{maxT-class}
-\title{Westfall & Young's max\eqn{T} Algorithm}
+\title{Westfall & Young's \link{maxT} Algorithm}
 \usage{
 maxT(t., T., two.sided = TRUE)
 }
 \arguments{
-\item{t.}{\link[base]{numeric} \link[base]{vector},
-test statistic \eqn{(t_1,\cdots,t_m)^t}
-for each hypothesis \eqn{H_j, j = 1,\cdots,m},
+\item{t.}{\link[base]{double} \link[base]{vector},
+test statistic \eqn{t_1,\cdots,t_m}
+for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 in the original data}
 
-\item{T.}{\link[base]{numeric} \link[base]{matrix} of dimension \eqn{(m,B)},
-test statistic \eqn{(t_{1,b},\cdots,t_{m,b})^t}
+\item{T.}{\link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
+test statistic \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
 for permutation \eqn{b=1,\cdots,B}}
 
 \item{two.sided}{\link[base]{logical} scalar,
-whether to take \link[base]{abs}olute of \code{t.} and \code{T.}
-before other calculations.
+whether to perform a two sided test.
 Default \code{TRUE} as in \doi{10.1214/ss/1056397487},
-while Moodie's algorithm (\url{https://rundfr.fredhutch.org}) does not have this step.}
+while Moodie's (\url{https://rundfr.fredhutch.org}) use \code{FALSE}}
 }
 \value{
 Function \link{maxT} returns an S4 \linkS4class{maxT} object.  See slots in section \strong{Slots}.
 }
 \description{
-Westfall & Young's max\eqn{T} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}
+Westfall & Young's \link{maxT} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 }
 \details{
 In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m}
 for each hypothesis \eqn{H_j}, \eqn{j=1,\cdots,m},
 as well as the \emph{decreasing order statistic} \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that
-\deqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|}
+\deqn{
+\begin{cases}
+|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\
+t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m} & \text{for one-sided test}
+\end{cases}
+}
 
 In each permuted copy \eqn{b}, \eqn{b=1,\cdots,B},
 obtain the test statistics \eqn{t_{1,b},\cdots,t_{m,b}}
-and their \strong{successive maxima} by the decreasing order statistic \eqn{\mathbf{r}} of the original data
+and their \strong{successive maxima} for two-sided test
 \deqn{
 \begin{cases}
 u_{m,b} & = |t_{r_m,b}|\\
 u_{j,b} & = \text{max}\left\{u_{j+1,b}, |t_{r_j,b}|\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
 \end{cases}
 }
+or for one-sided test
+\deqn{
+\begin{cases}
+u_{m,b} & = t_{r_m,b}\\
+u_{j,b} & = \text{max}\left\{u_{j+1,b}, t_{r_j,b}\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
+\end{cases}
+}
 
 The permutation adjusted \eqn{p}-values are
 \deqn{
-\tilde{p}_{r_j} = B^{-1}\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right)
+\tilde{p}_{r_j} = 
+\begin{cases}
+\dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right) & \text{for two-sided test}\\
+\dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq t_{r_j}\right) & \text{for one-sided test}
+\end{cases}
 }
 
 To enforce the monotonicity constraints,
@@ -62,9 +77,9 @@ To enforce the monotonicity constraints,
 \section{Slots}{
 
 \describe{
-\item{\code{t.}}{\link[base]{double} \link[base]{vector}, original test statistics \eqn{t_1,\cdots,t_m}}
+\item{\code{t.,T.}}{see parameter \code{t.} and \code{T.} in section \strong{Arguments}}
 
-\item{\code{tr}}{\link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} if \code{!two.sided}, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} if \code{two.sided}}
+\item{\code{tr}}{\link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test}
 
 \item{\code{U}}{\link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)}, successive maxima \eqn{u_{j,b}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}}
 
@@ -74,7 +89,7 @@ To enforce the monotonicity constraints,
 
 \item{\code{p.}}{\link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints, restored in the order of original test statistics \eqn{t_1,\cdots,t_m}}
 
-\item{\code{two.sided}}{\link[base]{logical} scalar}
+\item{\code{two.sided}}{see parameter \code{two.sided} in section \strong{Arguments}}
 
 \item{\code{design}}{(optional) \link[base]{data.frame}, study design}
 
