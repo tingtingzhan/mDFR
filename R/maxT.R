@@ -167,15 +167,16 @@ maxT <- function(t., T., two.sided = TRUE, ...) {
   
   # `U` can be huge
   # rendering `gg` can be slow
-  # try to save `gtb` inside \linkS4class{maxT}, to save time in printing
+  # read carefully!!!
+  # https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
+  # save slot `@gtable` inside \linkS4class{maxT}, to save time in printing
   
-  # [autoplot_maxT_] is always fast
-  gg <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided)
+  gg <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) # always fast
   message('running ggplot2::ggplot_build ... ', appendLF = FALSE)
-  blt <- ggplot_build(gg) # can be slow
+  blt <- ggplot_build(gg) # 'ggplot_built'
   message('done!')
   message('running ggplot2::ggplot_gtable ... ', appendLF = FALSE)
-  gtb <- ggplot_gtable(blt) # can be slow
+  gtb <- ggplot_gtable(blt) # c('gtable', 'gTree', 'grob', 'gDesc')
   message('done!')
   
   new(Class = 'maxT',
@@ -189,8 +190,6 @@ maxT <- function(t., T., two.sided = TRUE, ...) {
 }
 
 
-# read carefully!!!
-# https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
 
 
 
