@@ -1,4 +1,6 @@
 
+setOldClass('gtable')
+
 #' @title Westfall & Young's [maxT] Algorithm
 #' 
 #' @description
@@ -78,6 +80,7 @@
 #' @slot two.sided see parameter `two.sided` in section **Arguments**
 #' @slot design (optional) \link[base]{data.frame}, study design
 #' @slot name (optional) \link[base]{character} scalar, study name
+#' @slot gtable returned object of function \link[ggplot2]{ggplot_gtable}
 #' 
 #' @references
 #' Peter H. Westfall, S. Stanley Young (1993). *Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment*. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
@@ -96,11 +99,13 @@ setClass(Class = 'maxT', slots = c(
   p. = 'numeric',
   two.sided = 'logical',
   design = 'data.frame',
-  name = 'character'
+  name = 'character',
+  gtable = 'gtable'
 ))
 
 
 #' @rdname maxT
+#' @importFrom ggplot2 ggplot_build ggplot_gtable
 #' @export
 maxT <- function(t., T., two.sided = TRUE, ...) {
   
@@ -160,14 +165,33 @@ maxT <- function(t., T., two.sided = TRUE, ...) {
     identical(s[order(o)], x) # solution!
   } # R intro 101
   
+  # `U` can be huge
+  # rendering `gg` can be slow
+  # try to save `gtb` inside \linkS4class{maxT}, to save time in printing
+  
+  # [autoplot_maxT_] is always fast
+  gg <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided)
+  message('running ggplot2::ggplot_build ... ', appendLF = FALSE)
+  blt <- ggplot_build(gg) # can be slow
+  message('done!')
+  message('running ggplot2::ggplot_gtable ... ', appendLF = FALSE)
+  gtb <- ggplot_gtable(blt) # can be slow
+  message('done!')
+  
   new(Class = 'maxT',
       t. = t.orig, T. = T.orig, # not `t.` and `T.`, which may be \link[base]{abs}-ed if `two.sided`
       tr = tr, U = U,
       p_perm = p_perm, p_mono = p_mono, 
       p. = p_mono[order(r)],
-      two.sided = two.sided)
+      two.sided = two.sided,
+      gtable = gtb)
 
 }
+
+
+# read carefully!!!
+# https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
+
 
 
 #' @title Convert \linkS4class{maxT} to a \link[base]{data.frame}
@@ -217,6 +241,8 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' 
 #' @param object a \linkS4class{maxT} object
 #' 
+#' @param p_perm,p_mono,tr,U,two.sided description
+#' 
 #' @param conf.level \link[base]{double} scalar, 
 #' confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
 #' 
@@ -250,13 +276,22 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme
 #' @importFrom ggtext element_markdown
 #' @importFrom scales hue_pal
+#' @name autoplot.maxT
 #' @export autoplot.maxT
 #' @export
-autoplot.maxT <- function(object, conf.level = .95, vertical = TRUE, ...) {
-  p_perm <- object@p_perm
-  p_mono <- object@p_mono
-  tr <- object@tr
-  U <- object@U
+autoplot.maxT <- function(object, ...) {
+  autoplot_maxT_(p_perm = object@p_perm, p_mono = object@p_mono, tr = object@tr, U = object@U, two.sided = object@two.sided, ...)
+}
+
+#' @rdname autoplot.maxT
+#' @export
+autoplot_maxT_ <- function(
+    p_perm, p_mono, tr, U, two.sided,
+    conf.level = .95, 
+    vertical = TRUE, 
+    ...
+) {
+  
   dm <- dim(U)
   
   col0 <- hue_pal()(n = 2L)
@@ -285,13 +320,13 @@ autoplot.maxT <- function(object, conf.level = .95, vertical = TRUE, ...) {
       labels = sprintf(fmt = '%.2f%% (%.2f%%)', 1e2*p_perm, 1e2*p_mono), # '\u27a4' is a beautiful arrow
       sec.axis = sec_axis(
         transform = ~.,
-        name = sprintf(fmt = 'Original Test-Statistic, %s Sided', ifelse(object@two.sided, 'Two', 'One')),
+        name = sprintf(fmt = 'Original Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One')),
         breaks = tseq,
         labels = sprintf(fmt = '%.2f', tr)
       )
     )
   
-  U_lab <- sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(object@two.sided, 'Two', 'One'))
+  U_lab <- sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One'))
   
   # https://github.com/kassambara/survminer/pull/503
   # 'the function ?ggtext::element_markdown is now used in place of ?ggplot2::element_text to handle vectorized colors'

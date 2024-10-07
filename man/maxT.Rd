@@ -96,6 +96,8 @@ To enforce the monotonicity constraints,
 \item{\code{design}}{(optional) \link[base]{data.frame}, study design}
 
 \item{\code{name}}{(optional) \link[base]{character} scalar, study name}
+
+\item{\code{gtable}}{returned object of function \link[ggplot2]{ggplot_gtable}}
 }}
 
 \references{

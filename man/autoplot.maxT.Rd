@@ -2,12 +2,28 @@
 % Please edit documentation in R/maxT.R
 \name{autoplot.maxT}
 \alias{autoplot.maxT}
+\alias{autoplot_maxT_}
 \title{Visualize Westfall & Young's \link{maxT} Algorithm}
 \usage{
-\method{autoplot}{maxT}(object, conf.level = 0.95, vertical = TRUE, ...)
+\method{autoplot}{maxT}(object, ...)
+
+autoplot_maxT_(
+  p_perm,
+  p_mono,
+  tr,
+  U,
+  two.sided,
+  conf.level = 0.95,
+  vertical = TRUE,
+  ...
+)
 }
 \arguments{
 \item{object}{a \linkS4class{maxT} object}
+
+\item{...}{additional parameters, currently not in use}
+
+\item{p_perm, p_mono, tr, U, two.sided}{description}
 
 \item{conf.level}{\link[base]{double} scalar,
 confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
@@ -15,8 +31,6 @@ confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
 \item{vertical}{\link[base]{logical} scalar, whether the
 labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
 default \code{TRUE}}
-
-\item{...}{additional parameters, currently not in use}
 }
 \value{
 Function \link{autoplot.maxT} returns a \link[ggplot2]{ggplot} object.

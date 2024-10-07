@@ -2,7 +2,7 @@
 % Please edit documentation in R/maxT_santos_test.R
 \name{santosTm}
 \alias{santosTm}
-\title{Santos' \eqn{T}-statistic, between time point}
+\title{Santos' Test-Statistic, between time point}
 \usage{
 santosTm(tm1, tm0)
 }

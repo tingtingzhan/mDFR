@@ -108,12 +108,14 @@ maxT_santos_test <- function(
 santosTm <- function(
     tm1, tm0
 ) {
+  # [Gosset_Welch] main return is `df`
   v1 <- attr(tm1, which = 'stderr2', exact = TRUE)
   v0 <- attr(tm0, which = 'stderr2', exact = TRUE)
   stat1 <- attr(tm1, which = 'statistic', exact = TRUE)
   stat0 <- attr(tm0, which = 'statistic', exact = TRUE)
-  sd_pooled <- pmax(sqrt(30)/10, # copy what authors did for equation (3)
-                    sqrt( (tm1*v1 + tm0*v0) / (tm1+tm0)))
+  #sd_pooled <- pmax(sqrt(30)/10, # copy what authors did for equation (3)
+  #                  sqrt( (tm1*v1 + tm0*v0) / (tm1+tm0)))
+  sd_pooled <- sqrt( (tm1*v1 + tm0*v0) / (tm1+tm0) )
   (stat1 - stat0) / sd_pooled
 }
 

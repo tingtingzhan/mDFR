@@ -2,7 +2,7 @@
 % Please edit documentation in R/maxT_santos.R
 \name{santosT}
 \alias{santosT}
-\title{Santos' \eqn{T}-statistic, at given time point}
+\title{Santos' Test-Statistic, at given time point}
 \usage{
 santosT(y1, y0, null.value = 1, ...)
 }
