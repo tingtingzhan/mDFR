@@ -44,10 +44,10 @@ moodie2ELISpot <- function(formula, data, control, ...) {
   # only symbol `f_design[[2L]]` supported, for now!!
   data <- sort_by.data.frame(data, y = eval(f_sort))
   
-  yid <- grepl(pattern = deparse1(formula[[2L]]), x = names(data))
-  y <- as.matrix.data.frame(data[yid]) # responses, 'treatment' and 'control'
-  dimnames(y) <- NULL
-  if (any(y < 0, na.rm = TRUE)) stop('negative value in experiment/control?')
+  xid <- grepl(pattern = deparse1(formula[[2L]]), x = names(data))
+  x <- as.matrix.data.frame(data[xid]) # responses, 'treatment' and 'control'
+  dimnames(x) <- NULL
+  if (any(x < 0, na.rm = TRUE)) stop('negative value in experiment/control?')
   
   if (!is.character(control) || length(control) != 1L || is.na(control) || !nzchar(control)) stop('illegal `control`')
   
@@ -58,14 +58,14 @@ moodie2ELISpot <- function(formula, data, control, ...) {
   #X <- data[!cid, id.vars, drop = FALSE] # design matrix *after removing control*
   .rowNamesDF(ret) <- NULL
   
-  y1 <- y[!cid, , drop = FALSE]
-  dy1 <- dim(y1)
-  if (any(id <- (.colSums(is.na(y1), m = dy1[1L], n = dy1[2L]) == dy1[1L]))) {
-    y1 <- y1[, !id, drop = FALSE] # remove all-missing columns in `y`
+  x1 <- x[!cid, , drop = FALSE]
+  dx1 <- dim(x1)
+  if (any(id <- (.colSums(is.na(x1), m = dx1[1L], n = dx1[2L]) == dx1[1L]))) {
+    x1 <- x1[, !id, drop = FALSE] # remove all-missing columns in `x`
   }
-  ret$y1 <- y1
+  ret$x1 <- x1
   
-  ret$y0 <- y[rep(which(cid), times = tabulate(do.call(interaction, ret[all.vars(f_design[[3L]])]))), ]
+  ret$x0 <- x[rep(which(cid), times = tabulate(do.call(interaction, ret[all.vars(f_design[[3L]])]))), ]
   
   attr(ret, which = 'design') <- f_design
   
@@ -115,11 +115,11 @@ santos2ELISpot <- function(
   nm <- names(ret)
   nm0 <- grepl(pattern = ptn0, x = nm)
   nm1 <- grepl(pattern = ptn1, x = nm)
-  y0 <- as.matrix.data.frame(unname(ret[nm0]))
-  y1 <- as.matrix.data.frame(unname(ret[nm1]))
+  x0 <- as.matrix.data.frame(unname(ret[nm0]))
+  x1 <- as.matrix.data.frame(unname(ret[nm1]))
   ret[nm0 | nm1] <- NULL
-  ret$y1 <- y1
-  ret$y0 <- y0
+  ret$x1 <- x1
+  ret$x0 <- x0
   attr(ret, which = 'design') <- f_design
   class(ret) <- c('elispot', class(ret))
   return(ret)
@@ -151,12 +151,12 @@ santos2ELISpot <- function(
 #' @export log.elispot
 #' @export
 log.elispot <- function(x, base = exp(1)) {
-  if (any(x$y1 == 0, x$y0 == 0, na.rm = TRUE)) {
-    x$y1 <- x$y1 + 1
-    x$y0 <- x$y0 + 1
+  if (any(x$x1 == 0, x$x0 == 0, na.rm = TRUE)) {
+    x$x1 <- x$x1 + 1
+    x$x0 <- x$x0 + 1
   }
-  x$y0 <- log(x$y0, base = base)
-  x$y1 <- log(x$y1, base = base)
+  x$x0 <- log(x$x0, base = base)
+  x$x1 <- log(x$x1, base = base)
   return(x)
 }
 

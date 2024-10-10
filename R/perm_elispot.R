@@ -5,7 +5,7 @@
 #' Permuted indices of treatment in a `elispot` object
 #' 
 #' @note
-#' We follow the terminology used in Westfall & Young's [maxT] algorithm
+#' We follow the terminology used in Westfall & Young's \linkS4class{maxT} algorithm
 #' (Box 2, page 82 of \doi{10.1214/ss/1056397487}), which is *permutation*.
 #' 
 #' In **R** convention, this is indeed a *combination* \link[utils]{combn}.
@@ -19,7 +19,7 @@
 #' @keywords internal
 #' @export
 perm_elispot <- function(data) {
-  n1 <- dim(data$y1)[2L]
-  n0 <- dim(data$y0)[2L]
+  n1 <- dim(data$x1)[2L]
+  n0 <- dim(data$x0)[2L]
   combn(n1 + n0, m = n1, simplify = FALSE)
 }

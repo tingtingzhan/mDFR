@@ -3,7 +3,7 @@
 \name{autoplot.maxT}
 \alias{autoplot.maxT}
 \alias{autoplot_maxT_}
-\title{Visualize Westfall & Young's \link{maxT} Algorithm}
+\title{Visualize Westfall & Young's \linkS4class{maxT} Algorithm}
 \usage{
 \method{autoplot}{maxT}(object, ...)
 
@@ -36,7 +36,7 @@ default \code{TRUE}}
 Function \link{autoplot.maxT} returns a \link[ggplot2]{ggplot} object.
 }
 \description{
-To visualize Westfall & Young's \link{maxT} algorithm using package \CRANpkg{ggplot2}.
+To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
 }
 \details{
 Function \link{autoplot.maxT} plots
@@ -54,5 +54,5 @@ Printed on opposing axis are
 Tests with \eqn{\tilde{p}^*_{r_j}\leq\alpha} is considered significant
 and colored pink (hex color \verb{#F8766D}), otherwise non-significant and colored blue (hex color \verb{#00BFC4})
 
-See full details of these notations in documentations of function \link{maxT}.
+See full details of these notations in \linkS4class{maxT}.
 }

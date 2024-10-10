@@ -1,26 +1,14 @@
 
 setOldClass('gtable')
 
-#' @title Westfall & Young's [maxT] Algorithm
+#' @title Westfall & Young's \linkS4class{maxT} Algorithm
 #' 
 #' @description
-#' Westfall & Young's [maxT] algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
+#' Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 #' 
-#' @param t. \link[base]{double} \link[base]{vector},
-#' test statistics \eqn{t_1,\cdots,t_m} 
-#' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
-#' in the original data
+# @param .Object the \linkS4class{maxT} object to be \link[methods]{initialize}d
 #' 
-#' @param T. \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
-#' test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
-#' for permutation \eqn{b=1,\cdots,B}
-#' 
-#' @param two.sided \link[base]{logical} scalar,
-#' whether to perform a two sided test.
-#' Default `TRUE` as in \doi{10.1214/ss/1056397487},
-#' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
-#' 
-#' @param ... additional parameters, currently not in use
+# @param ... additional parameters, currently not in use
 #' 
 #' @details
 #' In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m} 
@@ -67,17 +55,32 @@ setOldClass('gtable')
 #' \end{cases}
 #' }
 #' 
-#' @returns 
-#' Function [maxT] returns an S4 \linkS4class{maxT} object.  See slots in section **Slots**.
+#' @note
+#' The altorithm described in **Details** is implemented in an unexported
+#' \link[methods]{initialize} method, which could be revealed by 
+#' `getMethod(initialize, signature = 'maxT')` to curious eyes.
 #' 
 #' 
-#' @slot t.,T. see parameter `t.` and `T.` in section **Arguments**
+#' @slot t. \link[base]{double} \link[base]{vector},
+#' test statistics \eqn{t_1,\cdots,t_m} 
+#' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
+#' in the original data
+#' 
+#' @slot T. \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
+#' test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
+#' for permutation \eqn{b=1,\cdots,B}
+#' 
 #' @slot tr \link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test
 #' @slot U \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)}, successive maxima \eqn{u_{j,b}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}
 #' @slot p_perm \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}
 #' @slot p_mono \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
-#' @slot p. \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints, restored in the order of original test statistics \eqn{t_1,\cdots,t_m}
-#' @slot two.sided see parameter `two.sided` in section **Arguments**
+#' @slot p. \link[base]{double} \link[base]{vector}, \eqn{\tilde{p}^*_{r_j}} restored in the order of original test statistics \eqn{t_1,\cdots,t_m}
+#' 
+#' @slot two.sided two.sided \link[base]{logical} scalar,
+#' whether to perform a two sided test.
+#' Default `TRUE` as in \doi{10.1214/ss/1056397487},
+#' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
+#' 
 #' @slot design (optional) \link[base]{data.frame}, study design
 #' @slot name (optional) \link[base]{character} scalar, study name
 #' @slot gtable returned object of function \link[ggplot2]{ggplot_gtable}
@@ -88,9 +91,11 @@ setOldClass('gtable')
 #' S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). *Multiple Hypothesis Testing in Microarray Experiments*, 
 #' \doi{10.1214/ss/1056397487}
 #' 
-#' @name maxT
-#' @aliases maxT-class
-#' @importFrom methods setClass setMethod new show 
+# @name maxT
+# @aliases maxT-class
+#' @importFrom ggplot2 ggplot_build ggplot_gtable
+#' @importFrom methods setClass
+#' 
 #' @export
 setClass(Class = 'maxT', slots = c(
   t. = 'numeric', T. = 'matrix',
@@ -101,16 +106,21 @@ setClass(Class = 'maxT', slots = c(
   design = 'data.frame',
   name = 'character',
   gtable = 'gtable'
+), prototype = prototype(
+  two.sided = TRUE,
+  gtable = ggplot_gtable(ggplot_build(ggplot()))
 ))
 
 
-#' @rdname maxT
 #' @importFrom ggplot2 ggplot_build ggplot_gtable
-#' @export
-maxT <- function(t., T., two.sided = TRUE, ...) {
+#' @importFrom methods setMethod callNextMethod initialize
+setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...) {
   
-  t.orig <- t.
-  T.orig <- T.
+  x <- callNextMethod(.Object, ...)
+  
+  t. <- x@t. # t.orig <- 
+  T. <- x@T. # T.orig <- 
+  two.sided <- x@two.sided
   
   m <- length(t.)
   if (!is.matrix(T.)) stop('`T.` must be matrix')
@@ -179,15 +189,16 @@ maxT <- function(t., T., two.sided = TRUE, ...) {
   gtb <- ggplot_gtable(blt) # c('gtable', 'gTree', 'grob', 'gDesc')
   message('done!')
   
-  new(Class = 'maxT',
-      t. = t.orig, T. = T.orig, # not `t.` and `T.`, which may be \link[base]{abs}-ed if `two.sided`
-      tr = tr, U = U,
-      p_perm = p_perm, p_mono = p_mono, 
-      p. = p_mono[order(r)],
-      two.sided = two.sided,
-      gtable = gtb)
+  x@tr <- tr 
+  x@U <- U
+  x@p_perm <- p_perm
+  x@p_mono <- p_mono
+  x@p. <- p_mono[order(r)]
+  x@gtable <- gtb
+  return(x)
+})
 
-}
+
 
 
 
@@ -224,19 +235,20 @@ as.data.frame.maxT <- function(x, ...) {
 #' @returns 
 #' The \link[methods]{show} method of \linkS4class{maxT} object returns a \link[reactable]{reactable} object.
 #' 
+#' @importFrom methods setMethod show 
 #' @importFrom reactable reactable
 #' @export
-setMethod(f = show, signature = signature(object = 'maxT'), definition = function(object) {
+setMethod(f = show, signature = 'maxT', definition = function(object) {
   print(reactable(as.data.frame.maxT(object))) # ?htmlwidgets:::print.htmlwidget
 })
 
 
 
 
-#' @title Visualize Westfall & Young's [maxT] Algorithm
+#' @title Visualize Westfall & Young's \linkS4class{maxT} Algorithm
 #' 
 #' @description
-#' To visualize Westfall & Young's [maxT] algorithm using package \CRANpkg{ggplot2}.
+#' To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
 #' 
 #' @param object a \linkS4class{maxT} object
 #' 
@@ -267,7 +279,7 @@ setMethod(f = show, signature = signature(object = 'maxT'), definition = functio
 #' Tests with \eqn{\tilde{p}^*_{r_j}\leq\alpha} is considered significant
 #' and colored pink (hex color `#F8766D`), otherwise non-significant and colored blue (hex color `#00BFC4`)
 #' 
-#' See full details of these notations in documentations of function [maxT].
+#' See full details of these notations in \linkS4class{maxT}.
 #' 
 #' @returns
 #' Function [autoplot.maxT] returns a \link[ggplot2]{ggplot} object.
@@ -354,7 +366,7 @@ autoplot_maxT_ <- function(
 #' indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}
 #' 
 #' @details
-#' Function `[.maxT` performs Westfall & Young's [maxT] algorithm  
+#' Function `[.maxT` performs Westfall & Young's \linkS4class{maxT} algorithm  
 #' on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
 #' and their corresponding test statistics 
 #' \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
@@ -366,8 +378,9 @@ autoplot_maxT_ <- function(
 #' @returns 
 #' Function `[.maxT` returns a \linkS4class{maxT} object.
 #' 
+#' @importFrom methods new
 #' @export
 '[.maxT' <- function(x, i) {
-  maxT(t. = x@t.[i], T. = x@T.[i, , drop = FALSE], two.sided = x@two.sided)
+  new(Class = 'maxT', t. = x@t.[i], T. = x@T.[i, , drop = FALSE], two.sided = x@two.sided)
 }
 

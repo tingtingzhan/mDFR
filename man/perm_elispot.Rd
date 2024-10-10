@@ -16,7 +16,7 @@ Function \link{perm_elispot} returns a \link[base]{list} of \link[base]{integer}
 Permuted indices of treatment in a \code{elispot} object
 }
 \note{
-We follow the terminology used in Westfall & Young's \link{maxT} algorithm
+We follow the terminology used in Westfall & Young's \linkS4class{maxT} algorithm
 (Box 2, page 82 of \doi{10.1214/ss/1056397487}), which is \emph{permutation}.
 
 In \strong{R} convention, this is indeed a \emph{combination} \link[utils]{combn}.

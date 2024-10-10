@@ -13,7 +13,7 @@ maxT_moodie(data, bootstrap = FALSE, null.value, R = 1000L, seed_, ...)
 whether to use bootstrap samples.
 Default \code{FALSE} indicating the use of permuted samples.}
 
-\item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \bar{x}_0 = \mu_0}}
+\item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{X}_1 - \bar{X}_0 = \mu_0}}
 
 \item{R}{\link[base]{integer} scalar \eqn{R}, number of bootstrap copies if \code{bootstrap = TRUE}}
 

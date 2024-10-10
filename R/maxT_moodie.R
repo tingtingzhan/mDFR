@@ -10,7 +10,7 @@
 #' whether to use bootstrap samples.
 #' Default `FALSE` indicating the use of permuted samples.
 #' 
-#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{x}_1 - \bar{x}_0 = \mu_0}
+#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{X}_1 - \bar{X}_0 = \mu_0}
 #' 
 # @param log_base \link[base]{numeric} scalar, base of log-transformation.
 # Choice of `log_base` does not affect the p-values, only the statistics.
@@ -39,6 +39,7 @@
 #' 
 #' @example inst/moodie/maxT_moodie.R
 #' 
+#' @importFrom methods new
 #' @export
 maxT_moodie <- function(
     data, bootstrap = FALSE,
@@ -47,12 +48,12 @@ maxT_moodie <- function(
     ...
 ) {
   
-  m1 <- rowMeans(data$y1, na.rm = TRUE)
-  m0 <- rowMeans(data$y0, na.rm = TRUE)
+  m1 <- rowMeans(data$x1, na.rm = TRUE)
+  m0 <- rowMeans(data$x0, na.rm = TRUE)
   t_ <- (m1 - m0) - null.value
   
   if (!bootstrap) { # moodie's [elsdfreq]
-    dd <- cbind(data$y1, data$y0)
+    dd <- cbind(data$x1, data$x0)
     ids <- perm_elispot(data)
     prm1 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)))
     prm0 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)))
@@ -65,27 +66,30 @@ maxT_moodie <- function(
     bmeans <- function(x, R) {
       # moodie's functions [bf] and [bcf], re-written
       # `x` is numeric vector
-      x0 <- x[!is.na(x)]
-      if (!(nx <- length(x0))) stop('all-missing not allowed')
-      x1 <- sample(x0, size = nx * R, replace = TRUE)
-      rowMeans(array(x1, dim = c(R, nx)))
+      x_a <- x[!is.na(x)]
+      if (!(nx <- length(x_a))) stop('all-missing not allowed')
+      x_b <- sample(x_a, size = nx * R, replace = TRUE)
+      rowMeans(array(x_b, dim = c(R, nx)))
     }
     if (!missing(seed_)) set.seed(seed = seed_) 
-    bt1 <- t.default(apply(data$y1, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bemeans`
-    bt0 <- t.default(apply(data$y0, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bcmeans`
+    bt1 <- t.default(apply(data$x1, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bemeans`
+    bt0 <- t.default(apply(data$x0, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bcmeans`
     T_ <- (bt1 - m1) - (bt0 - m0) # moodie's
     # Tingting does not understand this `T_`
     
   }
 
-  ret <- maxT(t. = t_, T. = T_, ...)
-  
-  data$y1 <- data$y0 <- NULL
+  data$x1 <- data$x0 <- NULL
   class(data) <- 'data.frame' # 'elispot' is not specified in slot `@design` of \linkS4class{maxT}
-  ret@design <- data
   
-  return(ret)
-
+  ag0 <- list(...)[c('two.sided')]
+  return(do.call(new, args = c(list(
+    Class = 'maxT', 
+    t. = t_, T. = T_,
+    design = data#,
+    #name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
+  ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
+  
 }
 
 

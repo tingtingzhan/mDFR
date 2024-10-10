@@ -19,7 +19,7 @@ Function \verb{[.maxT} returns a \linkS4class{maxT} object.
 Subset of Hypothesis in Westfall & Young's \linkS4class{maxT} Algorithm
 }
 \details{
-Function \verb{[.maxT} performs Westfall & Young's \link{maxT} algorithm
+Function \verb{[.maxT} performs Westfall & Young's \linkS4class{maxT} algorithm
 on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
 and their corresponding test statistics
 \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}

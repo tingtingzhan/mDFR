@@ -10,7 +10,7 @@ maxT_santos(data, ...)
 \item{data}{an \code{elispot}}
 
 \item{...}{additional parameters, such as \code{null.value} in function \link{santosT},
-and \code{two.sided} for function \link{maxT}}
+and \code{two.sided} for \linkS4class{maxT}}
 }
 \description{
 ..

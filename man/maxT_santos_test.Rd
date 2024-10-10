@@ -11,7 +11,7 @@ maxT_santos_test(data1, data0, ...)
 at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 
 \item{...}{additional parameters, such as \code{null.value} in function \link{santosT} and
-\code{two.sided} in function \link{maxT}}
+\code{two.sided} for \linkS4class{maxT}}
 }
 \description{
 ..
