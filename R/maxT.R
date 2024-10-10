@@ -228,16 +228,16 @@ as.data.frame.maxT <- function(x, ...) {
 
 
 
-#' @title \link[methods]{show} \linkS4class{maxT} object
+# @title \link[methods]{show} \linkS4class{maxT} object
 #' 
-#' @param object a \linkS4class{maxT} object
+# @param object a \linkS4class{maxT} object
 #' 
-#' @returns 
-#' The \link[methods]{show} method of \linkS4class{maxT} object returns a \link[reactable]{reactable} object.
+# @returns 
+# The \link[methods]{show} method of \linkS4class{maxT} object returns a \link[reactable]{reactable} object.
 #' 
 #' @importFrom methods setMethod show 
 #' @importFrom reactable reactable
-#' @export
+# @export
 setMethod(f = show, signature = 'maxT', definition = function(object) {
   print(reactable(as.data.frame.maxT(object))) # ?htmlwidgets:::print.htmlwidget
 })
