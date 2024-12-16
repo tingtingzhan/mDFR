@@ -4,14 +4,14 @@
 \alias{rmd_.maxT}
 \title{rmd_.maxT}
 \usage{
-rmd_.maxT(x, xnm, type, ...)
+rmd_.maxT(x, xnm, autofold = TRUE, ...)
 }
 \arguments{
 \item{x}{\linkS4class{maxT}}
 
 \item{xnm}{..}
 
-\item{type}{..}
+\item{autofold}{\link[base]{logical} scalar}
 
 \item{...}{..}
 }

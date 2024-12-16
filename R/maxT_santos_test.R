@@ -19,6 +19,7 @@
 #' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
 #' 
 #' @importFrom methods new
+#' @importFrom matrixStats colAnys
 #' @export
 maxT_santos_test <- function(
     data1, data0, 
@@ -44,8 +45,8 @@ maxT_santos_test <- function(
                  v = santosT(x1 = data0$x1, x0 = data0$x0, ...))
   
   # based on permutation (remove all NA columns)
-  n1 <- length(ids1 <- perm_elispot(data1))
-  n0 <- length(ids0 <- perm_elispot(data0))
+  ids1 <- perm_elispot(data1)
+  ids0 <- perm_elispot(data0)
   
   fn <- function(data, id) {
     santosT(x1 = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], ...)
@@ -53,24 +54,23 @@ maxT_santos_test <- function(
   tm1 <- lapply(ids1, FUN = fn, data = cbind(data1$x1, data1$x0))
   tm0 <- lapply(ids0, FUN = fn, data = cbind(data0$x1, data0$x0))
   
-  T_ <- list()
-  for (i1 in seq_len(n1)) {
-    for (i0 in seq_len(n0)) {
-      T_ <- c(T_, list(santosT2(u = tm1[[i1]], v = tm0[[i0]]))) # ?base::cbind might be slow after `T_` gets big
-      message('\r', i1, '/', n1, ' \u00d7 ', i0, '/', n0, ' permutation done!   ', sep = '', appendLF = FALSE)
-    }
-  }
-  # I don't know how to message if using ?base::mapply
-  # .. and even ?base::.mapply may not be much faster than this for-loop
-  message()
-  # end of permutation
+  ### actually [santosT2]
+  t1. <- do.call(cbind, args = tm1)
+  df1. <- do.call(cbind, args = lapply(tm1, FUN = attr, which = 'df', exact = TRUE))
+  stderr1. <- do.call(cbind, args = lapply(tm1, FUN = attr, which = 'stderr', exact = TRUE))
+  t0. <- do.call(cbind, args = tm0)
+  df0. <- do.call(cbind, args = lapply(tm0, FUN = attr, which = 'df', exact = TRUE))
+  stderr0. <- do.call(cbind, args = lapply(tm0, FUN = attr, which = 'stderr', exact = TRUE))
   
-  id <- vapply(T_, FUN = anyNA, FUN.VALUE = NA)
-  if (any(id)) {
-    # at least one hypothesis has permuted treatment or permuted control being all-equal
+  id_ <- expand.grid(tm0 = seq_along(tm0), tm1 = seq_along(tm1))
+  var_pooled <- ((df1.*stderr1.^2)[,id_$tm1] + (df0.*stderr0.^2)[,id_$tm0]) / (df1.[,id_$tm1] + df0.[,id_$tm0])
+  T. <- (t1.[,id_$tm1] - t0.[,id_$tm0]) / sqrt(var_pooled)
+  if (any(id <- colAnys(is.na(T.)))) {
     message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
-    T_ <- T_[!id]
+    T. <- T.[, !id]
   }
+  ### but using [santosT2] is too slow on \emph{permutation-of-permutation}
+  ### have to manually vectorize [santosT2] !!
 
   # combine `data1` and `data0` for output
   d1 <- data1; d1$x0 <- d1$x1 <- NULL
@@ -86,8 +86,7 @@ maxT_santos_test <- function(
   ag0 <- list(...)[c('two.sided')]
   return(do.call(new, args = c(list(
     Class = 'maxT', 
-    t. = t_, 
-    T. = do.call(cbind, args = T_),
+    t. = t_, T. = T.,
     design = as.data.frame.list(d),
     name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
   ), ag0[lengths(ag0, use.names = FALSE) > 0L])))

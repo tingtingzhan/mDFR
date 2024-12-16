@@ -9,15 +9,15 @@
 #' 
 #' @param xnm ..
 #' 
-#' @param type ..
+#' @param autofold \link[base]{logical} scalar
 #' 
 #' @param ... ..
 #' 
 #' @export rmd_.maxT
 #' @export
-rmd_.maxT <- function(x, xnm, type, ...) {
+rmd_.maxT <- function(x, xnm, autofold = TRUE, ...) {
   return(c(
-    if (type == 'html') sprintf(fmt = '<details><summary>**Expand for `%s`**</summary>', x@name),
+    if (autofold) sprintf(fmt = '<details><summary>**Expand for `%s`**</summary>', x@name),
     '```{r results = \'asis\'}', 
     sprintf(fmt = 'z <- as.data.frame(%s)', xnm), # my ?mDFR::as.data.frame.maxT
     'z$adjp <- format_pval(z$adjp)',
