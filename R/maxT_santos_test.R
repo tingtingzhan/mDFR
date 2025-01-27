@@ -36,6 +36,8 @@ maxT_santos_test <- function(
     data0 <- merge.data.frame(d_share, data0, by = names(d_share), all.x = TRUE)
   }
   
+  nr <- .row_names_info(data1, type = 2L) # now `nrow(data1) == nrow(data0)`
+  
   data1$x1 <- data1$x1[, colSums(!is.na(data1$x1)) > 0L, drop = FALSE]
   data1$x0 <- data1$x0[, colSums(!is.na(data1$x0)) > 0L, drop = FALSE]
   data0$x1 <- data0$x1[, colSums(!is.na(data0$x1)) > 0L, drop = FALSE]
@@ -46,7 +48,9 @@ maxT_santos_test <- function(
   
   # based on permutation (remove all NA columns)
   ids1 <- perm_elispot(data1)
+  n1 <- length(ids1)
   ids0 <- perm_elispot(data0)
+  n0 <- length(ids0)
   
   fn <- function(data, id) {
     santosT(x1 = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], ...)
@@ -55,14 +59,21 @@ maxT_santos_test <- function(
   tm0 <- lapply(ids0, FUN = fn, data = cbind(data0$x1, data0$x0))
   
   ### actually [santosT2]
-  t1. <- do.call(cbind, args = tm1)
-  df1. <- do.call(cbind, args = lapply(tm1, FUN = attr, which = 'df', exact = TRUE))
-  stderr1. <- do.call(cbind, args = lapply(tm1, FUN = attr, which = 'stderr', exact = TRUE))
-  t0. <- do.call(cbind, args = tm0)
-  df0. <- do.call(cbind, args = lapply(tm0, FUN = attr, which = 'df', exact = TRUE))
-  stderr0. <- do.call(cbind, args = lapply(tm0, FUN = attr, which = 'stderr', exact = TRUE))
+  t1. <- unlist(tm1, use.names = FALSE)
+  df1_ <- lapply(tm1, FUN = attr, which = 'df', exact = TRUE)
+  df1. <- unlist(df1_, use.names = FALSE)
+  stderr1_ <- lapply(tm1, FUN = attr, which = 'stderr', exact = TRUE)
+  stderr1. <- unlist(stderr1_, use.names = FALSE)
+  dim(t1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
   
-  id_ <- expand.grid(tm0 = seq_along(tm0), tm1 = seq_along(tm1))
+  t0. <- unlist(tm0, use.names = FALSE)
+  df0_ <- lapply(tm0, FUN = attr, which = 'df', exact = TRUE)
+  df0. <- unlist(df0_, use.names = FALSE)
+  stderr0_ <- lapply(tm0, FUN = attr, which = 'stderr', exact = TRUE)
+  stderr0. <- unlist(stderr0_, use.names = FALSE)
+  dim(t0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
+  
+  id_ <- expand.grid(tm0 = seq_len(n0), tm1 = seq_len(n1))
   var_pooled <- ((df1.*stderr1.^2)[,id_$tm1] + (df0.*stderr0.^2)[,id_$tm0]) / (df1.[,id_$tm1] + df0.[,id_$tm0])
   T. <- (t1.[,id_$tm1] - t0.[,id_$tm0]) / sqrt(var_pooled)
   if (any(id <- colAnys(is.na(T.)))) {

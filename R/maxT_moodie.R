@@ -55,10 +55,12 @@ maxT_moodie <- function(
   if (!bootstrap) { # moodie's [elsdfreq]
     dd <- cbind(data$x1, data$x0)
     ids <- perm_elispot(data)
-    prm1 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)))
-    prm0 <- do.call(cbind, args = lapply(ids, FUN = function(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)))
-    #T_ <- prm1 - prm0 # moodie's
-    T_ <- (prm1 - prm0) - null.value # Tingting's
+    prm1. <- lapply(ids, FUN = function(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) # permutation of treatment
+    prm0. <- lapply(ids, FUN = function(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)) # permutation of control
+    prm. <- unlist(prm1., use.names = FALSE) - unlist(prm0., use.names = FALSE)
+    dim(prm.) <- c(.row_names_info(data, type = 2L), length(ids))
+    #T_ <- prm. # moodie's
+    T_ <- prm. - null.value # Tingting's
     # moodie's [elsdfreq] example has `null.value = 0`
     # Tingting thinks moodie's code is wrong
     

@@ -40,10 +40,12 @@ maxT_santos <- function(data, ...) {
   # based on permutation
   dd <- cbind(data$x1, data$x0)
   ids <- perm_elispot(data)
-  T_ <- do.call(cbind, args = lapply(ids, FUN = function(i) {
+  tmp <- lapply(ids, FUN = function(i) {
     tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
     tmp / attr(tmp, which = 'stderr', exact = TRUE)
-  }))
+  })
+  T_ <- unlist(tmp, use.names = FALSE)
+  dim(T_) <- c(.row_names_info(data, type = 2L), length(ids))
   # end of permutation
   
   data$x1 <- data$x0 <- NULL
