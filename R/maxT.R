@@ -95,7 +95,6 @@ setOldClass('gtable')
 # @aliases maxT-class
 #' @importFrom ggplot2 ggplot_build ggplot_gtable
 #' @importFrom methods setClass
-#' 
 #' @export
 setClass(Class = 'maxT', slots = c(
   t. = 'numeric', T. = 'matrix',
@@ -229,9 +228,10 @@ as.data.frame.maxT <- function(x, ...) {
 
 
 #' @importFrom methods setMethod show 
-#' @importFrom reactable reactable
 setMethod(f = show, signature = 'maxT', definition = function(object) {
-  print(reactable(as.data.frame.maxT(object))) # ?htmlwidgets:::print.htmlwidget
+  object |>
+    reactable_maxT() |>
+    print() # ?htmlwidgets:::print.htmlwidget
 })
 
 
