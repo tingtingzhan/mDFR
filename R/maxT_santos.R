@@ -40,7 +40,7 @@ maxT_santos <- function(data, ...) {
   # based on permutation
   dd <- cbind(data$x1, data$x0)
   ids <- perm_elispot(data)
-  tmp <- lapply(ids, FUN = function(i) {
+  tmp <- lapply(ids, FUN = \(i) {
     tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
     tmp / attr(tmp, which = 'stderr', exact = TRUE)
   })
@@ -51,7 +51,7 @@ maxT_santos <- function(data, ...) {
   data$x1 <- data$x0 <- NULL
   class(data) <- 'data.frame'
   
-  tmp <- lapply(data, FUN = function(i) {
+  tmp <- lapply(data, FUN = \(i) {
     if (is.factor(i)) i <- as.character.factor(i)
     unique(i)
   })

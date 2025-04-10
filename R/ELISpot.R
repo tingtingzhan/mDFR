@@ -104,7 +104,7 @@ santos2ELISpot <- function(
   data <- as.data.frame(data) # use S3, 'tibble'
   
   f_design <- formula[[2L]] # antigen | Hr + Subj
-  data[all.vars(f_design)] <- na.locf(data[all.vars(f_design)]) # ?zoo:::na.locf.data.frame
+  data[all.vars(f_design)] <- data[all.vars(f_design)] |> na.locf() # ?zoo:::na.locf.data.frame
   
   f_sort <- call('~', call('+', f_design[[3L]], f_design[[2L]])) # ~Hr + Subj + antigen
   # only symbol `f_design[[2L]]` supported, for now!!
@@ -115,8 +115,8 @@ santos2ELISpot <- function(
   nm <- names(ret)
   nm0 <- grepl(pattern = ptn0, x = nm)
   nm1 <- grepl(pattern = ptn1, x = nm)
-  x0 <- as.matrix.data.frame(unname(ret[nm0]))
-  x1 <- as.matrix.data.frame(unname(ret[nm1]))
+  x0 <- ret[nm0] |> unname() |> as.matrix.data.frame()
+  x1 <- ret[nm1] |> unname() |> as.matrix.data.frame()
   ret[nm0 | nm1] <- NULL
   ret$x1 <- x1
   ret$x0 <- x0

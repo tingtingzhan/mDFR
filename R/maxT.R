@@ -149,7 +149,7 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   U <- if (m == 1L) T. else {
     # order rows of `T.` by `r`
     Tr <- T.[r, , drop = FALSE] # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
-    apply(Tr, MARGIN = 2L, FUN = function(x) {
+    apply(Tr, MARGIN = 2L, FUN = \(x) {
       # 'successive maxima'
       rev.default(cummax(rev.default(x)))
       # \eqn{u_{m,b}} and recursive \eqn{u_{j,b}}

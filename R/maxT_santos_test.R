@@ -87,7 +87,7 @@ maxT_santos_test <- function(
   d1 <- data1; d1$x0 <- d1$x1 <- NULL
   d0 <- data0; d0$x0 <- d0$x1 <- NULL
   if (!identical(names(d1), names(d0))) stop('`elispot` at two time points must have same design')
-  d <- mapply(FUN = function(c1, c0) {
+  d <- mapply(FUN = \(c1, c0) {
     if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
     if (all(c1 == c0)) return(c1)
     return(paste(c1, c0, sep = ' vs. '))
