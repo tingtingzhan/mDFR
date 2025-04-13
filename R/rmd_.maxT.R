@@ -1,6 +1,6 @@
 
 
-#' @title rmd_.maxT
+#' @title md_.maxT
 #' 
 #' @description
 #' ..
@@ -13,9 +13,9 @@
 #' 
 #' @keywords internal
 #' @export
-rmd_.maxT <- function(x, xnm, ...) c(
+md_.maxT <- function(x, xnm, ...) c(
   
-  # ?rmarkdown.tzh::rmd_.reactable ready
+  # ?rmarkdown.tzh::md_.reactable ready
   '```{r}', 
   sprintf(fmt = 'reactable_maxT(%s)', xnm),
   '```', 
