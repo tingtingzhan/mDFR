@@ -20,7 +20,9 @@ md_.maxT <- function(x, xnm, ...) c(
   sprintf(fmt = 'reactable_maxT(%s)', xnm),
   '```', 
   
-  sprintf(fmt = '```{r fig.height = %.1f, fig.width = %.1f}', 7, 6), 
+  '```{r}',
+  sprintf(fmt = '#| fig-height: %.1f', 7),
+  sprintf(fmt = '#| fig-width: %.1f', 6),
   sprintf(fmt = 'suppressWarnings(grid::grid.draw(%s@gtable))', xnm), 
   # ?grid:::grid.draw.gTree; 
   # workhorse ?grid:::drawGTree
