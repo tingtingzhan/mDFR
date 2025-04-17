@@ -4,7 +4,7 @@
 \alias{md_.maxT}
 \title{md_.maxT}
 \usage{
-md_.maxT(x, xnm, ...)
+\method{md_}{maxT}(x, xnm, ...)
 }
 \arguments{
 \item{x}{\linkS4class{maxT} object}
@@ -15,5 +15,13 @@ md_.maxT(x, xnm, ...)
 }
 \description{
 ..
+}
+\examples{
+library(rmd.tzh)
+ds = split(santos1, f = ~ Hr + antigen)
+list(
+ '`maxT`' = maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
+) |> render_(file = 'maxT')
+
 }
 \keyword{internal}
