@@ -278,7 +278,7 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' 
 #' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme
 #' @importFrom ggtext element_markdown
-#' @importFrom scales hue_pal
+#' @importFrom scales pal_hue
 #' @name autoplot.maxT
 #' @export autoplot.maxT
 #' @export
@@ -297,7 +297,7 @@ autoplot_maxT_ <- function(
   
   dm <- dim(U)
   
-  col0 <- hue_pal()(n = 2L)
+  col0 <- pal_hue()(n = 2L)
   col <- ifelse(p_mono <= (1-conf.level), yes = col0[1L], no = col0[2L])
   
   tseq <- seq_along(tr)
