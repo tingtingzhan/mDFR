@@ -12,7 +12,7 @@ reactable_maxT(x, ...)
 \item{...}{additional parameters of function \link[reactable]{reactable}}
 }
 \value{
-Function \link{reactable_maxT} returns a \link[reactable]{reactable} object.
+Function \code{\link[=reactable_maxT]{reactable_maxT()}} returns a \link[reactable]{reactable} object.
 }
 \description{
 To create a \link[reactable]{reactable} from a \linkS4class{maxT} object.

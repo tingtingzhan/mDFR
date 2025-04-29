@@ -11,7 +11,7 @@
 #' @param ... additional parameters of function \link[reactable]{reactable}
 #' 
 #' @returns
-#' Function [reactable_maxT] returns a \link[reactable]{reactable} object.
+#' Function [reactable_maxT()] returns a \link[reactable]{reactable} object.
 #' 
 #' @importFrom scales.tzh label_pvalue_sym
 #' @importFrom reactable reactable
