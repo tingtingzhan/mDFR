@@ -13,8 +13,9 @@
 #' @returns
 #' Function [reactable_maxT()] returns a \link[reactable]{reactable} object.
 #' 
-#' @importFrom scales.tzh label_pvalue_sym
+#' @keywords internal
 #' @importFrom reactable reactable
+#' @importFrom rmd.tzh label_pvalue_sym
 #' @export
 reactable_maxT <- function(x, ...) {
   

@@ -2,7 +2,6 @@ Package: mDFR
 Type: Package
 Title: mDFR
 Version: 0.1.0
-Date: 2025-04-28
 Description: Need to think more..
 Authors@R: c(person(given = "Tingting", family = "Zhan", role =
         c("aut", "cre"), email = "tingtingzhan@gmail.com", comment = c(ORCID =
@@ -16,4 +15,4 @@ License: GPL-2
 Depends: R (>= 4.5)
 Imports: methods, ggplot2 (== 3.5.2), ggtext (== 0.1.2), matrixStats (== 1.5.0), 
   reactable (== 0.4.4), scales (== 1.4.0), zoo (== 1.8.14), 
-  DanielBiostatistics10th, scales.tzh, rmd.tzh
+  DanielBiostatistics10th, rmd.tzh

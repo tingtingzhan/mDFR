@@ -17,3 +17,4 @@ Function \code{\link[=reactable_maxT]{reactable_maxT()}} returns a \link[reactab
 \description{
 To create a \link[reactable]{reactable} from a \linkS4class{maxT} object.
 }
+\keyword{internal}

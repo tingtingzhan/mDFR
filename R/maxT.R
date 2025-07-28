@@ -107,7 +107,9 @@ setClass(Class = 'maxT', slots = c(
   gtable = 'gtable'
 ), prototype = prototype(
   two.sided = TRUE,
-  gtable = ggplot_gtable(ggplot_build(ggplot()))
+  gtable = ggplot() |>
+    ggplot_build() |>
+    ggplot_gtable()
 ))
 
 
@@ -180,13 +182,11 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   # https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
   # save slot `@gtable` inside \linkS4class{maxT}, to save time in printing
   
-  gg <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) # always fast
-  message('running ggplot2::ggplot_build ... ', appendLF = FALSE)
-  blt <- ggplot_build(gg) # 'ggplot_built'
-  message('done!')
-  message('running ggplot2::ggplot_gtable ... ', appendLF = FALSE)
-  gtb <- ggplot_gtable(blt) # c('gtable', 'gTree', 'grob', 'gDesc')
-  message('done!')
+  gtb <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) |> # always fast
+    ggplot_build() |> # 'ggplot_built'
+    ggplot_gtable() # c('gtable', 'gTree', 'grob', 'gDesc')
+  # ggplot_build() and ggplot_gtable() not too slow
+  # use parallel::mclapply() in production code!
   
   x@tr <- tr 
   x@U <- U

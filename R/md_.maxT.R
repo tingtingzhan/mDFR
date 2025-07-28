@@ -19,25 +19,34 @@
 #' ) |> render_(file = 'maxT')
 #' 
 #' @keywords internal
+#' @importFrom methods new
 #' @importFrom rmd.tzh md_
+#' @importClassesFrom rmd.tzh md_lines
+#' @export md_.maxT
 #' @export
-md_.maxT <- function(x, xnm, ...) c(
+md_.maxT <- function(x, xnm, ...) {
   
-  # ?rmd.tzh::md_.reactable ready
-  '```{r}', 
-  sprintf(fmt = 'reactable_maxT(%s)', xnm),
-  '```', 
+  z1 <- c(
+    # ?rmd.tzh::md_.reactable ready
+    '```{r}', 
+    sprintf(fmt = 'reactable_maxT(%s)', xnm),
+    '```'
+  ) |> new(Class = 'md_lines')
   
-  '```{r}',
-  sprintf(fmt = '#| fig-height: %.1f', 7),
-  sprintf(fmt = '#| fig-width: %.1f', 6),
-  sprintf(fmt = 'suppressWarnings(grid::grid.draw(%s@gtable))', xnm), 
-  # ?grid:::grid.draw.gTree; 
-  # workhorse ?grid:::drawGTree
-  # this step is the slowest for big data
-  '```',
-  '<any-text>'
-)
+  z2 <- c(
+    '```{r}',
+    sprintf(fmt = '#| fig-height: %.1f', 7),
+    sprintf(fmt = '#| fig-width: %.1f', 6),
+    sprintf(fmt = 'suppressWarnings(grid::grid.draw(%s@gtable))', xnm), 
+    # ?grid:::grid.draw.gTree; 
+    # workhorse ?grid:::drawGTree
+    # this step is the slowest for big data
+    '```'
+  ) |> new(Class = 'md_lines')
+  
+  c(z1, z2) # ?rmd.tzh::c.md_lines
+  
+}
 
 
 
