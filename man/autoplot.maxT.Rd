@@ -7,16 +7,7 @@
 \usage{
 \method{autoplot}{maxT}(object, ...)
 
-autoplot_maxT_(
-  p_perm,
-  p_mono,
-  tr,
-  U,
-  two.sided,
-  conf.level = 0.95,
-  vertical = TRUE,
-  ...
-)
+autoplot_maxT_(p_perm, p_mono, tr, U, two.sided, conf.level = 0.95, ...)
 }
 \arguments{
 \item{object}{a \linkS4class{maxT} object}
@@ -27,13 +18,9 @@ autoplot_maxT_(
 
 \item{conf.level}{\link[base]{double} scalar,
 confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
-
-\item{vertical}{\link[base]{logical} scalar, whether the
-labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
-default \code{TRUE}}
 }
 \value{
-Function \link{autoplot.maxT} returns a \link[ggplot2]{ggplot} object.
+Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} returns a \link[ggplot2]{ggplot} object.
 }
 \description{
 To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
@@ -56,3 +43,4 @@ and colored pink (hex color \verb{#F8766D}), otherwise non-significant and color
 
 See full details of these notations in \linkS4class{maxT}.
 }
+\keyword{internal}

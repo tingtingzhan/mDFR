@@ -13,6 +13,6 @@ RoxygenNote: 7.3.2
 Encoding: UTF-8
 License: GPL-2
 Depends: R (>= 4.5)
-Imports: methods, ggplot2 (== 3.5.2), ggtext (== 0.1.2), matrixStats (== 1.5.0), 
-  reactable (== 0.4.4), scales (== 1.4.0), zoo (== 1.8.14), 
-  DanielBiostatistics10th, rmd.tzh
+Imports: methods, ggplot2, matrixStats, 
+    reactable, scales, zoo, 
+    DanielBiostatistics10th, rmd.tzh

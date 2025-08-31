@@ -1,5 +1,5 @@
 
-setOldClass('gtable')
+#setOldClass('gtable')
 
 #' @title Westfall & Young's \linkS4class{maxT} Algorithm
 #' 
@@ -83,7 +83,7 @@ setOldClass('gtable')
 #' 
 #' @slot design (optional) \link[base]{data.frame}, study design
 #' @slot name (optional) \link[base]{character} scalar, study name
-#' @slot gtable returned object of function \link[ggplot2]{ggplot_gtable}
+# @slot gtable returned object of function \link[ggplot2]{ggplot_gtable}
 #' 
 #' @references
 #' Peter H. Westfall, S. Stanley Young (1993). *Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment*. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
@@ -103,13 +103,13 @@ setClass(Class = 'maxT', slots = c(
   p. = 'numeric',
   two.sided = 'logical',
   design = 'data.frame',
-  name = 'character',
-  gtable = 'gtable'
+  name = 'character'#,
+  # gtable = 'gtable'
 ), prototype = prototype(
-  two.sided = TRUE,
-  gtable = ggplot() |>
-    ggplot_build() |>
-    ggplot_gtable()
+  two.sided = TRUE#,
+  #gtable = ggplot() |>
+  #  ggplot_build() |>
+  #  ggplot_gtable()
 ))
 
 
@@ -180,11 +180,10 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   # rendering `gg` can be slow
   # read carefully!!!
   # https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
-  # save slot `@gtable` inside \linkS4class{maxT}, to save time in printing
-  
-  gtb <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) |> # always fast
-    ggplot_build() |> # 'ggplot_built'
-    ggplot_gtable() # c('gtable', 'gTree', 'grob', 'gDesc')
+  # NO LONGER!!!!  save slot `@gtable` inside \linkS4class{maxT}, to save time in printing
+  #gtb <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) |> # always fast
+  #  ggplot_build() |> # 'ggplot_built'
+  #  ggplot_gtable() # c('gtable', 'gTree', 'grob', 'gDesc')
   # ggplot_build() and ggplot_gtable() not too slow
   # use parallel::mclapply() in production code!
   
@@ -193,7 +192,7 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   x@p_perm <- p_perm
   x@p_mono <- p_mono
   x@p. <- p_mono[order(r)]
-  x@gtable <- gtb
+  #x@gtable <- gtb
   return(x)
 })
 
@@ -249,10 +248,6 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' @param conf.level \link[base]{double} scalar, 
 #' confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
 #' 
-#' @param vertical \link[base]{logical} scalar, whether the
-#' labels of ordered test statistics and permutation adjusted \eqn{p}-values should be on vertical axes,
-#' default `TRUE`
-#' 
 #' @param ... additional parameters, currently not in use
 #' 
 #' @details
@@ -274,10 +269,11 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' See full details of these notations in \linkS4class{maxT}.
 #' 
 #' @returns
-#' Function [autoplot.maxT] returns a \link[ggplot2]{ggplot} object.
+#' Function [autoplot.maxT()] returns a \link[ggplot2]{ggplot} object.
 #' 
+#' @keywords internal
 #' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme
-#' @importFrom ggtext element_markdown
+# @importFrom ggtext element_markdown
 #' @importFrom scales pal_hue
 #' @name autoplot.maxT
 #' @export autoplot.maxT
@@ -291,7 +287,6 @@ autoplot.maxT <- function(object, ...) {
 autoplot_maxT_ <- function(
     p_perm, p_mono, tr, U, two.sided,
     conf.level = .95, 
-    vertical = TRUE, 
     ...
 ) {
   
@@ -302,50 +297,49 @@ autoplot_maxT_ <- function(
   
   tseq <- seq_along(tr)
   
-  if (vertical) {
-    mp_jitter <- aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U)))
-    mp_point <- aes(y = tseq, x = tr)
-    scale_t_p <- scale_y_continuous 
-  } else {
-    mp_jitter <- aes(x = rep(tseq, each = dm[2L]), y = c(t.default(U)))
-    mp_point <- aes(x = tseq, y = tr)
-    scale_t_p <- scale_x_continuous
-  }
+  mp_jitter <- aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U)))
+  mp_point <- aes(y = tseq, x = tr)
+  
+  #p_mono_str <- p_mono |> 
+  #  sprintf(fmt = '%.3f')
+  #p_mono_str[duplicated(p_mono)] <- '.'
+  #p_mono_str <- p_mono_str |>
+  #  format(justify = 'centre')
+  #print(p_mono_str)
+  # text are not equi-width. not pretty
   
   fig <- ggplot() + 
     geom_jitter(mapping = mp_jitter, color = rep(col, each = dm[2L]), width = .25, height = .25, size = 1e-5, alpha = .1, show.legend = FALSE) + 
     geom_point(mapping = mp_point, color = col, size = 1.5, show.legend = FALSE) + 
-    geom_line(mapping = mp_point, color = if (vertical) rev.default(col) else col, linewidth = .5, show.legend = FALSE) +
-    scale_t_p(
-      name = 'Permutation Adjusted p-values (w. Monotonicity Constraints)',
+    geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE) +
+    scale_y_continuous(
+      name = 'Permutation Adjusted p-values \u27a4 Monotonicity Constraints',
       breaks = tseq, 
       minor_breaks = NULL, 
-      labels = sprintf(fmt = '%.2f%% (%.2f%%)', 1e2*p_perm, 1e2*p_mono), # '\u27a4' is a beautiful arrow
+      labels = sprintf(fmt = '%.3f \u27a4 %.3f', p_perm, p_mono),
+      #labels = sprintf(fmt = '%.3f \u27a4 %s', p_perm, p_mono_str),
       sec.axis = sec_axis(
         transform = ~.,
         name = sprintf(fmt = 'Original Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One')),
         breaks = tseq,
-        labels = sprintf(fmt = '%.2f', tr)
+        labels = tr |> sprintf(fmt = '%.2f') |> format(justify = 'right')
       )
     )
   
-  U_lab <- sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One'))
-  
   # https://github.com/kassambara/survminer/pull/503
   # 'the function ?ggtext::element_markdown is now used in place of ?ggplot2::element_text to handle vectorized colors'
+  # tzh remembers \CRANpkg{ggtext} works great on Fall 2024
+  # but Aug 2025 it seems no longer works ..
   
-  if (vertical) {
-    fig + labs(x = U_lab) + theme(
-      axis.text.y.left = element_markdown(colour = col),
-      axis.text.y.right = element_markdown(colour = col)
-    )
-  } else {
-    fig + labs(y = U_lab) + theme(
-      axis.text.x.top = element_markdown(angle = 90, vjust = 0.5, color = col),
-      axis.text.x.bottom = element_markdown(angle = 90, vjust = 0.5, color = col)
-    )
-  }
-    
+  fig + 
+    labs(
+      x = sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One'))
+    ) # + 
+    # theme(
+    #  axis.text.y.left = element_markdown(colour = col),
+    #  axis.text.y.right = element_markdown(colour = col)
+    #)
+  
 }
 
 

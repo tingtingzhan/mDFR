@@ -20,7 +20,8 @@
 reactable_maxT <- function(x, ...) {
   
   z <- as.data.frame.maxT(x)
-  z$adjp <- z$adjp |> label_pvalue_sym()()
+  z$adjp <- z$adjp |> 
+    label_pvalue_sym()()
   z$tstat <- round(z$tstat, digits = 3L)
   if (length(z[['abs(tstat)']])) z[['abs(tstat)']] <- round(z[['abs(tstat)']], digits = 3L)
   reactable(z, ...)
