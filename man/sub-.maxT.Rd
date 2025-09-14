@@ -28,3 +28,4 @@ in each permuted copy \eqn{b}, \eqn{b=1,\cdots,B}.
 In other words, we take the subset of hypothesis \eqn{j=1,\cdots,m},
 \strong{not} of permutations copies \eqn{b=1,\cdots,B}.
 }
+\keyword{internal}

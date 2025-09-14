@@ -42,3 +42,4 @@ has degree of freedom based on Welch–Satterthwaite equation (see more from hel
 \references{
 The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 }
+\keyword{internal}

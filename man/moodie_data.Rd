@@ -14,4 +14,4 @@ moodie
 \description{
 Moodie's data
 }
-\keyword{datasets}
+\keyword{internal}

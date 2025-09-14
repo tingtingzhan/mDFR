@@ -10,11 +10,12 @@ trim_elispot(x)
 \item{x}{an \code{elispot} object}
 }
 \value{
-Function \link{trim_elispot} returns an \code{elispot} object.
+Function \code{\link[=trim_elispot]{trim_elispot()}} returns an \code{elispot} object.
 }
 \description{
 Trim \code{'elispot'} Object
 }
 \details{
-Both treatment \verb{$x1} and control \verb{$x0} must contain more than 1 measurement
+Both treatment \verb{@x1} and control \verb{@x0} must contain more than 1 measurement
 }
+\keyword{internal}

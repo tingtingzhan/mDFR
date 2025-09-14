@@ -35,3 +35,4 @@ lapply(st2, FUN = maxT_santos, null.value = 2)
 \references{
 Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
 }
+\keyword{internal}

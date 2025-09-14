@@ -39,7 +39,7 @@
 #' has degree of freedom based on Welch–Satterthwaite equation (see more from help files of function \link[DanielBiostatistics10th]{Gosset_Welch}),
 #' \deqn{\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{(s^2_1/n_1)^2}{n_1-1}+\dfrac{(c^2s^2_0/n_0)^2}{n_0-1}}}
 #' 
-#' @importFrom DanielBiostatistics10th Gosset_Welch
+#' @keywords internal
 #' @importFrom matrixStats rowVars
 #' @importFrom stats var
 #' @export
@@ -50,15 +50,21 @@ santosT <- function(
 ) {
   
   d1 <- dim(x1)
-  m1 <- .rowMeans(x1, m = d1[1L], n = d1[2L], na.rm = TRUE)
-  n1 <- .rowSums(!is.na(x1), m = d1[1L], n = d1[2L], na.rm = TRUE)
-  vr1 <- rowVars(x1, na.rm = TRUE)
+  m1 <- x1 |>
+    .rowMeans(m = d1[1L], n = d1[2L], na.rm = TRUE)
+  n1 <- (!is.na(x1)) |>
+    .rowSums(m = d1[1L], n = d1[2L], na.rm = TRUE)
+  vr1 <- x1 |>
+    rowVars(na.rm = TRUE)
   # ?matrixStats::rowVars is the fastest solution I know of!!!
   
   d0 <- dim(x0)
-  m0 <- .rowMeans(x0, m = d0[1L], n = d0[2L], na.rm = TRUE)
-  n0 <- .rowSums(!is.na(x0), m = d0[1L], n = d0[2L], na.rm = TRUE)
-  vr0 <- rowVars(x0, na.rm = TRUE)
+  m0 <- x0 |>
+    .rowMeans(m = d0[1L], n = d0[2L], na.rm = TRUE)
+  n0 <- (!is.na(x0)) |>
+    .rowSums(m = d0[1L], n = d0[2L], na.rm = TRUE)
+  vr0 <- x0 |>
+    rowVars(na.rm = TRUE)
   
   ### Equation (3) of \doi{10.3390/cells4010001} is wrong!!!! 
   ### 'the maximum standard deviation of an n = 6 binary set' # ???

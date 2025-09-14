@@ -1,0 +1,291 @@
+---
+title: "mDFR"
+author: Tingting Zhan
+date: today
+format: 
+  html:
+    page-layout: full
+    html-math-method: katex
+number-sections: true
+toc: true
+toc-location: left
+toc-depth: 4
+toc-title: 'Table of Contents'
+editor: source
+bibliography: mDFR.bib
+knitr:
+  opts_chunk: 
+    collapse: true
+    comment: "#" 
+vignette: >
+  %\VignetteIndexEntry{intro}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{=html}
+<!--
+`r knitr::asis_output('\U1f5dd')`
+seems not needed
+-->
+```
+
+This vignette of R package **`mDFR`** ([CRAN](https://cran.r-project.org/package=mDFR), [Github](https://github.com/tingtingzhan/mDFR), [RPubs](https://rpubs.com/tingtingzhan/mDFR)) does
+
+-   this
+-   that
+-   and that
+
+# Prerequisite
+
+Experimental (and maybe unstable) features of package **`mDFR`** are released *extremely frequently* to [Github](https://github.com/tingtingzhan/mDFR). [Active developers should use the Github version; suggestions and bug reports are welcome!]{style="background-color: #FFFF00"} Stable releases to [CRAN](https://CRAN.R-project.org/package=mDFR) are typically updated every 2 to 3 months, or when the authors have an upcoming manuscript in the peer-reviewing process.
+
+```{r}
+#| eval: false
+remotes::install_github('tingtingzhan/mDFR')
+```
+
+```{r}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Developers, do NOT use the CRAN version!"
+utils::install.packages('mDFR') # Developers, do NOT use!!
+```
+
+# Getting Started {#sec-start}
+
+Examples in the full vignette require that the `search` path has
+
+```{r}
+#| message: false
+#| label: search
+library(mDFR)
+library(ggplot2)
+```
+
+# Peer-Reviewed Publications
+
+Package **`mDFR`** plays a pivotal role in these peer reviewed publications from the authors.
+
+## A citation
+
+> `r citation(package = 'hyper.gam')[[1L]] |> format(style = 'text') |> gsub(pattern = '\n', replacement = ' ', x = _)`
+
+<details>
+
+<summary>[BibTeX](https://ctan.org/pkg/bibtex) and/or [BibLaTeX](https://ctan.org/pkg/biblatex) entries for [LaTeX](https://www.latex-project.org) users</summary>
+
+```{r}
+#| echo: false
+#| eval: false
+#| comment: ''
+c(
+  citation(package = 'mDFR')
+) |> toBibtex()
+```
+
+</details>
+
+some sample code for Adam's published paper.
+
+```{r}
+## sample code
+```
+
+```{r}
+#| message: false
+#| code-fold: true
+#| code-summary: 'Sample code return'
+```
+
+
+
+# Acknowledgement
+
+This work is supported by Department of Defense grants
+
+-   R01CA222847 ([A. Snook](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844))
+
+
+
+
+
+
+# Example
+
+```{r}
+d0 = moodie2ELISpot(`^rep[1-5]$` ~ Antigen | Week + Subject, data = snook, control = 'DMSO')
+```
+
+
+```{r}
+d1 = trim_elispot(d0)
+```
+
+
+```{r}
+ds = d1 |>
+  split(f = ~ Week + Antigen)
+```
+
+
+```{r}
+#m1 = mclapply(ds, FUN = maxT_santos, null.value = 1)
+#m2 = mclapply(ds, FUN = maxT_santos, null.value = 2)
+#m = mapply(FUN = c, 'null1' = m1, 'null2' = m2, SIMPLIFY = FALSE)
+```
+
+
+```{r}
+Wk5.Ad5 = maxT_santos_test(data1 = ds$Wk5.Ad5, data0 = ds$Wk1.Ad5)
+```
+
+
+@fig-XX presents an example visualization of Westfall-Yang max-$T$ correction
+for a total of 46 two-sided difference-of-difference hypotheses. 
+The nebula of points represents the successive maxima (\ref{successM2}).
+The bigger point per hypothesis is the test statistic (\ref{santosT2}).
+The labels on the left vertical axis are permutation adjusted $p$-values (\ref{perm_p}) and monotonicity constraints enforced (\ref{perm_p_mono}).
+The labels on the right vertical axis are the values of the test statistic (\ref{santosT2}).
+Hypothesis with monotonicity constraints enforced $\tilde{p}>.05$ are colored red.
+The line connecting all hypotheses does not have a statistical meaning, 
+but only to let all test statistics (\ref{santosT2}) stand out to the naked eye.
+
+
+```{r}
+#| fig-height: 7
+#| fig-width: 5
+#| fig-align: left
+#| fig-cap-location: top
+#| fig-cap: 'Say some thing'
+#| label: fig-XX
+autoplot(Wk5.Ad5) + theme_minimal()
+```
+
+
+
+# Appendix
+
+## Distribution Free Test Statistic
+
+Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively.
+To test the hypothesis $H_0: \mu_1 - c\cdot\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic
+
+$$
+t = \dfrac{\bar{x}_1 - c\cdot\bar{x}_0}{s_{\bar\Delta}}
+$$ {#eq-santosT}
+
+The standard deviation 
+$s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$
+has degree of freedom [@Welch47; @Satterthwaite46]
+$$
+\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
+$$
+
+
+We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that 
+
+$$
+\begin{cases}
+|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\
+t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m} & \text{for one-sided test}
+\end{cases}
+$$
+
+Let $t_{j,b}$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the $b$-th permutation of the treatment and control subjects, $j=1,\cdots,m$, $b=1,\cdots,B$.
+
+The successive maxima (@eq-successM2) for two-sided test, or (@eq-successM1) for one-sided test
+
+$$
+\begin{cases}
+u_{m,b} & = |t_{r_m,b}|\\
+u_{j,b} & = \max\left\{u_{j+1,b}, |t_{r_j,b}|\right\}, \quad \text{for}\ j = m-1,\cdots,1\\
+\end{cases}
+$$ {#eq-successM2}
+
+$$
+\begin{cases}
+u_{m,b} & = t_{r_m,b}\\
+u_{j,b} & = \max\left\{u_{j+1,b}, t_{r_j,b}\right\}, \quad \text{for}\ j = m-1,\cdots,1\\
+\end{cases}
+$$ {#eq-successM1}
+
+determines the permutation adjusted $p$-values,
+
+$$
+p_{r_j} = 
+\begin{cases}
+\dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right) & \text{for two-sided test}\\
+\dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq t_{r_j}\right) & \text{for one-sided test}
+\end{cases}
+$$ {#eq-perm_p}
+
+with the monotonicity constraints enforced by
+$$
+\begin{cases}
+\tilde{p}_{r_1} & = p_{r_1}\\
+\tilde{p}_{r_j} & = \max\left\{p_{r_j}, \tilde{p}_{r_j-1}\right\}, \quad \text{for}\ j = 2,\cdots,m\\
+\end{cases}
+$$ {#eq-perm_p_mono}
+
+
+
+
+
+### Difference of Difference
+
+Suppose we are interested in comparing the treatment effect at two time points $\phi$ versus $\psi$,
+i.e., the *time* difference of *treatment* difference.
+
+Let $\mu_{1,\phi}$, $\mu_{0,\phi}$, $\mu_{1,\psi}$ and $\mu_{0,\psi}$ be the population means of treatment and control at time points $\phi$ and $\psi$, respectively. To test the hypothesis 
+
+$$
+H_0: (\mu_{1,\phi} - c_\phi\cdot\mu_{0,\phi}) - (\mu_{1,\psi} - c_\psi\cdot\mu_{0,\psi}) = 0
+$$ {#eq-hypothesis2}
+
+In clinical practice, we should let $c=c_\phi=c_\psi$ for more intuitive interpretation.
+
+Let $(\bar{x}_{1,\phi}, s^2_{1,\phi}, n_{1,\phi})$ and $(\bar{x}_{0,\phi}, s^2_{0,\phi}, n_{0,\phi})$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, at time point $\phi$. We have distribution free test statistic
+
+$$
+t_\phi = \dfrac{\bar{x}_{1,\phi} - c_\phi\bar{x}_{0,\phi}}{s_{\bar\Delta,\phi}}
+$$
+
+The standard deviation 
+$s^2_{\bar\Delta,\phi}=s^2_{1,\phi}/n_{1,\phi} + c_\phi^2s^2_{0,\phi}/n_{0,\phi}$
+has degree of freedom
+
+$$
+\text{df}_\phi = \dfrac{\left(\dfrac{s^2_{1,\phi}}{n_{1,\phi}}+\dfrac{c_\phi^2s^2_{0,\phi}}{n_{0,\phi}}\right)^2}{\dfrac{\left(s^2_{1,\phi}/n_{1,\phi}\right)^2}{n_{1,\phi}-1}+\dfrac{\left(c_\phi^2s^2_{0,\phi}/n_{0,\phi}\right)^2}{n_{0,\phi}-1}}
+$$
+
+Similarly, at time point $\psi$, we have distribution free test statistic $t_\psi$,
+standard deviation $s^2_{\bar\Delta,\psi}$ and degree of freedom $\text{df}_\psi$.
+To test the difference-of-difference hypothesis (@eq-hypothesis2), we have a distribution free difference-of-difference test statistic
+
+$$
+t = \dfrac{\left(\bar{x}_{1,\phi} - c_\phi\bar{x}_{0,\phi}\right) - \left(\bar{x}_{1,\psi} - c_\psi\bar{x}_{0,\psi}\right)}{s_{\bar\Delta}}
+$$ {#eq-santosT2}
+
+with standard deviation
+
+$$
+s^2_{\bar\Delta} = \dfrac{\text{df}_\phi\cdot s^2_{\bar\Delta,\phi} + \text{df}_\psi\cdot s^2_{\bar\Delta,\psi}}{\text{df}_\phi + \text{df}_\psi}
+$$
+
+
+We apply Westfall-Young max-$T$ correction on test statistic (@eq-santosT2) in the following steps,
+
+1.  Generate $B_\phi$ permutations of the treatment and control subjects at time point $\phi$;
+2.  Generate $B_\psi$ permutations of the treatment and control subjects at time point $\psi$;
+3.  Calculate test statistic (@eq-santosT2) in $B_\phi\times B_\psi$ permutations;
+4.  Calculate successive maxima, permutation adjust $p$-values with monotonicity constraints according to equation (@eq-successM2), (@eq-successM1), (@eq-perm_p) and (@eq-perm_p_mono).
+
+
+
+
+
+# References {.appendix}
+
+::: {#refs}
+:::

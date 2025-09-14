@@ -1,8 +1,54 @@
 
+#' @title S4 class \linkS4class{elispot}
+#' 
+#' @slot design \link[base]{data.frame}, experimental design
+#' 
+#' @slot x1 \link[base]{matrix}
+#' 
+#' @slot x0 \link[base]{matrix}
+#' 
+#' @keywords internal
+#' @name elispot
+#' @aliases elispot-class
+#' @export
+setClass(Class = 'elispot', slots = c(
+  design = 'data.frame',
+  x1 = 'matrix',
+  x0 = 'matrix'
+))
 
 
 
-#' @title Create `elispot` Object
+setMethod(f = initialize, signature = 'elispot', definition = function(.Object, ...) {
+  
+  x <- callNextMethod(.Object, ...)
+  
+  # remove all-NA columns from `@x0` and `@x1`
+  id1 <- (colSums(!is.na(x@x1)) > 0L)
+  if (!all(id1)) {
+    'all-NA columns in @x1 removed' |>
+      message()
+    x@x1 <- x@x1[, id1, drop = FALSE]
+  }
+  
+  id0 <- (colSums(!is.na(x@x0)) > 0L)
+  if (!all(id0)) {
+    'all-NA columns in @x0 removed' |>
+      message()
+    x@x0 <- x@x0[, , drop = FALSE]
+  }
+
+  return(x)
+  
+})
+
+
+
+
+
+
+
+#' @title Create `elispot` Object, Moodie's fashion
 #' 
 #' @description ..
 #' 
@@ -18,16 +64,17 @@
 #' 
 #' @returns 
 #' 
-#' Functions [moodie2ELISpot] and [santos2ELISpot] both return an `elispot`.
+#' Functions [moodie2ELISpot()] and [santos2ELISpot()] both return an `elispot`.
 #' 
 #' @examples 
 #' # see ?maxT_moodie
 #' @references 
 #' \url{https://rundfr.fredhutch.org}
 #' 
-#' @name ELISpot
+#' @keywords internal
 #' @export
 moodie2ELISpot <- function(formula, data, control, ...) {
+  
   if (!is.data.frame(data)) stop('`data` must be data.frame')
   data <- as.data.frame(data) # use S3, 'tibble'
   
@@ -40,8 +87,8 @@ moodie2ELISpot <- function(formula, data, control, ...) {
   xvar <- all.vars(f_design)
   if (anyNA(data[xvar], recursive = TRUE)) stop('Do not allow missingness in ', sQuote(deparse1(f_design)))
   
-  f_sort <- call('~', call('+', f_design[[3L]], f_design[[2L]])) # ~Hr + Subj + antigen
-  # only symbol `f_design[[2L]]` supported, for now!!
+  f_sort <- call(name = '~', call(name = '+', f_design[[3L]], f_design[[2L]])) # ~Hr + Subj + antigen
+  # only symbol-`f_design[[2L]]` supported, for now!!
   data <- sort_by.data.frame(data, y = eval(f_sort))
   
   xid <- grepl(pattern = deparse1(formula[[2L]]), x = names(data))
@@ -63,24 +110,20 @@ moodie2ELISpot <- function(formula, data, control, ...) {
   if (any(id <- (.colSums(is.na(x1), m = dx1[1L], n = dx1[2L]) == dx1[1L]))) {
     x1 <- x1[, !id, drop = FALSE] # remove all-missing columns in `x`
   }
-  ret$x1 <- x1
   
-  ret$x0 <- x[rep(which(cid), times = tabulate(do.call(interaction, ret[all.vars(f_design[[3L]])]))), ]
+  x0 <- x[rep(which(cid), times = tabulate(do.call(interaction, ret[all.vars(f_design[[3L]])]))), ]
   
-  attr(ret, which = 'design') <- f_design
-  
-  class(ret) <- c('elispot', class(ret))
-  return(ret)
+  new(Class = 'elispot', design = ret, x1 = x1, x0 = x0)
+
 }
 
 
 
 
 
-
-# @param col_trt 'character' scalar (names(data)[3L]), the column name of treatment.  Currently use scalar 'Treatment'
-# 
-#' @rdname ELISpot
+#' @title Create `elispot` Object, Santos' fashion
+#' 
+#' @description ..
 #' 
 #' @param ptn0 \link[base]{regex}, pattern of control
 #' 
@@ -91,6 +134,7 @@ moodie2ELISpot <- function(formula, data, control, ...) {
 #' santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos1_raw)
 #' santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos2_raw)
 #' 
+#' @keywords internal
 #' @importFrom zoo na.locf
 #' @export
 santos2ELISpot <- function(
@@ -118,47 +162,11 @@ santos2ELISpot <- function(
   x0 <- ret[nm0] |> unname() |> as.matrix.data.frame()
   x1 <- ret[nm1] |> unname() |> as.matrix.data.frame()
   ret[nm0 | nm1] <- NULL
-  ret$x1 <- x1
-  ret$x0 <- x0
-  attr(ret, which = 'design') <- f_design
-  class(ret) <- c('elispot', class(ret))
-  return(ret)
+  
+  new(Class = 'elispot', design = ret, x1 = x1, x0 = x0)
+  
 }
 
-
-
-
-
-#' @title Several S3 method dispatches for `elispot`
-#' 
-#' @description
-#' `elispot` dispatches for S3 generics \link[base]{log}, \link[base]{split}.
-#' 
-#' @param x an `elispot` object
-#' 
-#' @param base \link[base]{numeric} scalar, see \link[base]{log}
-#' 
-#' @note
-#' Unfortunately \link[base]{log10} and \link[base]{log1p} are not an S3 generics.
-#' 
-#' \link[base]{log1p} does not have `base` parameter.
-#' 
-#' @returns
-#' 
-#' Function [log.elispot] returns an `elispot`.
-#' 
-#' @name elispot_S3
-#' @export log.elispot
-#' @export
-log.elispot <- function(x, base = exp(1)) {
-  if (any(x$x1 == 0, x$x0 == 0, na.rm = TRUE)) {
-    x$x1 <- x$x1 + 1
-    x$x0 <- x$x0 + 1
-  }
-  x$x0 <- log(x$x0, base = base)
-  x$x1 <- log(x$x1, base = base)
-  return(x)
-}
 
 
 

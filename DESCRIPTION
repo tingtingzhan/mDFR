@@ -9,10 +9,11 @@ Authors@R: c(person(given = "Tingting", family = "Zhan", role =
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 License: GPL-2
 Depends: R (>= 4.5)
-Imports: methods, ggplot2, matrixStats, 
-    reactable, scales, zoo, 
-    DanielBiostatistics10th, rmd.tzh
+Imports: methods, cli, ggplot2, matrixStats, 
+    reactable, scales, zoo
+Suggests: knitr, quarto, rmarkdown
+VignetteBuilder: quarto

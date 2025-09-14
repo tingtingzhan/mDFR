@@ -18,7 +18,7 @@
 #' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, null.value = 10)
 #' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
 #' 
-#' @importFrom methods new
+#' @keywords internal
 #' @importFrom matrixStats colAnys
 #' @export
 maxT_santos_test <- function(
@@ -26,51 +26,71 @@ maxT_santos_test <- function(
     ...
 ) {
   
-  if (nrow(data1) != nrow(data0)) {
+  if (nrow(data1@design) != nrow(data0@design)) {
     # timepoint1 and timepoint2 may not have same subjects!!
-    d_1 <- data1; d_1$x1 <- d_1$x0 <- NULL
-    d_0 <- data0; d_0$x1 <- d_0$x0 <- NULL
+    
+    # before 2025-09
+    #d_1 <- data1; d_1$x1 <- d_1$x0 <- NULL
+    #d_0 <- data0; d_0$x1 <- d_0$x0 <- NULL
+    #tmp <- mapply(FUN = intersect, d_1, d_0)
+    #d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
+    #data1 <- merge.data.frame(d_share, data1, by = names(d_share), all.x = TRUE)
+    #data0 <- merge.data.frame(d_share, data0, by = names(d_share), all.x = TRUE)
+    # end of before 2025-09
+    
+    d_1 <- data1@design
+    d_0 <- data0@design
     tmp <- mapply(FUN = intersect, d_1, d_0)
     d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
+    stop('um, tzh needs to think about how to write this beautifully..')
     data1 <- merge.data.frame(d_share, data1, by = names(d_share), all.x = TRUE)
     data0 <- merge.data.frame(d_share, data0, by = names(d_share), all.x = TRUE)
+    
   }
   
-  nr <- .row_names_info(data1, type = 2L) # now `nrow(data1) == nrow(data0)`
+  nr <- nrow(data1@design) # now `nrow(data1) == nrow(data0)`
   
-  data1$x1 <- data1$x1[, colSums(!is.na(data1$x1)) > 0L, drop = FALSE]
-  data1$x0 <- data1$x0[, colSums(!is.na(data1$x0)) > 0L, drop = FALSE]
-  data0$x1 <- data0$x1[, colSums(!is.na(data0$x1)) > 0L, drop = FALSE]
-  data0$x0 <- data0$x0[, colSums(!is.na(data0$x0)) > 0L, drop = FALSE]
+  x11 <- data1@x1
+  x10 <- data1@x0
+  x01 <- data0@x1
+  x00 <- data0@x0
   
-  t_ <- santosT2(u = santosT(x1 = data1$x1, x0 = data1$x0, ...), 
-                 v = santosT(x1 = data0$x1, x0 = data0$x0, ...))
+  t_ <- santosT2(u = santosT(x1 = x11, x0 = x10, ...), 
+                 v = santosT(x1 = x01, x0 = x00, ...))
   
   # based on permutation (remove all NA columns)
-  ids1 <- perm_elispot(data1)
+  ids1 <- combn_elispot(data1)
   n1 <- length(ids1)
-  ids0 <- perm_elispot(data0)
+  ids0 <- combn_elispot(data0)
   n0 <- length(ids0)
   
   fn <- function(data, id) {
     santosT(x1 = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], ...)
   }
-  tm1 <- lapply(ids1, FUN = fn, data = cbind(data1$x1, data1$x0))
-  tm0 <- lapply(ids0, FUN = fn, data = cbind(data0$x1, data0$x0))
+  tm1 <- ids1 |>
+    lapply(FUN = fn, data = cbind(x11, x10))
+  tm0 <- ids0 |> 
+    lapply(FUN = fn, data = cbind(x01, x00))
   
   ### actually [santosT2]
-  t1. <- unlist(tm1, use.names = FALSE)
-  df1_ <- lapply(tm1, FUN = attr, which = 'df', exact = TRUE)
-  df1. <- unlist(df1_, use.names = FALSE)
-  stderr1_ <- lapply(tm1, FUN = attr, which = 'stderr', exact = TRUE)
-  stderr1. <- unlist(stderr1_, use.names = FALSE)
+  t1. <- tm1 |>
+    unlist(use.names = FALSE)
+  df1. <- tm1 |>
+    lapply(FUN = attr, which = 'df', exact = TRUE) |>
+    unlist(use.names = FALSE)
+  stderr1. <- tm1 |>
+    lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
+    unlist(use.names = FALSE)
   dim(t1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
   
-  t0. <- unlist(tm0, use.names = FALSE)
-  df0_ <- lapply(tm0, FUN = attr, which = 'df', exact = TRUE)
-  df0. <- unlist(df0_, use.names = FALSE)
-  stderr0_ <- lapply(tm0, FUN = attr, which = 'stderr', exact = TRUE)
-  stderr0. <- unlist(stderr0_, use.names = FALSE)
+  t0. <- tm0 |> 
+    unlist(use.names = FALSE)
+  df0. <- tm0 |>
+    lapply(FUN = attr, which = 'df', exact = TRUE) |>
+    unlist(use.names = FALSE)
+  stderr0. <- tm0 |>
+    lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
+    unlist(use.names = FALSE)
   dim(t0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
   
   id_ <- expand.grid(tm0 = seq_len(n0), tm1 = seq_len(n1))
@@ -84,8 +104,8 @@ maxT_santos_test <- function(
   ### have to manually vectorize [santosT2] !!
 
   # combine `data1` and `data0` for output
-  d1 <- data1; d1$x0 <- d1$x1 <- NULL
-  d0 <- data0; d0$x0 <- d0$x1 <- NULL
+  d1 <- data1@design
+  d0 <- data0@design
   if (!identical(names(d1), names(d0))) stop('`elispot` at two time points must have same design')
   d <- mapply(FUN = \(c1, c0) {
     if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')

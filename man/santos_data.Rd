@@ -9,9 +9,9 @@
 \alias{santos2_raw}
 \title{Santos' data}
 \format{
-An object of class \code{elispot} (inherits from \code{data.frame}) with 36 rows and 5 columns.
+An object of class \code{elispot} of length 1.
 
-An object of class \code{elispot} (inherits from \code{data.frame}) with 36 rows and 5 columns.
+An object of class \code{elispot} of length 1.
 
 An object of class \code{data.frame} with 36 rows and 12 columns.
 
@@ -30,3 +30,4 @@ santos2_raw
 Santos' data
 }
 \keyword{datasets}
+\keyword{internal}

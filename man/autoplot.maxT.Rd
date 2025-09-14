@@ -26,7 +26,7 @@ Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} returns a \link[ggplot2]{
 To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
 }
 \details{
-Function \link{autoplot.maxT} plots
+Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} plots
 \itemize{
 \item the successive maxima
 \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and

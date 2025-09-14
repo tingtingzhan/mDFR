@@ -37,9 +37,18 @@
 #' and an empirical study \doi{10.1007/s00262-010-0875-4}.
 #' 
 #' 
-#' @example inst/moodie/maxT_moodie.R
+#' @examples
+#' (m0 = moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')) # no log
+#' r1a = m0 |>
+#'  split(f = ~ day + id) |>
+#'  lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE)
 #' 
-#' @importFrom methods new
+#' r2a = m0 |> 
+#'  log(base = 10) |> # [elsdfr2x] uses base-10
+#'  split(f = ~ day + id) |>
+#'  lapply(FUN = maxT_moodie, null.value = log10(2), 
+#'    bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
+#' @keywords internal
 #' @export
 maxT_moodie <- function(
     data, bootstrap = FALSE,
@@ -48,48 +57,54 @@ maxT_moodie <- function(
     ...
 ) {
   
-  m1 <- rowMeans(data$x1, na.rm = TRUE)
-  m0 <- rowMeans(data$x0, na.rm = TRUE)
+  m1 <- rowMeans(data@x1, na.rm = TRUE)
+  m0 <- rowMeans(data@x0, na.rm = TRUE)
   t_ <- (m1 - m0) - null.value
   
   if (!bootstrap) { # moodie's [elsdfreq]
-    dd <- cbind(data$x1, data$x0)
-    ids <- perm_elispot(data)
-    prm1. <- lapply(ids, FUN = \(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) # permutation of treatment
-    prm0. <- lapply(ids, FUN = \(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)) # permutation of control
-    prm. <- unlist(prm1., use.names = FALSE) - unlist(prm0., use.names = FALSE)
-    dim(prm.) <- c(.row_names_info(data, type = 2L), length(ids))
+    dd <- cbind(data@x1, data@x0)
+    ids <- combn_elispot(data)
+    prm1. <- ids |>
+      lapply(FUN = \(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) |> # permutation of treatment
+      unlist(use.names = FALSE)
+    prm0. <- ids |>
+      lapply(FUN = \(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)) |> # permutation of control
+      unlist(use.names = FALSE)
+    prm. <- prm1. - prm0.
+    dim(prm.) <- c(nrow(data@design), length(ids))
     #T_ <- prm. # moodie's
     T_ <- prm. - null.value # Tingting's
     # moodie's [elsdfreq] example has `null.value = 0`
     # Tingting thinks moodie's code is wrong
     
   } else { # moodie's [elsdfr2x]
-    bmeans <- function(x, R) {
+    bmeans <- \(x, R) {
       # moodie's functions [bf] and [bcf], re-written
       # `x` is numeric vector
       x_a <- x[!is.na(x)]
       if (!(nx <- length(x_a))) stop('all-missing not allowed')
-      x_b <- sample(x_a, size = nx * R, replace = TRUE)
-      rowMeans(array(x_b, dim = c(R, nx)))
+      sample(x_a, size = nx * R, replace = TRUE) |> 
+        array(dim = c(R, nx)) |>
+        rowMeans()
     }
     if (!missing(seed_)) set.seed(seed = seed_) 
-    bt1 <- t.default(apply(data$x1, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bemeans`
-    bt0 <- t.default(apply(data$x0, MARGIN = 1L, FUN = bmeans, R = R)) # moodie's `bcmeans`
+    bt1 <- data@x1 |>
+      apply(MARGIN = 1L, FUN = bmeans, R = R) |>
+      t.default() # moodie's `bemeans`
+    bt0 <- data@x0 |>
+      apply(MARGIN = 1L, FUN = bmeans, R = R) |>
+      t.default() # moodie's `bcmeans`
     T_ <- (bt1 - m1) - (bt0 - m0) # moodie's
     # Tingting does not understand this `T_`
     
   }
 
-  data$x1 <- data$x0 <- NULL
-  class(data) <- 'data.frame' # 'elispot' is not specified in slot `@design` of \linkS4class{maxT}
-  
   ag0 <- list(...)[c('two.sided')]
+  
   return(do.call(new, args = c(list(
     Class = 'maxT', 
     t. = t_, T. = T_,
-    design = data#,
-    #name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
+    design = data@design #data
   ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   
 }

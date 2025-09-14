@@ -28,39 +28,38 @@
 #' 
 #' Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
 #' 
-#' @importFrom methods new
+#' @keywords internal
 #' @export
 maxT_santos <- function(data, ...) { 
-  data$x1 <- data$x1[, colSums(!is.na(data$x1)) > 0L, drop = FALSE]
-  data$x0 <- data$x0[, colSums(!is.na(data$x0)) > 0L, drop = FALSE]
   
-  tmp <- santosT(x1 = data$x1, x0 = data$x0, ...)
+  x1 <- data@x1
+  x0 <- data@x0
+  
+  tmp <- santosT(x1 = x1, x0 = x0, ...)
   t_ <- tmp / attr(tmp, which = 'stderr', exact = TRUE)
   
   # based on permutation
-  dd <- cbind(data$x1, data$x0)
-  ids <- perm_elispot(data)
+  dd <- cbind(x1, x0)
+  ids <- combn_elispot(data)
   tmp <- lapply(ids, FUN = \(i) {
     tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
     tmp / attr(tmp, which = 'stderr', exact = TRUE)
   })
   T_ <- unlist(tmp, use.names = FALSE)
-  dim(T_) <- c(.row_names_info(data, type = 2L), length(ids))
+  dim(T_) <- c(nrow(data@design), length(ids))
   # end of permutation
   
-  data$x1 <- data$x0 <- NULL
-  class(data) <- 'data.frame'
-  
-  tmp <- lapply(data, FUN = \(i) {
-    if (is.factor(i)) i <- as.character.factor(i)
-    unique(i)
-  })
+  tmp <- data@design |>
+    lapply(FUN = \(i) {
+      if (is.factor(i)) i <- as.character.factor(i)
+      unique(i)
+    })
   
   ag0 <- list(...)[c('two.sided')]
   return(do.call(new, args = c(list(
     Class = 'maxT', 
     t. = t_, T. = T_,
-    design = data,
+    design = data@design,
     name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
   ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   

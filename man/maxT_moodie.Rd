@@ -33,16 +33,15 @@ Resampling-based \eqn{p}-value adjustment
 }
 \examples{
 (m0 = moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')) # no log
-
 r1a = m0 |>
-  split(f = ~ day + id) |>
-  lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE)
+ split(f = ~ day + id) |>
+ lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE)
 
 r2a = m0 |> 
-  log(base = 10) |> # [elsdfr2x] uses base-10
-  split(f = ~ day + id) |>
-  lapply(FUN = maxT_moodie, null.value = log10(2), 
-         bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
+ log(base = 10) |> # [elsdfr2x] uses base-10
+ split(f = ~ day + id) |>
+ lapply(FUN = maxT_moodie, null.value = log10(2), 
+   bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
 }
 \references{
 Original algorithm by Zoe Moodie on March 16, 2010 \url{https://rundfr.fredhutch.org},
@@ -50,3 +49,4 @@ and
 her 2006 papers \doi{10.1016/j.jim.2006.07.015},
 and an empirical study \doi{10.1007/s00262-010-0875-4}.
 }
+\keyword{internal}
