@@ -11,33 +11,12 @@
 #' treatment \eqn{x_1} and control responses \eqn{x_0}, respectively
 #' 
 #' @param null.value \link[base]{numeric} scalar \eqn{c}, 
-#' as in \eqn{H_0: \bar{X}_1 - c\bar{X}_0 = 0}
+#' as in \eqn{H_0: \mu_1 - c\mu_0 = 0}
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
-#' @returns
-#' Function [santosT] returns a \link[base]{numeric} \link[base]{vector} of \eqn{\bar{x}_1 - c\bar{x}_0}, 
-#' i.e., the numerator of distribution free test statistic \eqn{t},
-#' with \link[base]{attributes}
-#' \describe{
-#' \item{`attr(.,'df')`}{degree of freedom \eqn{\text{df}}, to be used in function [santosT2];}
-#' \item{`attr(.,'stderr')`}{standard error \eqn{s_{\bar\Delta}}, i.e., the denominator of distribution free test statistic \eqn{t};}
-#' \item{`attr(.,'stderr2')`}{standard deviation \eqn{s^2_{\bar\Delta}}, included due to the extreme time-sensitivity of function [santosT2].}
-#' }
-#' 
 #' @references
 #' The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
-#' 
-#' @details
-#' Distribution free test statistic
-#' \deqn{
-#' T = \dfrac{\bar{X}_1 - c\bar{X}_0}{s_{\bar\Delta}}
-#' }
-#' Let \eqn{n_1}, \eqn{n_0}, \eqn{s^2_1} and \eqn{s^2_0} be sample sizes and sample standard deviations of treatment and control, respectively.
-#' The standard deviation 
-#' \eqn{s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0},
-#' has degree of freedom based on Welch–Satterthwaite equation (see more from help files of function \link[DanielBiostatistics10th]{Gosset_Welch}),
-#' \deqn{\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{(s^2_1/n_1)^2}{n_1-1}+\dfrac{(c^2s^2_0/n_0)^2}{n_0-1}}}
 #' 
 #' @keywords internal
 #' @importFrom matrixStats rowVars
@@ -87,30 +66,6 @@ santosT <- function(
 #' @title Distribution Free Test Statistic, Difference of Difference
 #' 
 #' @param u,v two objects, both returned from function [santosT]
-#' 
-#' @details
-#' At time point \eqn{u} (see more at [santosT]), distribution free test statistic
-#' \deqn{
-#' T_u = \dfrac{\bar{X}_{1,u} - c_u\bar{X}_{0,u}}{s_{\bar\Delta,u}}
-#' }
-#' The standard deviation 
-#' \eqn{s^2_{\bar\Delta,u}=s^2_{1,u}/n_{1,u} + c_u^2s^2_{0,u}/n_{0,u}}
-#' has degree of freedom based on Welch–Satterthwaite equation
-#' \deqn{\text{df}_u = \dfrac{\left(\dfrac{s^2_{1,u}}{n_{1,u}}+\dfrac{c_u^2s^2_{0,u}}{n_{0,u}}\right)^2}{\dfrac{(s^2_{1,u}/n_{1,u})^2}{n_{1,u}-1}+\dfrac{(c_u^2s^2_{0,u}/n_{0,u})^2}{n_{0,u}-1}}}
-#' Similarly, at time point \eqn{v}, we have distribution free test statistic \eqn{T_v},
-#' standard deviation \eqn{s^2_{\bar\Delta,v}} and degree of freedom \eqn{\text{df}_v}.
-#' 
-#' To compare time point \eqn{u} vs. \eqn{v}, we have distribution free test statistic
-#' \deqn{
-#' T = \dfrac{\left(\bar{X}_{1,u} - c_u\bar{X}_{0,u}\right) - \left(\bar{X}_{1,v} - c_v\bar{X}_{0,v}\right)}{s_{\bar\Delta}}
-#' }
-#' where 
-#' \deqn{
-#' s^2_{\bar\Delta} = \dfrac{\text{df}_u\cdot s^2_{\bar\Delta,u} + \text{df}_v\cdot s^2_{\bar\Delta,v}}{\text{df}_u + \text{df}_v}
-#' }
-#' 
-#' @note
-#' In practice we often let \eqn{c=c_u=c_v} for more intuitive interpretation.
 #' 
 #' @references
 #' The distribution free test statistic \eqn{T} is not exactly the same as 

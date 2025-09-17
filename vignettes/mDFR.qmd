@@ -263,15 +263,23 @@ st1 |>
 
 ## Distribution Free Test Statistic
 
-Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\cdot\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic
+Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic (function `santosT()`)
 
 $$
-t = \dfrac{\bar{x}_1 - c\cdot\bar{x}_0}{s_{\bar\Delta}}
+t = \dfrac{\bar{x}_1 - c\bar{x}_0}{s_{\bar\Delta}}
 $$ {#eq-santosT}
 
 The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree of freedom [@Welch47; @Satterthwaite46] $$
 \text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
-$$
+$$ {#eq-santosT_df}
+
+Function `santosT()` returns a `numeric` `vector` of $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of distribution free test statistic (@eq-santosT), with `attributes`,
+
+-   `attr(.,'df')`, degree of freedom (@eq-santosT_df)
+-   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of distribution free test statistic (@eq-santosT)
+-   `attr(.,'stderr2')`, standard deviation $s^2_{\bar\Delta}$, included due to the extreme time-sensitivity of function `santosT2()`
+
+
 
 We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
 
@@ -324,7 +332,7 @@ Suppose we are interested in comparing the treatment effect at two time points $
 Let $\mu_{1,\phi}$, $\mu_{0,\phi}$, $\mu_{1,\psi}$ and $\mu_{0,\psi}$ be the population means of treatment and control at time points $\phi$ and $\psi$, respectively. To test the hypothesis
 
 $$
-H_0: (\mu_{1,\phi} - c_\phi\cdot\mu_{0,\phi}) - (\mu_{1,\psi} - c_\psi\cdot\mu_{0,\psi}) = 0
+H_0: (\mu_{1,\phi} - c_\phi\mu_{0,\phi}) - (\mu_{1,\psi} - c_\psi\mu_{0,\psi}) = 0
 $$ {#eq-hypothesis2}
 
 In clinical practice, we should let $c=c_\phi=c_\psi$ for more intuitive interpretation.
@@ -341,7 +349,7 @@ $$
 \text{df}_\phi = \dfrac{\left(\dfrac{s^2_{1,\phi}}{n_{1,\phi}}+\dfrac{c_\phi^2s^2_{0,\phi}}{n_{0,\phi}}\right)^2}{\dfrac{\left(s^2_{1,\phi}/n_{1,\phi}\right)^2}{n_{1,\phi}-1}+\dfrac{\left(c_\phi^2s^2_{0,\phi}/n_{0,\phi}\right)^2}{n_{0,\phi}-1}}
 $$
 
-Similarly, at time point $\psi$, we have distribution free test statistic $t_\psi$, standard deviation $s^2_{\bar\Delta,\psi}$ and degree of freedom $\text{df}_\psi$. To test the difference-of-difference hypothesis (@eq-hypothesis2), we have a distribution free difference-of-difference test statistic
+Similarly, at time point $\psi$, we have distribution free test statistic $t_\psi$, standard deviation $s^2_{\bar\Delta,\psi}$ and degree of freedom $\text{df}_\psi$. To test the difference-of-difference hypothesis (@eq-hypothesis2), we have a distribution free difference-of-difference test statistic (function `santosT2()`)
 
 $$
 t = \dfrac{\left(\bar{x}_{1,\phi} - c_\phi\bar{x}_{0,\phi}\right) - \left(\bar{x}_{1,\psi} - c_\psi\bar{x}_{0,\psi}\right)}{s_{\bar\Delta}}

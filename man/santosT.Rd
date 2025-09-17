@@ -11,33 +11,12 @@ santosT(x1, x0, null.value = 1, ...)
 treatment \eqn{x_1} and control responses \eqn{x_0}, respectively}
 
 \item{null.value}{\link[base]{numeric} scalar \eqn{c},
-as in \eqn{H_0: \bar{X}_1 - c\bar{X}_0 = 0}}
+as in \eqn{H_0: \mu_1 - c\mu_0 = 0}}
 
 \item{...}{additional parameters, currently not in use}
 }
-\value{
-Function \link{santosT} returns a \link[base]{numeric} \link[base]{vector} of \eqn{\bar{x}_1 - c\bar{x}_0},
-i.e., the numerator of distribution free test statistic \eqn{t},
-with \link[base]{attributes}
-\describe{
-\item{\code{attr(.,'df')}}{degree of freedom \eqn{\text{df}}, to be used in function \link{santosT2};}
-\item{\code{attr(.,'stderr')}}{standard error \eqn{s_{\bar\Delta}}, i.e., the denominator of distribution free test statistic \eqn{t};}
-\item{\code{attr(.,'stderr2')}}{standard deviation \eqn{s^2_{\bar\Delta}}, included due to the extreme time-sensitivity of function \link{santosT2}.}
-}
-}
 \description{
 Distribution free test statistic to compare a treatment against a control.
-}
-\details{
-Distribution free test statistic
-\deqn{
-T = \dfrac{\bar{X}_1 - c\bar{X}_0}{s_{\bar\Delta}}
-}
-Let \eqn{n_1}, \eqn{n_0}, \eqn{s^2_1} and \eqn{s^2_0} be sample sizes and sample standard deviations of treatment and control, respectively.
-The standard deviation
-\eqn{s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0},
-has degree of freedom based on Welch–Satterthwaite equation (see more from help files of function \link[DanielBiostatistics10th]{Gosset_Welch}),
-\deqn{\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{(s^2_1/n_1)^2}{n_1-1}+\dfrac{(c^2s^2_0/n_0)^2}{n_0-1}}}
 }
 \references{
 The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
