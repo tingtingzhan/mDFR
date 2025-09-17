@@ -12,7 +12,7 @@
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \link{as.data.frame.maxT} returns a \link[base]{data.frame}.
+Function \code{\link[=as.data.frame.maxT]{as.data.frame.maxT()}} returns a \link[base]{data.frame}.
 }
 \description{
 Convert \linkS4class{maxT} to a \link[base]{data.frame}

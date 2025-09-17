@@ -92,7 +92,6 @@
 #' 
 # @name maxT
 # @aliases maxT-class
-#' @importFrom ggplot2 ggplot_build ggplot_gtable
 #' @export
 setClass(Class = 'maxT', slots = c(
   t. = 'numeric', T. = 'matrix',
@@ -107,7 +106,6 @@ setClass(Class = 'maxT', slots = c(
 ))
 
 
-#' @importFrom ggplot2 ggplot_build ggplot_gtable
 setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...) {
   
   x <- callNextMethod(.Object, ...)
@@ -169,23 +167,11 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
     identical(s[order(o)], x) # solution!
   } # R intro 101
   
-  # `U` can be huge
-  # rendering `gg` can be slow
-  # read carefully!!!
-  # https://stackoverflow.com/questions/73470828/ggplot2-is-slow-where-is-the-bottleneck
-  # NO LONGER!!!!  save slot `@gtable` inside \linkS4class{maxT}, to save time in printing
-  #gtb <- autoplot_maxT_(p_perm = p_perm, p_mono = p_mono, tr = tr, U = U, two.sided = two.sided) |> # always fast
-  #  ggplot_build() |> # 'ggplot_built'
-  #  ggplot_gtable() # c('gtable', 'gTree', 'grob', 'gDesc')
-  # ggplot_build() and ggplot_gtable() not too slow
-  # use parallel::mclapply() in production code!
-  
   x@tr <- tr 
   x@U <- U
   x@p_perm <- p_perm
   x@p_mono <- p_mono
   x@p. <- p_mono[order(r)]
-  #x@gtable <- gtb
   return(x)
 })
 
@@ -202,7 +188,7 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns 
-#' Function [as.data.frame.maxT] returns a \link[base]{data.frame}.
+#' Function [as.data.frame.maxT()] returns a \link[base]{data.frame}.
 #' 
 #' @method as.data.frame maxT
 #' @export as.data.frame.maxT
@@ -228,6 +214,34 @@ as.data.frame.maxT <- function(x, ...) {
 
 
 
+
+
+#' @title Create \link[reactable]{reactable} from \linkS4class{maxT} Object
+#' 
+#' @description
+#' To create a \link[reactable]{reactable} from a \linkS4class{maxT} object.
+#' 
+#' @param x a \linkS4class{maxT} object
+#' 
+#' @param ... additional parameters of function \link[reactable]{reactable}
+#' 
+#' @returns
+#' Function [reactable_maxT()] returns a \link[reactable]{reactable} object.
+#' 
+#' @keywords internal
+#' @importFrom reactable reactable
+#' @export
+reactable_maxT <- function(x, ...) {
+  x |>
+    as.data.frame.maxT() |>
+    reactable(...)
+}
+
+
+
+
+
+
 setMethod(f = show, signature = 'maxT', definition = function(object) {
   object |>
     reactable_maxT() |>
@@ -236,55 +250,6 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 
 
 
-#' @title [rbind.maxT()]
-#' 
-#' @param ... ..
-#' 
-#' @keywords internal
-#' @export rbind.maxT
-#' @export
-rbind.maxT <- function(...) {
-  
-  dots <- list(...)
-  # slotNames(dots[[1L]])
-  
-  design <- dots |>
-    lapply(FUN = slot, name = 'design') |>
-    do.call(what = rbind.data.frame, args = _)
-  
-  t. <- dots |>
-    lapply(FUN = slot, name = 't.') |>
-    unlist(use.names = FALSE)
-  
-  T. <- dots |>
-    lapply(FUN = slot, name = 'T.') |> # 'matrix'-es
-    do.call(what = rbind, args = _)
-  
-  tr <- dots |>
-    lapply(FUN = slot, name = 'tr') |>
-    unlist(use.names = FALSE)
-  
-  U <- dots |>
-    lapply(FUN = slot, name = 'U') |> # 'matrix'-es
-    do.call(what = rbind, args = _)
-  
-  p_perm <- dots |>
-    lapply(FUN = slot, name = 'p_perm') |>
-    unlist(use.names = FALSE)
-  
-  p_mono <- dots |>
-    lapply(FUN = slot, name = 'p_mono') |> # mono **within** each `dot`
-    unlist(use.names = FALSE)
-  
-  p. <- dots |>
-    lapply(FUN = slot, name = 'p.') |>
-    unlist(use.names = FALSE)
-  
-  # nah, nah..
-  # we don't want to initialize here!!!!
-  
-  return(invisible())
-}
 
 
 
@@ -328,20 +293,15 @@ rbind.maxT <- function(...) {
 #' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme element_text
 # @importFrom ggtext element_markdown
 #' @importFrom scales pal_hue
-#' @name autoplot.maxT
 #' @export autoplot.maxT
 #' @export
-autoplot.maxT <- function(object, ...) {
-  autoplot_maxT_(p_perm = object@p_perm, p_mono = object@p_mono, tr = object@tr, U = object@U, two.sided = object@two.sided, ...)
-}
+autoplot.maxT <- function(object, conf.level = .95, ...) {
 
-#' @rdname autoplot.maxT
-#' @export
-autoplot_maxT_ <- function(
-    p_perm, p_mono, tr, U, two.sided,
-    conf.level = .95, 
-    ...
-) {
+  p_perm <- object@p_perm 
+  p_mono <- object@p_mono
+  tr <- object@tr
+  U <- object@U
+  two.sided <- object@two.sided
   
   dm <- dim(U)
   
