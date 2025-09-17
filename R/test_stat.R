@@ -1,17 +1,27 @@
 
 
-
-
 #' @title Distribution Free Test Statistic
 #' 
 #' @description
 #' Distribution free test statistic to compare a treatment against a control.
 #' 
-#' @param x1,x0 \link[base]{numeric} \link[base]{matrix}-es, 
+#' @slot .Data ..
+#' 
+#' @slot delta ..
+#' 
+#' @slot stderr ..
+#' 
+#' @slot df ..
+#' 
+#' @slot data ..
+#' 
+#' @param x,x0 \link[base]{numeric} \link[base]{matrix}-es, 
 #' treatment \eqn{x_1} and control responses \eqn{x_0}, respectively
 #' 
 #' @param null.value \link[base]{numeric} scalar \eqn{c}, 
 #' as in \eqn{H_0: \mu_1 - c\mu_0 = 0}
+#' 
+#' @param s4 \link[base]{logical} scalar
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -19,14 +29,45 @@
 #' The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
 #' @keywords internal
+#' @name santosT
+#' @aliases santosT-class
+#' @export
+setClass(Class = 'santosT', contains = 'numeric', slots = c(
+  delta = 'numeric',
+  stderr = 'numeric',
+  df = 'numeric',
+  data = 'ANY'
+  # null.value = <maybe I want to save as well?>
+))
+
+
+#' @rdname santosT
+#' @export
+santosT <- function(x, ...) UseMethod(generic = 'santosT')
+
+#' @rdname santosT
+#' @export santosT.ELISpot
+#' @export
+santosT.ELISpot <- function(x, ...) {
+  santosT.matrix(x = x@x1, x0 = x@x0, data = x, ...)
+}
+  
+  
+
+#' @rdname santosT
 #' @importFrom matrixStats rowVars
 #' @importFrom stats var
+#' @export santosT.matrix
 #' @export
-santosT <- function(
-    x1, x0, 
+santosT.matrix <- function(
+    x, x0, 
+    data,
     null.value = 1,
+    s4 = TRUE,
     ...
 ) {
+  
+  x1 <- x; x <- NULL
   
   d1 <- dim(x1)
   m1 <- x1 |>
@@ -55,13 +96,17 @@ santosT <- function(
   
   gw <- Gosset_Welch(v1 = vr1, v0 = vr0, c0 = null.value, n1 = n1, n0 = n0)
   gw_stderr <- attr(gw, which = 'stderr', exact = TRUE)
-  
+
   out <- delta / gw_stderr
   attr(out, which = 'delta') <- delta
   attr(out, which = 'stderr') <- gw_stderr
   attr(out, which = 'df') <- c(gw) # to drop attributes
+  attr(out, which = 'x1') <- x1
+  attr(out, which = 'x0') <- x0
+  attr(out, which = 'data') <- if (!missing(data)) data # else NULL
+  if (s4) return(new(Class = 'santosT', out)) # `slot`s are `attr`s !
   return(out)
-  
+
 }
 
 

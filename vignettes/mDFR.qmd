@@ -125,16 +125,27 @@ d0 = snook |>
   as.ELISpot(formula = ~ Antigen | Week + Subject, data = _, pattern1 = '^rep[1-5]$', pattern0 = 'DMSO')
 ```
 
-
 ```{r}
 ds = d0 |>
   split(f = ~ Week + Antigen)
 ```
 
 ```{r}
-#m1 = mclapply(ds, FUN = maxT_santos, null.value = 1)
-#m2 = mclapply(ds, FUN = maxT_santos, null.value = 2)
-#m = mapply(FUN = c, 'null1' = m1, 'null2' = m2, SIMPLIFY = FALSE)
+ds$Wk5.Ad5 |> 
+  santosT() |>
+  maxT() |>
+  reactable_maxT(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+```{r}
+ds$Wk5.Ad5 |> 
+  santosT(null.value = 2) |>
+  maxT() |>
+  reactable_maxT(
+    rownames = FALSE, defaultPageSize = 6L
+  )
 ```
 
 ```{r}
@@ -217,7 +228,8 @@ st1 = santos1 |>
 
 ```{r}
 st1 |>
-  lapply(FUN = maxT_santos, null.value = 1) |>
+  lapply(FUN = santosT, null.value = 1) |>
+  lapply(FUN = maxT) |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
   reactable::reactable(
@@ -227,7 +239,8 @@ st1 |>
 
 ```{r}
 st1 |>
-  lapply(FUN = maxT_santos, null.value = 2) |>
+  lapply(FUN = santosT, null.value = 2) |>
+  lapply(FUN = maxT) |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
   reactable::reactable(
@@ -278,8 +291,6 @@ Function `santosT()` returns a `numeric` `vector` of distribution free test stat
 -   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-santosT),
 -   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-santosT),
 -   `attr(.,'df')`, degree of freedom (@eq-santosT_df).
-
-
 
 We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
 

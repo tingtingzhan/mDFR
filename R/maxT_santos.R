@@ -3,7 +3,7 @@
 #' 
 #' @description ..
 #' 
-#' @param data an \linkS4class{ELISpot}
+#' @param x an \linkS4class{ELISpot}
 #' 
 #' @param ... additional parameters, such as `null.value` in function [santosT],
 #' and `two.sided` for \linkS4class{maxT}
@@ -13,44 +13,45 @@
 #' Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
 #' 
 #' @keywords internal
+#' @name maxT
 #' @export
-maxT_santos <- function(data, ...) { 
+maxT <- function(x, ...) UseMethod(generic = 'maxT')
+
+
+#' @rdname maxT
+#' @export maxT.santosT
+#' @export
+maxT.santosT <- function(x, ...) {
   
-  x1 <- data@x1
-  x0 <- data@x0
+  x1 <- x@x1
+  x0 <- x@x0
   
-  # before 2025-09
-  #tmp <- santosT(x1 = x1, x0 = x0, ...)
-  #t_ <- tmp / attr(tmp, which = 'stderr', exact = TRUE)
-  t_ <- santosT(x1 = x1, x0 = x0, ...)
-  
-  # based on permutation
   dd <- cbind(x1, x0)
-  ids <- combn_ELISpot(data)
+  ids <- combn_ELISpot(x)
   tmp <- lapply(ids, FUN = \(i) {
-    #tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
-    #tmp / attr(tmp, which = 'stderr', exact = TRUE)
-    santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
+    santosT.matrix(x = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
   })
   T_ <- unlist(tmp, use.names = FALSE)
-  dim(T_) <- c(nrow(data@design), length(ids))
+  dim(T_) <- c(nrow(x@data@design), length(ids))
   # end of permutation
   
-  tmp <- data@design |>
+  tmp <- x@data@design |>
     lapply(FUN = \(i) {
       if (is.factor(i)) i <- as.character.factor(i)
       unique(i)
     })
   
   ag0 <- list(...)[c('two.sided')]
+  
   return(do.call(new, args = c(list(
     Class = 'maxT', 
-    t. = t_, T. = T_,
-    design = data@design,
+    t. = x@.Data, T. = T_,
+    design = x@data@design,
     name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
   ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   
 }
+
 
 
 

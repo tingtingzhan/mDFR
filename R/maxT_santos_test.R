@@ -49,8 +49,8 @@ maxT_santos_test <- function(
   x00 <- data0@x0
   
   t_ <- santosT2(
-    u = santosT(x1 = x11, x0 = x10, ...), 
-    v = santosT(x1 = x01, x0 = x00, ...)
+    u = santosT.matrix(x = x11, x0 = x10, ...), 
+    v = santosT.matrix(x = x01, x0 = x00, ...)
   )
   
   # based on permutation (remove all NA columns)
@@ -60,7 +60,7 @@ maxT_santos_test <- function(
   n0 <- length(ids0)
   
   fn <- function(data, id) {
-    santosT(x1 = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], ...)
+    santosT.matrix(x = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], s4 = FALSE, ...)
   }
   tm1 <- ids1 |>
     lapply(FUN = fn, data = cbind(x11, x10))
