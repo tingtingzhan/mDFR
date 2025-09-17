@@ -5,7 +5,7 @@
 #' @description
 #' ..
 #' 
-#' @param data1,data0 two `elispot` objects, 
+#' @param data1,data0 two `ELISpot` objects, 
 #' at two time points \eqn{t_1} and \eqn{t_0}, respectively
 #' 
 #' @param ... additional parameters, such as `null.value` in function [santosT] and
@@ -59,9 +59,9 @@ maxT_santos_test <- function(
                  v = santosT(x1 = x01, x0 = x00, ...))
   
   # based on permutation (remove all NA columns)
-  ids1 <- combn_elispot(data1)
+  ids1 <- combn_ELISpot(data1)
   n1 <- length(ids1)
-  ids0 <- combn_elispot(data0)
+  ids0 <- combn_ELISpot(data0)
   n0 <- length(ids0)
   
   fn <- function(data, id) {
@@ -106,7 +106,7 @@ maxT_santos_test <- function(
   # combine `data1` and `data0` for output
   d1 <- data1@design
   d0 <- data0@design
-  if (!identical(names(d1), names(d0))) stop('`elispot` at two time points must have same design')
+  if (!identical(names(d1), names(d0))) stop('`ELISpot` at two time points must have same design')
   d <- mapply(FUN = \(c1, c0) {
     if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
     if (all(c1 == c0)) return(c1)

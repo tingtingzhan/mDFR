@@ -2,7 +2,7 @@
 % Please edit documentation in R/ELISpot.R
 \name{santos2ELISpot}
 \alias{santos2ELISpot}
-\title{Create \code{elispot} Object, Santos' fashion}
+\title{Create \code{ELISpot} Object, Santos' fashion}
 \usage{
 santos2ELISpot(formula, data, ptn0 = "^y0_", ptn1 = "^y1_", ...)
 }

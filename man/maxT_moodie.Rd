@@ -7,7 +7,7 @@
 maxT_moodie(data, bootstrap = FALSE, null.value, R = 1000L, seed_, ...)
 }
 \arguments{
-\item{data}{an \code{elispot} object}
+\item{data}{an \code{ELISpot} object}
 
 \item{bootstrap}{\link[base]{logical} scalar,
 whether to use bootstrap samples.
@@ -30,18 +30,6 @@ Resampling-based \eqn{p}-value adjustment
 }
 \details{
 ..
-}
-\examples{
-(m0 = moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')) # no log
-r1a = m0 |>
- split(f = ~ day + id) |>
- lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE)
-
-r2a = m0 |> 
- log(base = 10) |> # [elsdfr2x] uses base-10
- split(f = ~ day + id) |>
- lapply(FUN = maxT_moodie, null.value = log10(2), 
-   bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
 }
 \references{
 Original algorithm by Zoe Moodie on March 16, 2010 \url{https://rundfr.fredhutch.org},

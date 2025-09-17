@@ -30,13 +30,15 @@ seems not needed
 -->
 ```
 
+# Introduction
+
 This vignette of R package **`mDFR`** ([CRAN](https://cran.r-project.org/package=mDFR), [Github](https://github.com/tingtingzhan/mDFR), [RPubs](https://rpubs.com/tingtingzhan/mDFR)) does
 
 -   this
 -   that
 -   and that
 
-# Prerequisite
+## Prerequisite
 
 Experimental (and maybe unstable) features of package **`mDFR`** are released *extremely frequently* to [Github](https://github.com/tingtingzhan/mDFR). [Active developers should use the Github version; suggestions and bug reports are welcome!]{style="background-color: #FFFF00"} Stable releases to [CRAN](https://CRAN.R-project.org/package=mDFR) are typically updated every 2 to 3 months, or when the authors have an upcoming manuscript in the peer-reviewing process.
 
@@ -52,7 +54,7 @@ remotes::install_github('tingtingzhan/mDFR')
 utils::install.packages('mDFR') # Developers, do NOT use!!
 ```
 
-# Getting Started {#sec-start}
+## Getting Started {#sec-start}
 
 Examples in the full vignette require that the `search` path has
 
@@ -63,11 +65,11 @@ library(mDFR)
 library(ggplot2)
 ```
 
-# Peer-Reviewed Publications
+## Peer-Reviewed Publications
 
 Package **`mDFR`** plays a pivotal role in these peer reviewed publications from the authors.
 
-## A citation
+### A citation
 
 > `r citation(package = 'hyper.gam')[[1L]] |> format(style = 'text') |> gsub(pattern = '\n', replacement = ' ', x = _)`
 
@@ -98,36 +100,39 @@ some sample code for Adam's published paper.
 #| code-summary: 'Sample code return'
 ```
 
-
-
-# Acknowledgement
+## Acknowledgement
 
 This work is supported by Department of Defense grants
 
--   R01CA222847 ([A. Snook](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844))
+-   ??? ([A. Snook](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844))
 
+# `'ELISpot'`
 
+An ELISpot (Enzyme-Linked ImmunoSpot) assay ..
 
+The `S4` class `'ELISpot'` ..
 
+## Creation
 
+# `'maxT'`
 
-# Example
+The `S4` class '`maxT`' ..
+
+# Snook
 
 ```{r}
-d0 = moodie2ELISpot(`^rep[1-5]$` ~ Antigen | Week + Subject, data = snook, control = 'DMSO')
+d0 = snook |>
+  as.ELISpot(formula = ~ Antigen | Week + Subject, data = _, pattern1 = '^rep[1-5]$', pattern0 = 'DMSO')
 ```
-
 
 ```{r}
-d1 = trim_elispot(d0)
+d1 = trim_ELISpot(d0)
 ```
-
 
 ```{r}
 ds = d1 |>
   split(f = ~ Week + Antigen)
 ```
-
 
 ```{r}
 #m1 = mclapply(ds, FUN = maxT_santos, null.value = 1)
@@ -135,22 +140,11 @@ ds = d1 |>
 #m = mapply(FUN = c, 'null1' = m1, 'null2' = m2, SIMPLIFY = FALSE)
 ```
 
-
 ```{r}
 Wk5.Ad5 = maxT_santos_test(data1 = ds$Wk5.Ad5, data0 = ds$Wk1.Ad5)
 ```
 
-
-@fig-XX presents an example visualization of Westfall-Yang max-$T$ correction
-for a total of 46 two-sided difference-of-difference hypotheses. 
-The nebula of points represents the successive maxima (\ref{successM2}).
-The bigger point per hypothesis is the test statistic (\ref{santosT2}).
-The labels on the left vertical axis are permutation adjusted $p$-values (\ref{perm_p}) and monotonicity constraints enforced (\ref{perm_p_mono}).
-The labels on the right vertical axis are the values of the test statistic (\ref{santosT2}).
-Hypothesis with monotonicity constraints enforced $\tilde{p}>.05$ are colored red.
-The line connecting all hypotheses does not have a statistical meaning, 
-but only to let all test statistics (\ref{santosT2}) stand out to the naked eye.
-
+@fig-XX presents an example visualization of Westfall-Yang max-$T$ correction for a total of 46 two-sided difference-of-difference hypotheses. The nebula of points represents the successive maxima (@eq-successM2). The bigger point per hypothesis is the test statistic (@eq-santosT2). The labels on the left vertical axis are permutation adjusted $p$-values (@eq-perm_p) and monotonicity constraints enforced (@eq-perm_p_mono). The labels on the right vertical axis are the values of the test statistic (@eq-santosT2). Hypothesis with monotonicity constraints enforced $\tilde{p}>.05$ are colored red. The line connecting all hypotheses does not have a statistical meaning, but only to let all test statistics (@eq-santosT2) stand out to the naked eye.
 
 ```{r}
 #| fig-height: 7
@@ -162,28 +156,67 @@ but only to let all test statistics (\ref{santosT2}) stand out to the naked eye.
 autoplot(Wk5.Ad5) + theme_minimal()
 ```
 
-
-
 # Appendix
+
+## Reproducing Moodie
+
+Her 2006 papers doi = 10.1016/j.jim.2006.07.015.
+
+<https://rundfr.fredhutch.org>, using the example data,
+
+```{r}
+#| code-fold: true
+#| code-summary: "Moodie's data as `ELISpot`"
+moodie = 'https://www.fredhutch.org/content/dam/www/research/divisions/vaccine-infectious-disease-division/staff-scientists/moodie/example.csv' |> 
+  url() |> 
+  read.csv() |>
+  as.ELISpot(formula = ~ antigen | day + id, data = _, pattern1 = '^a[1-9]$', pattern0 = 'negctl')
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'DFR(eq) adjp'
+moodie |>
+  split(f = ~ day + id) |>
+  lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, 
+    defaultPageSize = 20L
+  )
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'DFR(2x) adjp'
+moodie |> 
+  log(base = 10) |> # [elsdfr2x] uses base-10
+  split(f = ~ day + id) |>
+  lapply(FUN = maxT_moodie, null.value = log10(2), bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, 
+    defaultPageSize = 20L
+  )
+```
+
+## Reproducing Santos
 
 ## Distribution Free Test Statistic
 
-Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively.
-To test the hypothesis $H_0: \mu_1 - c\cdot\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic
+Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\cdot\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic
 
 $$
 t = \dfrac{\bar{x}_1 - c\cdot\bar{x}_0}{s_{\bar\Delta}}
 $$ {#eq-santosT}
 
-The standard deviation 
-$s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$
-has degree of freedom [@Welch47; @Satterthwaite46]
-$$
+The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree of freedom [@Welch47; @Satterthwaite46] $$
 \text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
 $$
 
-
-We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that 
+We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
 
 $$
 \begin{cases}
@@ -220,24 +253,18 @@ p_{r_j} =
 \end{cases}
 $$ {#eq-perm_p}
 
-with the monotonicity constraints enforced by
-$$
+with the monotonicity constraints enforced by $$
 \begin{cases}
 \tilde{p}_{r_1} & = p_{r_1}\\
 \tilde{p}_{r_j} & = \max\left\{p_{r_j}, \tilde{p}_{r_j-1}\right\}, \quad \text{for}\ j = 2,\cdots,m\\
 \end{cases}
 $$ {#eq-perm_p_mono}
 
-
-
-
-
 ### Difference of Difference
 
-Suppose we are interested in comparing the treatment effect at two time points $\phi$ versus $\psi$,
-i.e., the *time* difference of *treatment* difference.
+Suppose we are interested in comparing the treatment effect at two time points $\phi$ versus $\psi$, i.e., the *time* difference of *treatment* difference.
 
-Let $\mu_{1,\phi}$, $\mu_{0,\phi}$, $\mu_{1,\psi}$ and $\mu_{0,\psi}$ be the population means of treatment and control at time points $\phi$ and $\psi$, respectively. To test the hypothesis 
+Let $\mu_{1,\phi}$, $\mu_{0,\phi}$, $\mu_{1,\psi}$ and $\mu_{0,\psi}$ be the population means of treatment and control at time points $\phi$ and $\psi$, respectively. To test the hypothesis
 
 $$
 H_0: (\mu_{1,\phi} - c_\phi\cdot\mu_{0,\phi}) - (\mu_{1,\psi} - c_\psi\cdot\mu_{0,\psi}) = 0
@@ -251,17 +278,13 @@ $$
 t_\phi = \dfrac{\bar{x}_{1,\phi} - c_\phi\bar{x}_{0,\phi}}{s_{\bar\Delta,\phi}}
 $$
 
-The standard deviation 
-$s^2_{\bar\Delta,\phi}=s^2_{1,\phi}/n_{1,\phi} + c_\phi^2s^2_{0,\phi}/n_{0,\phi}$
-has degree of freedom
+The standard deviation $s^2_{\bar\Delta,\phi}=s^2_{1,\phi}/n_{1,\phi} + c_\phi^2s^2_{0,\phi}/n_{0,\phi}$ has degree of freedom
 
 $$
 \text{df}_\phi = \dfrac{\left(\dfrac{s^2_{1,\phi}}{n_{1,\phi}}+\dfrac{c_\phi^2s^2_{0,\phi}}{n_{0,\phi}}\right)^2}{\dfrac{\left(s^2_{1,\phi}/n_{1,\phi}\right)^2}{n_{1,\phi}-1}+\dfrac{\left(c_\phi^2s^2_{0,\phi}/n_{0,\phi}\right)^2}{n_{0,\phi}-1}}
 $$
 
-Similarly, at time point $\psi$, we have distribution free test statistic $t_\psi$,
-standard deviation $s^2_{\bar\Delta,\psi}$ and degree of freedom $\text{df}_\psi$.
-To test the difference-of-difference hypothesis (@eq-hypothesis2), we have a distribution free difference-of-difference test statistic
+Similarly, at time point $\psi$, we have distribution free test statistic $t_\psi$, standard deviation $s^2_{\bar\Delta,\psi}$ and degree of freedom $\text{df}_\psi$. To test the difference-of-difference hypothesis (@eq-hypothesis2), we have a distribution free difference-of-difference test statistic
 
 $$
 t = \dfrac{\left(\bar{x}_{1,\phi} - c_\phi\bar{x}_{0,\phi}\right) - \left(\bar{x}_{1,\psi} - c_\psi\bar{x}_{0,\psi}\right)}{s_{\bar\Delta}}
@@ -273,17 +296,12 @@ $$
 s^2_{\bar\Delta} = \dfrac{\text{df}_\phi\cdot s^2_{\bar\Delta,\phi} + \text{df}_\psi\cdot s^2_{\bar\Delta,\psi}}{\text{df}_\phi + \text{df}_\psi}
 $$
 
-
 We apply Westfall-Young max-$T$ correction on test statistic (@eq-santosT2) in the following steps,
 
 1.  Generate $B_\phi$ permutations of the treatment and control subjects at time point $\phi$;
 2.  Generate $B_\psi$ permutations of the treatment and control subjects at time point $\psi$;
 3.  Calculate test statistic (@eq-santosT2) in $B_\phi\times B_\psi$ permutations;
 4.  Calculate successive maxima, permutation adjust $p$-values with monotonicity constraints according to equation (@eq-successM2), (@eq-successM1), (@eq-perm_p) and (@eq-perm_p_mono).
-
-
-
-
 
 # References {.appendix}
 

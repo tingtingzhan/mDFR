@@ -208,13 +208,22 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 #' @export as.data.frame.maxT
 #' @export
 as.data.frame.maxT <- function(x, ...) {
+  
   tmp <- list(
     if (length(x@design)) x@design, #  else NULL
-    tstat = x@t.,
-    'abs(tstat)' = if (x@two.sided) abs(x@t.), # else NULL
-    adjp = x@p.
+    tstat = x@t. |> 
+      round(digits = 3L),
+    'abs(tstat)' = if (x@two.sided) {
+      abs(x@t.) |> 
+        round(digits = 3L)
+    }, # else NULL
+    adjp = x@p. |> 
+      label_pvalue_sym()()
   )
-  as.data.frame.list(tmp[lengths(tmp) > 0L], check.names = FALSE)
+  
+  tmp[lengths(tmp) > 0L] |>
+    as.data.frame.list(check.names = FALSE)
+  
 }
 
 
@@ -224,6 +233,58 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
     reactable_maxT() |>
     print() # ?htmlwidgets:::print.htmlwidget
 })
+
+
+
+#' @title [rbind.maxT()]
+#' 
+#' @param ... ..
+#' 
+#' @keywords internal
+#' @export rbind.maxT
+#' @export
+rbind.maxT <- function(...) {
+  
+  dots <- list(...)
+  # slotNames(dots[[1L]])
+  
+  design <- dots |>
+    lapply(FUN = slot, name = 'design') |>
+    do.call(what = rbind.data.frame, args = _)
+  
+  t. <- dots |>
+    lapply(FUN = slot, name = 't.') |>
+    unlist(use.names = FALSE)
+  
+  T. <- dots |>
+    lapply(FUN = slot, name = 'T.') |> # 'matrix'-es
+    do.call(what = rbind, args = _)
+  
+  tr <- dots |>
+    lapply(FUN = slot, name = 'tr') |>
+    unlist(use.names = FALSE)
+  
+  U <- dots |>
+    lapply(FUN = slot, name = 'U') |> # 'matrix'-es
+    do.call(what = rbind, args = _)
+  
+  p_perm <- dots |>
+    lapply(FUN = slot, name = 'p_perm') |>
+    unlist(use.names = FALSE)
+  
+  p_mono <- dots |>
+    lapply(FUN = slot, name = 'p_mono') |> # mono **within** each `dot`
+    unlist(use.names = FALSE)
+  
+  p. <- dots |>
+    lapply(FUN = slot, name = 'p.') |>
+    unlist(use.names = FALSE)
+  
+  # nah, nah..
+  # we don't want to initialize here!!!!
+  
+  return(invisible())
+}
 
 
 

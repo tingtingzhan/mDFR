@@ -7,7 +7,7 @@
 maxT_santos(data, ...)
 }
 \arguments{
-\item{data}{an \code{elispot}}
+\item{data}{an \code{ELISpot}}
 
 \item{...}{additional parameters, such as \code{null.value} in function \link{santosT},
 and \code{two.sided} for \linkS4class{maxT}}

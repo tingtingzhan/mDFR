@@ -3,7 +3,7 @@
 #' 
 #' @description ..
 #' 
-#' @param data an `elispot`
+#' @param data an `ELISpot`
 #' 
 #' @param ... additional parameters, such as `null.value` in function [santosT],
 #' and `two.sided` for \linkS4class{maxT}
@@ -40,7 +40,7 @@ maxT_santos <- function(data, ...) {
   
   # based on permutation
   dd <- cbind(x1, x0)
-  ids <- combn_elispot(data)
+  ids <- combn_ELISpot(data)
   tmp <- lapply(ids, FUN = \(i) {
     tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
     tmp / attr(tmp, which = 'stderr', exact = TRUE)

@@ -1,10 +1,11 @@
 
 
-#' @title Moodie's data
-#' 
-#' @keywords internal
-#' @name moodie_data
-'moodie'
+# @title Moodie's data
+# 
+# @keywords internal
+# @name moodie_data
+# 'moodie'
+# will need to restore if <https://rundfr.fredhutch.org> is down
 
 
 #' @title Santos' data

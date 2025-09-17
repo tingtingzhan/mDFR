@@ -1,16 +1,16 @@
 
-#' @title [split.elispot()]
+#' @title [split.ELISpot()]
 #' 
-#' @param x an \linkS4class{elispot}
+#' @param x an \linkS4class{ELISpot}
 #' 
 #' @param f ..
 #' 
 #' @param drop \link[base]{logical} scalar, must be `FALSE`
 #' 
 #' @keywords internal
-#' @export split.elispot
+#' @export split.ELISpot
 #' @export
-split.elispot <- function(x, f, drop = TRUE, ...) {
+split.ELISpot <- function(x, f, drop = TRUE, ...) {
   
   if (!drop) stop('`drop` must be TRUE')
   
@@ -23,7 +23,7 @@ split.elispot <- function(x, f, drop = TRUE, ...) {
   foo <- \(y) {
     y0 <- y
     y0$x1 <- y0$x0 <- NULL
-    new(Class = 'elispot', design = y0, x1 = y$x1, x0 = y$x0)
+    new(Class = 'ELISpot', design = y0, x1 = y$x1, x0 = y$x0)
   }
   
   

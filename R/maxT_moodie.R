@@ -4,18 +4,13 @@
 #' 
 #' @description Resampling-based \eqn{p}-value adjustment
 #' 
-#' @param data an `elispot` object
+#' @param data an `ELISpot` object
 #' 
 #' @param bootstrap \link[base]{logical} scalar, 
 #' whether to use bootstrap samples.
 #' Default `FALSE` indicating the use of permuted samples.
 #' 
 #' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{X}_1 - \bar{X}_0 = \mu_0}
-#' 
-# @param log_base \link[base]{numeric} scalar, base of log-transformation.
-# Choice of `log_base` does not affect the p-values, only the statistics.
-# When `log_base = NULL`, we are testing
-# \eqn{H_0: \mu_{e} - \mu_{c} = 0}, i.e., `null.value` is forced to be 0
 #' 
 #' @param R \link[base]{integer} scalar \eqn{R}, number of bootstrap copies if `bootstrap = TRUE`
 #' 
@@ -36,18 +31,6 @@
 #' her 2006 papers \doi{10.1016/j.jim.2006.07.015},
 #' and an empirical study \doi{10.1007/s00262-010-0875-4}.
 #' 
-#' 
-#' @examples
-#' (m0 = moodie2ELISpot(`^a[1-9]$` ~ antigen | day + id, data = moodie, control = 'negctl')) # no log
-#' r1a = m0 |>
-#'  split(f = ~ day + id) |>
-#'  lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE)
-#' 
-#' r2a = m0 |> 
-#'  log(base = 10) |> # [elsdfr2x] uses base-10
-#'  split(f = ~ day + id) |>
-#'  lapply(FUN = maxT_moodie, null.value = log10(2), 
-#'    bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE)
 #' @keywords internal
 #' @export
 maxT_moodie <- function(
@@ -63,7 +46,7 @@ maxT_moodie <- function(
   
   if (!bootstrap) { # moodie's [elsdfreq]
     dd <- cbind(data@x1, data@x0)
-    ids <- combn_elispot(data)
+    ids <- combn_ELISpot(data)
     prm1. <- ids |>
       lapply(FUN = \(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) |> # permutation of treatment
       unlist(use.names = FALSE)
