@@ -149,7 +149,12 @@ ds$Wk5.Ad5 |>
 ```
 
 ```{r}
-Wk5.Ad5 = maxT_santos_test(data1 = ds$Wk5.Ad5, data0 = ds$Wk1.Ad5)
+#Wk5.Ad5 = maxT_santos_test(data1 = ds$Wk5.Ad5, data0 = ds$Wk1.Ad5)
+Wk5.Ad5 = ds |>
+  with.default(expr = {
+    santosT(Wk5.Ad5, null.value = 2) - santosT(Wk1.Ad5, null.value = 2)   
+  }) |>
+  maxT()
 ```
 
 @fig-XX presents an example visualization of Westfall-Yang max-$T$ correction for a total of 46 two-sided difference-of-difference hypotheses. The nebula of points represents the successive maxima (@eq-successM2). The bigger point per hypothesis is the test statistic (@eq-santosT2). The labels on the left vertical axis are permutation adjusted $p$-values (@eq-perm_p) and monotonicity constraints enforced (@eq-perm_p_mono). The labels on the right vertical axis are the values of the test statistic (@eq-santosT2). Hypothesis with monotonicity constraints enforced $\tilde{p}>.05$ are colored red. The line connecting all hypotheses does not have a statistical meaning, but only to let all test statistics (@eq-santosT2) stand out to the naked eye.
@@ -253,24 +258,26 @@ to recreate Figure 2B
 ```{r}
 st1 |> 
   with.default(expr = {
-    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`)
+    santosT(`18.CEF`) - santosT(`0.CEF`)   
   }) |>
+  maxT() |>
   reactable_maxT()
 ```
 
 ```{r}
 st1 |> 
   with.default(expr = {
-    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`, two.sided = FALSE)
+    santosT(`18.CEF`) - santosT(`0.CEF`)   
   }) |>
+  maxT(two.sided = FALSE) |>
   reactable_maxT()
 ```
 
 ```{r}
 st1 |> 
   with.default(expr = {
-    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`, null.value = 10)
-  }) |>
+    santosT(`18.CEF`, null.value = 10) - santosT(`0.CEF`, null.value = 10)    }) |>
+  maxT() |>
   reactable_maxT()
 ```
 

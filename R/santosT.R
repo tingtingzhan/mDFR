@@ -1,12 +1,15 @@
 
 
-#' @title Distribution Free Test Statistic
+#' @title Distribution Free Test Statistic \linkS4class{santosT}
 #' 
 #' @description
 #' Distribution free test statistic to compare a treatment against a control.
 #' 
 #' @slot .Data ..
 #' 
+#' @slot null.value \link[base]{numeric} scalar \eqn{c}, 
+#' as in \eqn{H_0: \mu_1 - c\mu_0 = 0}
+
 #' @slot delta ..
 #' 
 #' @slot stderr ..
@@ -18,8 +21,7 @@
 #' @param x,x0 \link[base]{numeric} \link[base]{matrix}-es, 
 #' treatment \eqn{x_1} and control responses \eqn{x_0}, respectively
 #' 
-#' @param null.value \link[base]{numeric} scalar \eqn{c}, 
-#' as in \eqn{H_0: \mu_1 - c\mu_0 = 0}
+#' @param null.value see **Slots**
 #' 
 #' @param s4 \link[base]{logical} scalar
 #' 
@@ -33,12 +35,28 @@
 #' @aliases santosT-class
 #' @export
 setClass(Class = 'santosT', contains = 'numeric', slots = c(
+  null.value = 'numeric',
   delta = 'numeric',
   stderr = 'numeric',
   df = 'numeric',
   data = 'ANY'
-  # null.value = <maybe I want to save as well?>
 ))
+
+
+#' @title Distribution Free Test Statistic, Difference of Difference \linkS4class{santosT_diff}
+#' 
+#' @slot .Data \link[base]{numeric} \link[base]{vector}
+#' 
+#' @slot e1,e2 \linkS4class{santosT}
+#' 
+#' @name santosT_diff
+#' @aliases santosT_diff-class
+#' @export
+setClass(Class = 'santosT_diff', contains = 'numeric', slots = c(
+  e1 = 'santosT',
+  e2 = 'santosT'
+))
+
 
 
 #' @rdname santosT
@@ -51,8 +69,7 @@ santosT <- function(x, ...) UseMethod(generic = 'santosT')
 santosT.ELISpot <- function(x, ...) {
   santosT.matrix(x = x@x1, x0 = x@x0, data = x, ...)
 }
-  
-  
+
 
 #' @rdname santosT
 #' @importFrom matrixStats rowVars
@@ -96,8 +113,9 @@ santosT.matrix <- function(
   
   gw <- Gosset_Welch(v1 = vr1, v0 = vr0, c0 = null.value, n1 = n1, n0 = n0)
   gw_stderr <- attr(gw, which = 'stderr', exact = TRUE)
-
+  
   out <- delta / gw_stderr
+  attr(out, which = 'null.value') <- null.value
   attr(out, which = 'delta') <- delta
   attr(out, which = 'stderr') <- gw_stderr
   attr(out, which = 'df') <- c(gw) # to drop attributes
@@ -106,34 +124,39 @@ santosT.matrix <- function(
   attr(out, which = 'data') <- if (!missing(data)) data # else NULL
   if (s4) return(new(Class = 'santosT', out)) # `slot`s are `attr`s !
   return(out)
-
+  
 }
-
 
 
 
 #' @title Distribution Free Test Statistic, Difference of Difference
 #' 
-#' @param u,v two objects, both returned from function [santosT]
+#' @param e1,e2 \linkS4class{santosT}
 #' 
 #' @references
 #' The distribution free test statistic \eqn{T} is not exactly the same as 
 #' Equation (6) and (7) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
-#' @returns
-#' Function [santosT2()] returns a \link[base]{numeric} \link[base]{vector} \eqn{T}.
-#' 
+#' @keywords internal
 #' @export
-santosT2 <- function(
-    u, v
-) {
-  d_u <- attr(u, which = 'delta', exact = TRUE)
-  d_v <- attr(v, which = 'delta', exact = TRUE)
-  sd_u <- attr(u, which = 'stderr', exact = TRUE)
-  sd_v <- attr(v, which = 'stderr', exact = TRUE)
-  df_u <- attr(u, which = 'df', exact = TRUE)
-  df_v <- attr(v, which = 'df', exact = TRUE)
-  sd_pooled <- sqrt( (df_u*sd_u^2 + df_v*sd_v^2) / (df_u+df_v) )
-  (d_u - d_v) / sd_pooled
-}
+setMethod(f = '-', signature = c(e1 = 'santosT', e2 = 'santosT'), definition = \(e1, e2) {
+  
+  if (!all.equal.numeric(e1@null.value, e2@null.value)) stop('`@null.value` must be the same')
+  
+  # `@` much faster than ?base::attr !!!
+  d1 <- e1@delta
+  d2 <- e2@delta
+  sd1 <- e1@stderr
+  sd2 <- e2@stderr
+  df1 <- e1@df
+  df2 <- e2@df
+  sd_pooled <- sqrt( (df1*sd1^2 + df2*sd2^2) / (df1+df2) )
+  
+  new(
+    Class = 'santosT_diff',
+    (d1 - d2) / sd_pooled,
+    e1 = e1, e2 = e2
+  )
+
+})
 
