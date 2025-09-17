@@ -117,7 +117,7 @@ santosT <- function(
 #' Equation (6) and (7) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
 #' @returns
-#' Function [santosT2] returns a \link[base]{numeric} \link[base]{vector} \eqn{T}.
+#' Function [santosT2()] returns a \link[base]{numeric} \link[base]{vector} \eqn{T}.
 #' 
 #' @export
 santosT2 <- function(

@@ -125,12 +125,9 @@ d0 = snook |>
   as.ELISpot(formula = ~ Antigen | Week + Subject, data = _, pattern1 = '^rep[1-5]$', pattern0 = 'DMSO')
 ```
 
-```{r}
-d1 = trim_ELISpot(d0)
-```
 
 ```{r}
-ds = d1 |>
+ds = d0 |>
   split(f = ~ Week + Antigen)
 ```
 
@@ -182,8 +179,7 @@ moodie |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
   reactable::reactable(
-    rownames = FALSE, 
-    defaultPageSize = 20L
+    rownames = FALSE, defaultPageSize = 6L
   )
 ```
 
@@ -197,12 +193,73 @@ moodie |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
   reactable::reactable(
-    rownames = FALSE, 
-    defaultPageSize = 20L
+    rownames = FALSE, defaultPageSize = 6L
   )
 ```
 
 ## Reproducing Santos
+
+paper page 5, 'The ELISPOT spot results were analyzed for statistical significance at
+
+.. a given time point by comparing the number of spots for each of the tested peptides
+
+.. (triplicates) with the background controls (no peptide added, six replicates)
+
+at that time point.'
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Example**: Excel sheet 1'
+st1 = santos1 |>
+  as.ELISpot(formula = ~ antigen | Hr + Subj, data = _, pattern0 = '^y0_', pattern1 = '^y1_') |> 
+  split(f = ~ Hr + antigen)
+```
+
+```{r}
+st1 |>
+  lapply(FUN = maxT_santos, null.value = 1) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+```{r}
+st1 |>
+  lapply(FUN = maxT_santos, null.value = 2) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+to recreate Figure 2B
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`)
+  }) |>
+  reactable_maxT()
+```
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`, two.sided = FALSE)
+  }) |>
+  reactable_maxT()
+```
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    maxT_santos_test(data1 = `18.CEF`, data0 = `0.CEF`, null.value = 10)
+  }) |>
+  reactable_maxT()
+```
 
 ## Distribution Free Test Statistic
 

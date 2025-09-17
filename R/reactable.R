@@ -16,9 +16,7 @@
 #' @importFrom reactable reactable
 #' @export
 reactable_maxT <- function(x, ...) {
-  
   x |>
     as.data.frame.maxT() |>
     reactable(...)
-
 }

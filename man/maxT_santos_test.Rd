@@ -7,7 +7,7 @@
 maxT_santos_test(data1, data0, ...)
 }
 \arguments{
-\item{data1, data0}{two \code{ELISpot} objects,
+\item{data1, data0}{two \linkS4class{ELISpot} objects,
 at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 
 \item{...}{additional parameters, such as \code{null.value} in function \link{santosT} and
@@ -15,13 +15,5 @@ at two time points \eqn{t_1} and \eqn{t_0}, respectively}
 }
 \description{
 ..
-}
-\examples{
-# to recreate Figure 2B
-ds = split(santos1, f = ~ Hr + antigen)
-maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
-maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, null.value = 10)
-maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
-
 }
 \keyword{internal}

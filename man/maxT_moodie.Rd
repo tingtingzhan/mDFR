@@ -7,7 +7,7 @@
 maxT_moodie(data, bootstrap = FALSE, null.value, R = 1000L, seed_, ...)
 }
 \arguments{
-\item{data}{an \code{ELISpot} object}
+\item{data}{an \linkS4class{ELISpot} object}
 
 \item{bootstrap}{\link[base]{logical} scalar,
 whether to use bootstrap samples.

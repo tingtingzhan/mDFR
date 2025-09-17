@@ -5,18 +5,11 @@
 #' @description
 #' ..
 #' 
-#' @param data1,data0 two `ELISpot` objects, 
+#' @param data1,data0 two \linkS4class{ELISpot} objects, 
 #' at two time points \eqn{t_1} and \eqn{t_0}, respectively
 #' 
 #' @param ... additional parameters, such as `null.value` in function [santosT] and
 #' `two.sided` for \linkS4class{maxT}
-#' 
-#' @examples
-#' # to recreate Figure 2B
-#' ds = split(santos1, f = ~ Hr + antigen)
-#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`)
-#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, null.value = 10)
-#' maxT_santos_test(data1 = ds$`18.CEF`, data0 = ds$`0.CEF`, two.sided = FALSE)
 #' 
 #' @keywords internal
 #' @importFrom matrixStats colAnys

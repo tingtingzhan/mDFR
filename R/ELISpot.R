@@ -35,10 +35,17 @@ setMethod(f = initialize, signature = 'ELISpot', definition = function(.Object, 
     x <- x[, id, drop = FALSE]
     return(x)
   }
-   
   x@x1 <- .rm_colNA(x@x1)
   x@x0 <- .rm_colNA(x@x0)
 
+  # Both `@x1` and `@x0` must contain more than 1 measurement per row
+  id <- (rowSums(!is.na(x@x1)) > 1L) & (rowSums(!is.na(x@x0)) > 1L)
+  if (!all(id)) {
+    x@design <- x@design[id, ]
+    x@x1 <- x@x1[id, , drop = FALSE]
+    x@x0 <- x@x0[id, , drop = FALSE]
+  }
+  
   return(x)
   
 })
@@ -48,28 +55,25 @@ setMethod(f = initialize, signature = 'ELISpot', definition = function(.Object, 
 
 
 
-
-#' @title Create `ELISpot` Object, Moodie's fashion
+#' @title Create \linkS4class{ELISpot} Object
 #' 
 #' @description ..
 #' 
 #' @param formula \link[stats]{formula}
 #' 
-#' @param data \link[base]{data.frame} with columns in the order of 
-#' patient_id, day, antigen, rep1, rep2, etc.
+#' @param data \link[base]{data.frame}
 #' 
 #' @param pattern1 \link[base]{regex}
 #' 
-#' @param pattern0 \link[base]{character} scalar, name of negative control wells.
-#' Currently do not allow `missing` (for no negative control wells)
+#' @param pattern0 \link[base]{character} scalar of name of negative-control arm, or of \link[base]{regex} control pattern
 #' 
 #' @param ... potential parameters, currently not in use
 #' 
 #' @returns 
-#' 
-#' Functions [santos2ELISpot()] both return an `ELISpot`.
+#' Functions [as.ELISpot()] both return an \linkS4class{ELISpot} object
 #' 
 #' @keywords internal
+#' @importFrom zoo na.locf
 #' @export
 as.ELISpot <- function(
     formula, 
@@ -91,9 +95,11 @@ as.ELISpot <- function(
   if (f_design[[1L]] != '|') stop('design formula must contain a `|`')
    
   xvar <- all.vars(f_design)
+  data[xvar] <- data[xvar] |> 
+    na.locf() # ?zoo:::na.locf.data.frame
   if (anyNA(data[xvar], recursive = TRUE)) stop('Do not allow missingness in ', sQuote(deparse1(f_design)))
   
-  # do NOT sort by antigen!!
+  # NEXT: do NOT sort by antigen!!
   data <- call(name = '~', call(name = '+', f_design[[3L]], f_design[[2L]])) |> 
     #call(name = '~', f_design[[3L]]) |> 
     # ~Hr + Subj + antigen
@@ -115,12 +121,12 @@ as.ELISpot <- function(
     names() |>
     grepv(pattern = pattern0, x = _)
   
-  if (!length(v0)) { # moodie-style
+  if (!length(v0)) { # Moodie-style
     
     # `cid`: row indices of negative control
     if (!any(cid <- (data[[f_design[[2L]]]] == pattern0))) stop('Negative control ', sQuote(pattern0), ' is not present in data_design')
     
-    ret <- data[all.vars(f_design)][!cid, , drop = FALSE] # design *after removing control*
+    ret <- data[xvar][!cid, , drop = FALSE] # design *after removing control*
     .rowNamesDF(ret) <- NULL
     
     x1 <- X[!cid, , drop = FALSE]
@@ -133,62 +139,146 @@ as.ELISpot <- function(
     
     return(new(Class = 'ELISpot', design = ret, x1 = x1, x0 = x0))
     
-  }
+  } # Moodie-style
   
-
+  # Santos-style
+  
+  x0 <- v0 |>
+    subset.data.frame(x = data, select = _) |>
+    as.matrix.data.frame()
+  
+  return(new(Class = 'ELISpot', design = data[xvar], x1 = X, x0 = x0))
+  
 }
 
 
 
-
-
-#' @title Create `ELISpot` Object, Santos' fashion
+#' @title Permutation Indices of Treatment in \linkS4class{ELISpot}
 #' 
-#' @description ..
+#' @description
+#' Permuted indices of treatment in an \linkS4class{ELISpot} object
 #' 
-#' @param ptn0 \link[base]{regex}, pattern of control
+#' @note
+#' Westfall & Young's \linkS4class{maxT} algorithm
+#' (Box 2, page 82 of \doi{10.1214/ss/1056397487}) says *permutation*.
 #' 
-#' @param ptn1 \link[base]{regex}, pattern of treatment
+#' In **R** convention, this is a *combination* \link[utils]{combn}.
 #' 
-#' @examples
-#' # these are `santos1` and `santos2` in this package
-#' santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos1_raw)
-#' santos2ELISpot(formula = ~ antigen | Hr + Subj, data = santos2_raw)
+#' @param data an \linkS4class{ELISpot} object
+#' 
+#' @returns 
+#' Function [combn_ELISpot()] returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
 #' 
 #' @keywords internal
-#' @importFrom zoo na.locf
+#' @importFrom utils combn
 #' @export
-santos2ELISpot <- function(
-    formula,
-    data, 
-    ptn0 = '^y0_',
-    ptn1 = '^y1_',
-    ...
-) {
-  
-  if (!is.data.frame(data)) stop('`data` must be a data.frame')
-  data <- as.data.frame(data) # use S3, 'tibble'
-  
-  f_design <- formula[[2L]] # antigen | Hr + Subj
-  data[all.vars(f_design)] <- data[all.vars(f_design)] |> na.locf() # ?zoo:::na.locf.data.frame
-  
-  f_sort <- call('~', call('+', f_design[[3L]], f_design[[2L]])) # ~Hr + Subj + antigen
-  # only symbol `f_design[[2L]]` supported, for now!!
-  
-  ret <- sort_by.data.frame(data, y = eval(f_sort))
-  .rowNamesDF(ret) <- NULL
-  
-  nm <- names(ret)
-  nm0 <- grepl(pattern = ptn0, x = nm)
-  nm1 <- grepl(pattern = ptn1, x = nm)
-  x0 <- ret[nm0] |> unname() |> as.matrix.data.frame()
-  x1 <- ret[nm1] |> unname() |> as.matrix.data.frame()
-  ret[nm0 | nm1] <- NULL
-  
-  new(Class = 'ELISpot', design = ret, x1 = x1, x0 = x0)
-  
+combn_ELISpot <- function(data) {
+  n1 <- dim(data@x1)[2L]
+  n0 <- dim(data@x0)[2L]
+  combn(n1 + n0, m = n1, simplify = FALSE)
 }
 
+
+
+
+
+
+#' @title \link[base]{log} of \linkS4class{ELISpot}
+#' 
+#' @description
+#' \linkS4class{ELISpot} dispatches for S3 generics \link[base]{log}.
+#' 
+#' @param x an \linkS4class{ELISpot} object
+#' 
+#' @param base \link[base]{numeric} scalar, see \link[base]{log}
+#' 
+#' @note
+#' The `S3` generic function \link[base]{log1p} does not have `base` parameter.
+#' 
+#' @returns
+#' 
+#' Function [log.ELISpot()] returns an `ELISpot`.
+#' 
+#' @keywords internal
+#' @name log_ELISpot
+#' @export log.ELISpot
+#' @export
+log.ELISpot <- function(x, base = exp(1)) {
+  if (any(x@x1 == 0, x@x0 == 0, na.rm = TRUE)) {
+    x@x1 <- x@x1 + 1
+    x@x0 <- x@x0 + 1
+  }
+  x@x0 <- log(x@x0, base = base)
+  x@x1 <- log(x@x1, base = base)
+  return(x)
+}
+
+
+#' @rdname log_ELISpot
+#' @export log1p.ELISpot
+#' @export
+log1p.ELISpot <- function(x) {
+  x@x0 <- log1p(x@x0)
+  x@x1 <- log1p(x@x1)
+  return(x)
+}
+
+#' @rdname log_ELISpot
+#' @export log10.ELISpot
+#' @export
+log10.ELISpot <- function(x) {
+  x@x0 <- log10(x@x0)
+  x@x1 <- log10(x@x1)
+  return(x)
+}
+
+#' @rdname log_ELISpot
+#' @export log2.ELISpot
+#' @export
+log2.ELISpot <- function(x) {
+  x@x0 <- log2(x@x0)
+  x@x1 <- log2(x@x1)
+  return(x)
+}
+
+
+
+
+
+
+
+
+#' @title \link[base]{split} an \linkS4class{ELISpot} Object
+#' 
+#' @param x an \linkS4class{ELISpot}
+#' 
+#' @param f ..
+#' 
+#' @param drop \link[base]{logical} scalar, must be `FALSE`
+#' 
+#' @keywords internal
+#' @export split.ELISpot
+#' @export
+split.ELISpot <- function(x, f, drop = TRUE, ...) {
+  
+  if (!drop) stop('`drop` must be TRUE')
+  
+  # most simple solution..
+  z <- x@design
+  z$x1 <- x@x1
+  z$x0 <- x@x0
+  
+  foo <- \(y) {
+    y0 <- y
+    y0$x1 <- y0$x0 <- NULL
+    new(Class = 'ELISpot', design = y0, x1 = y$x1, x0 = y$x0)
+  }
+
+  z |>
+    split.data.frame(f = f, drop = drop, ...) |>
+    lapply(FUN = foo)
+  
+}
 
 
 

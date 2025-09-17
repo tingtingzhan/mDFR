@@ -2,25 +2,23 @@
 % Please edit documentation in R/ELISpot.R
 \name{as.ELISpot}
 \alias{as.ELISpot}
-\title{Create \code{ELISpot} Object, Moodie's fashion}
+\title{Create \linkS4class{ELISpot} Object}
 \usage{
 as.ELISpot(formula, data, pattern0, pattern1, ...)
 }
 \arguments{
 \item{formula}{\link[stats]{formula}}
 
-\item{data}{\link[base]{data.frame} with columns in the order of
-patient_id, day, antigen, rep1, rep2, etc.}
+\item{data}{\link[base]{data.frame}}
 
-\item{pattern0}{\link[base]{character} scalar, name of negative control wells.
-Currently do not allow \code{missing} (for no negative control wells)}
+\item{pattern0}{\link[base]{character} scalar of name of negative-control arm, or of \link[base]{regex} control pattern}
 
 \item{pattern1}{\link[base]{regex}}
 
 \item{...}{potential parameters, currently not in use}
 }
 \value{
-Functions \code{\link[=santos2ELISpot]{santos2ELISpot()}} both return an \code{ELISpot}.
+Functions \code{\link[=as.ELISpot]{as.ELISpot()}} both return an \linkS4class{ELISpot} object
 }
 \description{
 ..

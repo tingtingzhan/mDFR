@@ -4,7 +4,7 @@
 #' 
 #' @description Resampling-based \eqn{p}-value adjustment
 #' 
-#' @param data an `ELISpot` object
+#' @param data an \linkS4class{ELISpot} object
 #' 
 #' @param bootstrap \link[base]{logical} scalar, 
 #' whether to use bootstrap samples.
@@ -87,7 +87,7 @@ maxT_moodie <- function(
   return(do.call(new, args = c(list(
     Class = 'maxT', 
     t. = t_, T. = T_,
-    design = data@design #data
+    design = data@design
   ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   
 }

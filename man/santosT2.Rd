@@ -10,7 +10,7 @@ santosT2(u, v)
 \item{u, v}{two objects, both returned from function \link{santosT}}
 }
 \value{
-Function \link{santosT2} returns a \link[base]{numeric} \link[base]{vector} \eqn{T}.
+Function \code{\link[=santosT2]{santosT2()}} returns a \link[base]{numeric} \link[base]{vector} \eqn{T}.
 }
 \description{
 Distribution Free Test Statistic, Difference of Difference
