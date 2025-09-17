@@ -273,11 +273,11 @@ The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree o
 \text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
 $$ {#eq-santosT_df}
 
-Function `santosT()` returns a `numeric` `vector` of $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of distribution free test statistic (@eq-santosT), with `attributes`,
+Function `santosT()` returns a `numeric` `vector` of distribution free test statistic (@eq-santosT), with `attributes`,
 
--   `attr(.,'df')`, degree of freedom (@eq-santosT_df)
--   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of distribution free test statistic (@eq-santosT)
--   `attr(.,'stderr2')`, standard deviation $s^2_{\bar\Delta}$, included due to the extreme time-sensitivity of function `santosT2()`
+-   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-santosT),
+-   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-santosT),
+-   `attr(.,'df')`, degree of freedom (@eq-santosT_df).
 
 
 

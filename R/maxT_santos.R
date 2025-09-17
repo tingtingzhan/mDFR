@@ -19,15 +19,18 @@ maxT_santos <- function(data, ...) {
   x1 <- data@x1
   x0 <- data@x0
   
-  tmp <- santosT(x1 = x1, x0 = x0, ...)
-  t_ <- tmp / attr(tmp, which = 'stderr', exact = TRUE)
+  # before 2025-09
+  #tmp <- santosT(x1 = x1, x0 = x0, ...)
+  #t_ <- tmp / attr(tmp, which = 'stderr', exact = TRUE)
+  t_ <- santosT(x1 = x1, x0 = x0, ...)
   
   # based on permutation
   dd <- cbind(x1, x0)
   ids <- combn_ELISpot(data)
   tmp <- lapply(ids, FUN = \(i) {
-    tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
-    tmp / attr(tmp, which = 'stderr', exact = TRUE)
+    #tmp <- santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
+    #tmp / attr(tmp, which = 'stderr', exact = TRUE)
+    santosT(x1 = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
   })
   T_ <- unlist(tmp, use.names = FALSE)
   dim(T_) <- c(nrow(data@design), length(ids))

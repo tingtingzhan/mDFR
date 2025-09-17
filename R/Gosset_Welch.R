@@ -43,12 +43,10 @@
 #' 
 #' @returns 
 #' 
-#' Function [Gosset_Welch] returns a \link[base]{numeric} scalar or \link[base]{vector} 
+#' Function [Gosset_Welch()] returns a \link[base]{numeric} scalar or \link[base]{vector} 
 #' of the degree of freedom, with \link[base]{attributes},
 #' \describe{
-#' \item{`attr(., 'stderr')`}{\link[base]{numeric} scalar or \link[base]{vector}, standard error \eqn{s_{\bar\Delta}};}
-#' \item{`attr(., 'stderr2')`}{\link[base]{numeric} scalar or \link[base]{vector}, standard error squared \eqn{s^2_{\bar\Delta}},
-#' included for downstream compute-intensive functions.}
+#' \item{`attr(., 'stderr')`}{\link[base]{numeric} scalar or \link[base]{vector}, standard error \eqn{s_{\bar\Delta}}}
 #' } 
 #' 
 #' @references 
@@ -92,7 +90,6 @@ Gosset_Welch <- function(
     ret <- vd^2 / (.v1^2/(n1-1L) + .v0^2/(n0-1L))
   }
   attr(ret, which = 'stderr') <- sqrt(vd)
-  attr(ret, which = 'stderr2') <- vd
   return(ret)
 }
 

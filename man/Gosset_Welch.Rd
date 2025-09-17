@@ -36,12 +36,10 @@ sample sizes \eqn{n_1} and \eqn{n_0} of the treatment and control sample, respec
 whether to assume \eqn{v_1=v_0}, default \code{FALSE} (as in function \link[stats]{t.test.default}).}
 }
 \value{
-Function \link{Gosset_Welch} returns a \link[base]{numeric} scalar or \link[base]{vector}
+Function \code{\link[=Gosset_Welch]{Gosset_Welch()}} returns a \link[base]{numeric} scalar or \link[base]{vector}
 of the degree of freedom, with \link[base]{attributes},
 \describe{
-\item{\code{attr(., 'stderr')}}{\link[base]{numeric} scalar or \link[base]{vector}, standard error \eqn{s_{\bar\Delta}};}
-\item{\code{attr(., 'stderr2')}}{\link[base]{numeric} scalar or \link[base]{vector}, standard error squared \eqn{s^2_{\bar\Delta}},
-included for downstream compute-intensive functions.}
+\item{\code{attr(., 'stderr')}}{\link[base]{numeric} scalar or \link[base]{vector}, standard error \eqn{s_{\bar\Delta}}}
 }
 }
 \description{

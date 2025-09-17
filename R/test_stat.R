@@ -51,12 +51,16 @@ santosT <- function(
   ### reason 1: need to multiply by `null.value`
   ### reason 2: should not assume equal.variance between `x1` and `x0`
   
-  tmp <- Gosset_Welch(v1 = vr1, v0 = vr0, c0 = null.value, n1 = n1, n0 = n0)
-  ret <- (m1 - null.value * m0)
-  attr(ret, which = 'df') <- c(tmp) # to drop attributes
-  attr(ret, which = 'stderr') <- attr(tmp, which = 'stderr', exact = TRUE)
-  attr(ret, which = 'stderr2') <- attr(tmp, which = 'stderr2', exact = TRUE)
-  return(ret)
+  delta <- (m1 - null.value * m0)
+  
+  gw <- Gosset_Welch(v1 = vr1, v0 = vr0, c0 = null.value, n1 = n1, n0 = n0)
+  gw_stderr <- attr(gw, which = 'stderr', exact = TRUE)
+  
+  out <- delta / gw_stderr
+  attr(out, which = 'delta') <- delta
+  attr(out, which = 'stderr') <- gw_stderr
+  attr(out, which = 'df') <- c(gw) # to drop attributes
+  return(out)
   
 }
 
@@ -78,11 +82,13 @@ santosT <- function(
 santosT2 <- function(
     u, v
 ) {
-  sd2_u <- attr(u, which = 'stderr2', exact = TRUE)
-  sd2_v <- attr(v, which = 'stderr2', exact = TRUE)
+  d_u <- attr(u, which = 'delta', exact = TRUE)
+  d_v <- attr(v, which = 'delta', exact = TRUE)
+  sd_u <- attr(u, which = 'stderr', exact = TRUE)
+  sd_v <- attr(v, which = 'stderr', exact = TRUE)
   df_u <- attr(u, which = 'df', exact = TRUE)
   df_v <- attr(v, which = 'df', exact = TRUE)
-  sd_pooled <- sqrt( (df_u*sd2_u + df_v*sd2_v) / (df_u+df_v) )
-  (u - v) / sd_pooled
+  sd_pooled <- sqrt( (df_u*sd_u^2 + df_v*sd_v^2) / (df_u+df_v) )
+  (d_u - d_v) / sd_pooled
 }
 

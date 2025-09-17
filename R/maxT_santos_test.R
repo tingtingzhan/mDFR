@@ -48,8 +48,10 @@ maxT_santos_test <- function(
   x01 <- data0@x1
   x00 <- data0@x0
   
-  t_ <- santosT2(u = santosT(x1 = x11, x0 = x10, ...), 
-                 v = santosT(x1 = x01, x0 = x00, ...))
+  t_ <- santosT2(
+    u = santosT(x1 = x11, x0 = x10, ...), 
+    v = santosT(x1 = x01, x0 = x00, ...)
+  )
   
   # based on permutation (remove all NA columns)
   ids1 <- combn_ELISpot(data1)
@@ -66,7 +68,8 @@ maxT_santos_test <- function(
     lapply(FUN = fn, data = cbind(x01, x00))
   
   ### actually [santosT2]
-  t1. <- tm1 |>
+  d1. <- tm1 |>
+    lapply(FUN = attr, which = 'delta', exact = TRUE) |>
     unlist(use.names = FALSE)
   df1. <- tm1 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
@@ -74,9 +77,10 @@ maxT_santos_test <- function(
   stderr1. <- tm1 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
     unlist(use.names = FALSE)
-  dim(t1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
+  dim(d1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
   
-  t0. <- tm0 |> 
+  d0. <- tm0 |> 
+    lapply(FUN = attr, which = 'delta', exact = TRUE) |>
     unlist(use.names = FALSE)
   df0. <- tm0 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
@@ -84,11 +88,11 @@ maxT_santos_test <- function(
   stderr0. <- tm0 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
     unlist(use.names = FALSE)
-  dim(t0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
+  dim(d0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
   
   id_ <- expand.grid(tm0 = seq_len(n0), tm1 = seq_len(n1))
   var_pooled <- ((df1.*stderr1.^2)[,id_$tm1] + (df0.*stderr0.^2)[,id_$tm0]) / (df1.[,id_$tm1] + df0.[,id_$tm0])
-  T. <- (t1.[,id_$tm1] - t0.[,id_$tm0]) / sqrt(var_pooled)
+  T. <- (d1.[,id_$tm1] - d0.[,id_$tm0]) / sqrt(var_pooled)
   if (any(id <- colAnys(is.na(T.)))) {
     message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
     T. <- T.[, !id]
