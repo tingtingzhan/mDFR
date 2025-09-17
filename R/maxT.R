@@ -261,8 +261,6 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' 
 #' @param object a \linkS4class{maxT} object
 #' 
-#' @param p_perm,p_mono,tr,U,two.sided description
-#' 
 #' @param conf.level \link[base]{double} scalar, 
 #' confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
 #' 

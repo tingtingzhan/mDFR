@@ -13,8 +13,6 @@
 confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
 
 \item{...}{additional parameters, currently not in use}
-
-\item{p_perm, p_mono, tr, U, two.sided}{description}
 }
 \value{
 Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} returns a \link[ggplot2]{ggplot} object.
