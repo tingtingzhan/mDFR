@@ -4,12 +4,14 @@
 \alias{as.data.frame.maxT}
 \title{Convert \linkS4class{maxT} to a \link[base]{data.frame}}
 \usage{
-\method{as.data.frame}{maxT}(x, ...)
+\method{as.data.frame}{maxT}(x, ..., check.names = FALSE)
 }
 \arguments{
 \item{x}{a \linkS4class{maxT} object}
 
 \item{...}{additional parameters, currently not in use}
+
+\item{check.names}{see function \link[base]{as.data.frame}}
 }
 \value{
 Function \code{\link[=as.data.frame.maxT]{as.data.frame.maxT()}} returns a \link[base]{data.frame}.

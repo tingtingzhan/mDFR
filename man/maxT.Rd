@@ -2,11 +2,14 @@
 % Please edit documentation in R/maxT.R
 \name{maxT}
 \alias{maxT}
+\alias{maxT.free_d}
 \alias{maxT.free_t}
 \alias{maxT.free_t_diff}
 \title{Modified Distribution Free Resampling}
 \usage{
 maxT(x, two.sided, ...)
+
+\method{maxT}{free_d}(x, two.sided = TRUE, ...)
 
 \method{maxT}{free_t}(x, two.sided = TRUE, ...)
 

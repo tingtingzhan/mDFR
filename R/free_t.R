@@ -1,9 +1,9 @@
 
 
-#' @title Distribution Free Test Statistic \linkS4class{free_t}
+#' @title Distribution \linkS4class{free_t}-Statistic
 #' 
 #' @description
-#' Distribution free test statistic to compare a treatment against a control.
+#' Distribution \linkS4class{free_t} statistic to compare a treatment against a control.
 #' 
 #' @slot .Data ..
 #' 
@@ -19,7 +19,7 @@
 #' @slot data ..
 #' 
 #' @references
-#' The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
+#' Function [free_t()] return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
 #' @keywords internal
 #' @name free_t
@@ -136,8 +136,6 @@ free_t.matrix <- function(
   attr(out, which = 'delta') <- delta
   attr(out, which = 'stderr') <- gw_stderr
   attr(out, which = 'df') <- c(gw) # to drop attributes
-  attr(out, which = 'x1') <- x1
-  attr(out, which = 'x0') <- x0
   attr(out, which = 'data') <- if (!missing(data)) data # else NULL
   if (s4) return(new(Class = 'free_t', out)) # `slot`s are `attr`s !
   return(out)

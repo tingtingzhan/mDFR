@@ -185,6 +185,8 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 #' 
 #' @param x a \linkS4class{maxT} object
 #' 
+#' @param check.names see function \link[base]{as.data.frame}
+#' 
 #' @param ... additional parameters, currently not in use
 #' 
 #' @returns 
@@ -193,7 +195,11 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 #' @method as.data.frame maxT
 #' @export as.data.frame.maxT
 #' @export
-as.data.frame.maxT <- function(x, ...) {
+as.data.frame.maxT <- function(
+    x,
+    ..., 
+    check.names = FALSE
+) {
   
   tmp <- list(
     if (length(x@design)) x@design, #  else NULL
@@ -208,7 +214,7 @@ as.data.frame.maxT <- function(x, ...) {
   )
   
   tmp[lengths(tmp) > 0L] |>
-    as.data.frame.list(check.names = FALSE)
+    as.data.frame.list(check.names = FALSE, ...)
   
 }
 

@@ -106,32 +106,19 @@ This work is supported by Department of Defense grants
 
 -   ??? ([A. Snook](https://orcid.org/0000-0002-9104-4505), [T. Zhan](https://orcid.org/0000-0001-9971-4844))
 
-# `'ELISpot'`
-
-An ELISpot (Enzyme-Linked ImmunoSpot) assay ..
-
-The `S4` class `'ELISpot'` ..
-
-## Creation
-
-# `'maxT'`
-
-The `S4` class '`maxT`' ..
-
 # Snook
 
-```{r}
-d0 = snook |>
-  as.ELISpot(formula = ~ Antigen | Week + Subject, data = _, pattern1 = '^rep[1-5]$', pattern0 = 'DMSO')
-```
 
 ```{r}
-ds = d0 |>
+snook. = snook |>
+  as.ELISpot(formula = ~ Antigen | Week + Subject, data = _, pattern1 = '^rep[1-5]$', pattern0 = 'DMSO') |>
   split(f = ~ Week + Antigen)
 ```
 
 ```{r}
-ds$Wk5.Ad5 |> 
+#| code-fold: true
+#| code-summary: '**Example**: testing *`snook.$Wk5.Ad5`* with $c=1$'
+snook.$Wk5.Ad5 |> 
   free_t() |>
   maxT() |>
   reactable_maxT(
@@ -140,7 +127,9 @@ ds$Wk5.Ad5 |>
 ```
 
 ```{r}
-ds$Wk5.Ad5 |> 
+#| code-fold: true
+#| code-summary: '**Example**: testing *`snook.$Wk5.Ad5`* with $c=2$'
+snook.$Wk5.Ad5 |> 
   free_t(null.value = 2) |>
   maxT() |>
   reactable_maxT(
@@ -149,11 +138,17 @@ ds$Wk5.Ad5 |>
 ```
 
 ```{r}
-Wk5.Ad5 = ds |>
+#| code-fold: true
+#| code-summary: '**Example**: testing *`snook.$Wk5.Ad5`* vs. *`snook.$Wk1.Ad5`* with $c=2$'
+Wk5.Ad5 = snook. |>
   with.default(expr = {
     free_t(Wk5.Ad5, null.value = 2) - free_t(Wk1.Ad5, null.value = 2)   
   }) |>
   maxT()
+Wk5.Ad5 |> 
+  reactable_maxT(
+    rownames = FALSE, defaultPageSize = 6L
+  )
 ```
 
 @fig-XX presents an example visualization of Westfall-Yang max-$T$ correction for a total of 46 two-sided difference-of-difference hypotheses. The nebula of points represents the successive maxima (@eq-successM2). The bigger point per hypothesis is the test statistic (@eq-santosT2). The labels on the left vertical axis are permutation adjusted $p$-values (@eq-perm_p) and monotonicity constraints enforced (@eq-perm_p_mono). The labels on the right vertical axis are the values of the test statistic (@eq-santosT2). Hypothesis with monotonicity constraints enforced $\tilde{p}>.05$ are colored red. The line connecting all hypotheses does not have a statistical meaning, but only to let all test statistics (@eq-santosT2) stand out to the naked eye.
@@ -170,135 +165,9 @@ autoplot(Wk5.Ad5) + theme_minimal()
 
 # Appendix
 
-## Reproducing Moodie
+## @WestfallYoung93 max-$T$
 
-Her 2006 papers doi = 10.1016/j.jim.2006.07.015.
-
-<https://rundfr.fredhutch.org>, using the example data,
-
-```{r}
-#| code-fold: true
-#| code-summary: "Moodie's data as `ELISpot`"
-moodie = 'https://www.fredhutch.org/content/dam/www/research/divisions/vaccine-infectious-disease-division/staff-scientists/moodie/example.csv' |> 
-  url() |> 
-  read.csv() |>
-  as.ELISpot(formula = ~ antigen | day + id, data = _, pattern1 = '^a[1-9]$', pattern0 = 'negctl')
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'DFR(eq) adjp'
-moodie |>
-  split(f = ~ day + id) |>
-  lapply(FUN = maxT_moodie, null.value = 0, two.sided = FALSE) |>
-  lapply(FUN = as.data.frame.maxT) |>
-  do.call(what = rbind.data.frame, args = _) |>
-  reactable::reactable(
-    rownames = FALSE, defaultPageSize = 6L
-  )
-```
-
-```{r}
-#| code-fold: true
-#| code-summary: 'DFR(2x) adjp'
-moodie |> 
-  log(base = 10) |> # [elsdfr2x] uses base-10
-  split(f = ~ day + id) |>
-  lapply(FUN = maxT_moodie, null.value = log10(2), bootstrap = TRUE, seed_ = 9456845L, two.sided = FALSE) |>
-  lapply(FUN = as.data.frame.maxT) |>
-  do.call(what = rbind.data.frame, args = _) |>
-  reactable::reactable(
-    rownames = FALSE, defaultPageSize = 6L
-  )
-```
-
-## Reproducing Santos
-
-paper page 5, 'The ELISPOT spot results were analyzed for statistical significance at
-
-.. a given time point by comparing the number of spots for each of the tested peptides
-
-.. (triplicates) with the background controls (no peptide added, six replicates)
-
-at that time point.'
-
-```{r}
-#| code-fold: true
-#| code-summary: '**Example**: Excel sheet 1'
-st1 = santos1 |>
-  as.ELISpot(formula = ~ antigen | Hr + Subj, data = _, pattern0 = '^y0_', pattern1 = '^y1_') |> 
-  split(f = ~ Hr + antigen)
-```
-
-```{r}
-st1 |>
-  lapply(FUN = free_t, null.value = 1) |>
-  lapply(FUN = maxT) |>
-  lapply(FUN = as.data.frame.maxT) |>
-  do.call(what = rbind.data.frame, args = _) |>
-  reactable::reactable(
-    rownames = FALSE, defaultPageSize = 6L
-  )
-```
-
-```{r}
-st1 |>
-  lapply(FUN = free_t, null.value = 2) |>
-  lapply(FUN = maxT) |>
-  lapply(FUN = as.data.frame.maxT) |>
-  do.call(what = rbind.data.frame, args = _) |>
-  reactable::reactable(
-    rownames = FALSE, defaultPageSize = 6L
-  )
-```
-
-to recreate Figure 2B
-
-```{r}
-st1 |> 
-  with.default(expr = {
-    free_t(`18.CEF`) - free_t(`0.CEF`)   
-  }) |>
-  maxT() |>
-  reactable_maxT()
-```
-
-```{r}
-st1 |> 
-  with.default(expr = {
-    free_t(`18.CEF`) - free_t(`0.CEF`)   
-  }) |>
-  maxT(two.sided = FALSE) |>
-  reactable_maxT()
-```
-
-```{r}
-st1 |> 
-  with.default(expr = {
-    free_t(`18.CEF`, null.value = 10) - free_t(`0.CEF`, null.value = 10)    }) |>
-  maxT() |>
-  reactable_maxT()
-```
-
-## Distribution Free Test Statistic
-
-Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic (function `free_t()`)
-
-$$
-t = \dfrac{\bar{x}_1 - c\bar{x}_0}{s_{\bar\Delta}}
-$$ {#eq-freeT}
-
-The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree of freedom [@Welch47; @Satterthwaite46] $$
-\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
-$$ {#eq-santosT_df}
-
-Function `free_t()` returns a `numeric` `vector` of distribution free test statistic (@eq-freeT), with `attributes`,
-
--   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-freeT),
--   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-freeT),
--   `attr(.,'df')`, degree of freedom (@eq-santosT_df).
-
-We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-freeT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
+We apply @WestfallYoung93 max-$T$ correction [@Dudoit03] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-freeT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
 
 $$
 \begin{cases}
@@ -341,6 +210,154 @@ with the monotonicity constraints enforced by $$
 \tilde{p}_{r_j} & = \max\left\{p_{r_j}, \tilde{p}_{r_j-1}\right\}, \quad \text{for}\ j = 2,\cdots,m\\
 \end{cases}
 $$ {#eq-perm_p_mono}
+
+The `S3` generic function `maxT()` returns an object of `S4` class '`maxT`'.
+
+
+## `S4` class `'ELISpot'`
+
+An ELISpot (Enzyme-Linked ImmunoSpot) assay ..
+
+The `S4` class `'ELISpot'` ..
+
+
+
+
+
+## Moodie
+
+Her 2006 papers doi = 10.1016/j.jim.2006.07.015.
+
+<https://rundfr.fredhutch.org>, using the example data,
+
+```{r}
+#| code-fold: true
+#| code-summary: "Moodie's data as `ELISpot`"
+moodie = 'https://www.fredhutch.org/content/dam/www/research/divisions/vaccine-infectious-disease-division/staff-scientists/moodie/example.csv' |> 
+  url() |> 
+  read.csv() |>
+  as.ELISpot(formula = ~ antigen | day + id, data = _, pattern1 = '^a[1-9]$', pattern0 = 'negctl')
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'DFR(eq) adjp'
+moodie |>
+  split(f = ~ day + id) |>
+  lapply(FUN = \(i) {
+    i |> free_d() |> maxT(two.sided = FALSE)
+  }) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: 'DFR(2x) adjp; not fully identical?'
+#| echo: false
+#| eval: false
+set.seed(9456845L); moodie |> 
+  log(base = 10) |> # [elsdfr2x] uses base-10
+  split(f = ~ day + id) |>
+  lapply(FUN = maxT_moodie, null.value = log10(2), two.sided = FALSE) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+## Santos
+
+paper page 5, 'The ELISPOT spot results were analyzed for statistical significance at
+
+.. a given time point by comparing the number of spots for each of the tested peptides
+
+.. (triplicates) with the background controls (no peptide added, six replicates)
+
+at that time point.'
+
+```{r}
+#| code-fold: true
+#| code-summary: '**Example**: Excel sheet 1'
+st1 = santos1 |>
+  as.ELISpot(formula = ~ antigen | Hr + Subj, data = _, pattern0 = '^y0_', pattern1 = '^y1_') |> 
+  split(f = ~ Hr + antigen)
+```
+
+```{r}
+st1 |>
+  lapply(FUN = \(i) {
+    i |> free_t(null.value = 1) |> maxT()
+  }) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+```{r}
+st1 |>
+  lapply(FUN = \(i) {
+    i |> free_t(null.value = 2) |> maxT()
+  }) |>
+  lapply(FUN = as.data.frame.maxT) |>
+  do.call(what = rbind.data.frame, args = _) |>
+  reactable::reactable(
+    rownames = FALSE, defaultPageSize = 6L
+  )
+```
+
+to recreate Figure 2B
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    free_t(`18.CEF`) - free_t(`0.CEF`)   
+  }) |>
+  maxT() |>
+  reactable_maxT()
+```
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    free_t(`18.CEF`) - free_t(`0.CEF`)   
+  }) |>
+  maxT(two.sided = FALSE) |>
+  reactable_maxT()
+```
+
+```{r}
+st1 |> 
+  with.default(expr = {
+    free_t(`18.CEF`, null.value = 10) - free_t(`0.CEF`, null.value = 10)
+  }) |>
+  maxT() |>
+  reactable_maxT()
+```
+
+## Distribution Free Test Statistic
+
+Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic (function `free_t()`)
+
+$$
+t = \dfrac{\bar{x}_1 - c\bar{x}_0}{s_{\bar\Delta}}
+$$ {#eq-freeT}
+
+The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree of freedom [@Welch47; @Satterthwaite46] $$
+\text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
+$$ {#eq-santosT_df}
+
+Function `free_t()` returns a `numeric` `vector` of distribution free test statistic (@eq-freeT), with `attributes`,
+
+-   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-freeT),
+-   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-freeT),
+-   `attr(.,'df')`, degree of freedom (@eq-santosT_df).
 
 ### Difference of Difference
 

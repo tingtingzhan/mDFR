@@ -6,19 +6,9 @@
 #' 
 #' @param data an \linkS4class{ELISpot} object
 #' 
-#' @param bootstrap \link[base]{logical} scalar, 
-#' whether to use bootstrap samples.
-#' Default `FALSE` indicating the use of permuted samples.
-#' 
 #' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \log\mu_1 - \log\mu_0 = \mu_0}
 #' 
 #' @param R \link[base]{integer} scalar \eqn{R}, number of bootstrap copies if `bootstrap = TRUE`
-#' 
-#' @param seed_ (optional) \link[base]{integer} scalar, random seed for `'boot'` resampling method.
-#' In Moodie's function `elsdfr2x()`, `seed_ = 9456845L` is used.
-#' Howwever, Moodie uses a same seed for all analysis, which is a *bad* practice!
-#' The purpose of this parameter is solely to re-create Moodie's results.
-#' The end user is advised to leave this parameter missing.
 #' 
 #' @param two.sided \link[base]{logical} scalar, see \linkS4class{maxT}
 #' 
@@ -36,9 +26,9 @@
 #' @keywords internal
 #' @export
 maxT_moodie <- function(
-    data, bootstrap = FALSE,
+    data,
     null.value,
-    R = 1e3L, seed_, # only if (bootstrap)
+    R = 1e3L,
     two.sided = TRUE, 
     ...
 ) {
@@ -47,23 +37,7 @@ maxT_moodie <- function(
   m0 <- rowMeans(data@x0, na.rm = TRUE)
   t_ <- (m1 - m0) - null.value
   
-  if (!bootstrap) { # moodie's [elsdfreq]
-    dd <- cbind(data@x1, data@x0)
-    ids <- combn_ELISpot(data)
-    prm1 <- ids |>
-      lapply(FUN = \(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) |> # permutation of treatment
-      unlist(use.names = FALSE)
-    prm0 <- ids |>
-      lapply(FUN = \(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)) |> # permutation of control
-      unlist(use.names = FALSE)
-    prm <- prm1 - prm0
-    dim(prm) <- c(nrow(data@design), length(ids))
-    #T_ <- prm # moodie's
-    T_ <- prm - null.value # Tingting's
-    # moodie's [elsdfreq] example has `null.value = 0`
-    # Tingting thinks moodie's code is wrong
-    
-  } else { # moodie's [elsdfr2x]
+  { # moodie's [elsdfr2x]; bootstrap
     bmeans <- \(x, R) {
       # moodie's functions [bf] and [bcf], re-written
       # `x` is numeric vector
@@ -73,7 +47,6 @@ maxT_moodie <- function(
         array(dim = c(R, nx)) |>
         rowMeans()
     }
-    if (!missing(seed_)) set.seed(seed = seed_) 
     bt1 <- data@x1 |>
       apply(MARGIN = 1L, FUN = bmeans, R = R) |>
       t.default() # moodie's `bemeans`

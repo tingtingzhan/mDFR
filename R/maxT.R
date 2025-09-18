@@ -20,21 +20,47 @@ maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
 
 
 #' @rdname maxT
+#' @export maxT.free_d
+#' @export
+maxT.free_d <- function(x, two.sided = TRUE, ...) {
+  
+  T_ <- x@data |>
+    combn_ELISpot() |>
+    lapply(FUN = free_d.ELISpot, x = x@data, s4 = FALSE) |>
+    unlist(use.names = FALSE)
+  nr <- nrow(x@data@design)
+  dim(T_) <- c(nr, length(T_)/nr)
+  
+  tmp <- x@data@design |>
+    lapply(FUN = \(i) {
+      if (is.factor(i)) i <- as.character.factor(i)
+      unique(i)
+    })
+  
+  new(
+    Class = 'maxT', 
+    t. = x@.Data, T. = T_,
+    design = x@data@design,
+    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    two.sided = two.sided
+  )
+}
+
+
+
+
+
+#' @rdname maxT
 #' @export maxT.free_t
 #' @export
 maxT.free_t <- function(x, two.sided = TRUE, ...) {
   
-  x1 <- x@x1
-  x0 <- x@x0
-  
-  dd <- cbind(x1, x0)
-  ids <- combn_ELISpot(x)
-  tmp <- lapply(ids, FUN = \(i) {
-    free_t.matrix(x = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
-  })
-  T_ <- unlist(tmp, use.names = FALSE)
-  dim(T_) <- c(nrow(x@data@design), length(ids))
-  # end of permutation
+  T_ <- x@data |>
+    combn_ELISpot() |>
+    lapply(FUN = free_t.ELISpot, x = x@data, s4 = FALSE) |>
+    unlist(use.names = FALSE)
+  nr <- nrow(x@data@design)
+  dim(T_) <- c(nr, length(T_)/nr)
   
   tmp <- x@data@design |>
     lapply(FUN = \(i) {
@@ -90,14 +116,8 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   
   nr <- nrow(x@e1@data@design) # now `nrow(x@e1@data) == nrow(data0)`
   
-  x11 <- x@e1@data@x1
-  x10 <- x@e1@data@x0
-  x01 <- x@e2@data@x1
-  x00 <- x@e2@data@x0
-  
-  t_ <- free_t.matrix(x = x11, x0 = x10, ...) - 
-    free_t.matrix(x = x01, x0 = x00, ...)
-  
+  t_ <- free_t.ELISpot(x@e1@data) - free_t.ELISpot(x@e2@data)
+
   # based on permutation
   tm1 <- x@e1@data |>
     combn_ELISpot() |>
@@ -111,29 +131,23 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   ### actually [`-`('free_t', 'free_t')]
   d1. <- tm1 |>
     lapply(FUN = attr, which = 'delta', exact = TRUE) |>
-    #lapply(FUN = \(i) i@delta) |>
     unlist(use.names = FALSE)
   df1. <- tm1 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
-    #lapply(FUN = \(i) i@df) |>
     unlist(use.names = FALSE)
   stderr1. <- tm1 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
-    #lapply(FUN = \(i) i@stderr) |>
     unlist(use.names = FALSE)
   dim(d1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
   
   d0. <- tm0 |> 
     lapply(FUN = attr, which = 'delta', exact = TRUE) |>
-    #lapply(FUN = \(i) i@delta) |>
     unlist(use.names = FALSE)
   df0. <- tm0 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
-    #lapply(FUN = \(i) i@df) |>
     unlist(use.names = FALSE)
   stderr0. <- tm0 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
-    #lapply(FUN = \(i) i@stderr) |>
     unlist(use.names = FALSE)
   dim(d0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
   

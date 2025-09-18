@@ -4,32 +4,14 @@
 \alias{maxT_moodie}
 \title{maxT_moodie}
 \usage{
-maxT_moodie(
-  data,
-  bootstrap = FALSE,
-  null.value,
-  R = 1000L,
-  seed_,
-  two.sided = TRUE,
-  ...
-)
+maxT_moodie(data, null.value, R = 1000L, two.sided = TRUE, ...)
 }
 \arguments{
 \item{data}{an \linkS4class{ELISpot} object}
 
-\item{bootstrap}{\link[base]{logical} scalar,
-whether to use bootstrap samples.
-Default \code{FALSE} indicating the use of permuted samples.}
-
 \item{null.value}{\link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \log\mu_1 - \log\mu_0 = \mu_0}}
 
 \item{R}{\link[base]{integer} scalar \eqn{R}, number of bootstrap copies if \code{bootstrap = TRUE}}
-
-\item{seed_}{(optional) \link[base]{integer} scalar, random seed for \code{'boot'} resampling method.
-In Moodie's function \code{elsdfr2x()}, \code{seed_ = 9456845L} is used.
-Howwever, Moodie uses a same seed for all analysis, which is a \emph{bad} practice!
-The purpose of this parameter is solely to re-create Moodie's results.
-The end user is advised to leave this parameter missing.}
 
 \item{two.sided}{\link[base]{logical} scalar, see \linkS4class{maxT}}
 
