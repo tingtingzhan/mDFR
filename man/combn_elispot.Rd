@@ -4,10 +4,10 @@
 \alias{combn_ELISpot}
 \title{Permutation Indices of Treatment in \linkS4class{ELISpot}}
 \usage{
-combn_ELISpot(data)
+combn_ELISpot(x)
 }
 \arguments{
-\item{data}{an \linkS4class{ELISpot} object}
+\item{x}{an \linkS4class{ELISpot} object}
 }
 \value{
 Function \code{\link[=combn_ELISpot]{combn_ELISpot()}} returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.

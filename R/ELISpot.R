@@ -164,7 +164,7 @@ as.ELISpot <- function(
 #' 
 #' In **R** convention, this is a *combination* \link[utils]{combn}.
 #' 
-#' @param data an \linkS4class{ELISpot} object
+#' @param x an \linkS4class{ELISpot} object
 #' 
 #' @returns 
 #' Function [combn_ELISpot()] returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
@@ -172,9 +172,9 @@ as.ELISpot <- function(
 #' @keywords internal
 #' @importFrom utils combn
 #' @export
-combn_ELISpot <- function(data) {
-  n1 <- dim(data@x1)[2L]
-  n0 <- dim(data@x0)[2L]
+combn_ELISpot <- function(x) {
+  n1 <- dim(x@x1)[2L]
+  n0 <- dim(x@x0)[2L]
   combn(n1 + n0, m = n1, simplify = FALSE)
 }
 

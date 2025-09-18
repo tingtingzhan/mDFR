@@ -101,11 +101,11 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
   # based on permutation
   tm1 <- x@e1@data |>
     combn_ELISpot() |>
-    lapply(FUN = santosT.ELISpot, x = x@e1@data)
+    lapply(FUN = santosT.ELISpot, x = x@e1@data, s4 = FALSE)
   n1 <- length(tm1)
   tm0 <- x@e2@data |> 
     combn_ELISpot() |>
-    lapply(FUN = santosT.ELISpot, x = x@e2@data)
+    lapply(FUN = santosT.ELISpot, x = x@e2@data, s4 = FALSE)
   n0 <- length(tm0)
   
   ### actually [`-`('santosT', 'santosT')]

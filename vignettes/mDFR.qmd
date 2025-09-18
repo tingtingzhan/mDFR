@@ -149,7 +149,6 @@ ds$Wk5.Ad5 |>
 ```
 
 ```{r}
-#Wk5.Ad5 = maxT_santos_test(data1 = ds$Wk5.Ad5, data0 = ds$Wk1.Ad5)
 Wk5.Ad5 = ds |>
   with.default(expr = {
     santosT(Wk5.Ad5, null.value = 2) - santosT(Wk1.Ad5, null.value = 2)   

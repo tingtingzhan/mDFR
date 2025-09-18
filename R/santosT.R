@@ -72,17 +72,16 @@ santosT <- function(x, ...) UseMethod(generic = 'santosT')
 #' @rdname santosT
 #' @export santosT.ELISpot
 #' @export
-santosT.ELISpot <- function(x, id1, s4 = TRUE, ...) {
+santosT.ELISpot <- function(x, id1, ...) {
   
   if (missing(id1)) {
-    return(santosT.matrix(x = x@x1, x0 = x@x0, data = x, s4 = TRUE, ...))
+    return(santosT.matrix(x = x@x1, x0 = x@x0, data = x, ...))
   }
   
   z <- cbind(x@x1, x@x0)
   return(santosT.matrix(
     x = z[, id1, drop = FALSE], 
     x0 = z[, -id1, drop = FALSE], 
-    s4 = FALSE, # let `data` missing : very likely to be internal use!!!  
     ...
   ))
   
