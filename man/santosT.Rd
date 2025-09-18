@@ -10,19 +10,24 @@
 \usage{
 santosT(x, ...)
 
-\method{santosT}{ELISpot}(x, ...)
+\method{santosT}{ELISpot}(x, id1, s4 = TRUE, ...)
 
 \method{santosT}{matrix}(x, x0, data, null.value = 1, s4 = TRUE, ...)
 }
 \arguments{
-\item{x, x0}{\link[base]{numeric} \link[base]{matrix}-es,
-treatment \eqn{x_1} and control responses \eqn{x_0}, respectively}
+\item{x}{see \strong{Usage}}
 
 \item{...}{additional parameters, currently not in use}
 
-\item{null.value}{see \strong{Slots}}
+\item{id1}{(optional) \link[base]{integer} \link[base]{vector},
+permuted indices for treatment}
 
 \item{s4}{\link[base]{logical} scalar}
+
+\item{x0}{\link[base]{numeric} \link[base]{matrix},
+control responses \eqn{x_0}}
+
+\item{null.value}{see \strong{Slots}}
 }
 \description{
 Distribution free test statistic to compare a treatment against a control.

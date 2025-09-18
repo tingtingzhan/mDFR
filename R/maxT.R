@@ -42,15 +42,6 @@ maxT.santosT <- function(x, two.sided = TRUE, ...) {
       unique(i)
     })
   
-  #ag0 <- list(...)[c('two.sided')]
-  
-  #return(do.call(new, args = c(list(
-  #  Class = 'maxT', 
-  #  t. = x@.Data, T. = T_,
-  #  design = x@data@design,
-  #  name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
-  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
-  
   new(
     Class = 'maxT', 
     t. = x@.Data, T. = T_,
@@ -107,19 +98,15 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
   t_ <- santosT.matrix(x = x11, x0 = x10, ...) - 
     santosT.matrix(x = x01, x0 = x00, ...)
   
-  # based on permutation (remove all NA columns)
-  ids1 <- combn_ELISpot(x@e1@data)
-  n1 <- length(ids1)
-  ids0 <- combn_ELISpot(x@e2@data)
-  n0 <- length(ids0)
-  
-  fn <- function(data, id) {
-    santosT.matrix(x = data[, id, drop = FALSE], x0 = data[, -id, drop = FALSE], s4 = FALSE, ...)
-  }
-  tm1 <- ids1 |>
-    lapply(FUN = fn, data = cbind(x11, x10))
-  tm0 <- ids0 |> 
-    lapply(FUN = fn, data = cbind(x01, x00))
+  # based on permutation
+  tm1 <- x@e1@data |>
+    combn_ELISpot() |>
+    lapply(FUN = santosT.ELISpot, x = x@e1@data)
+  n1 <- length(tm1)
+  tm0 <- x@e2@data |> 
+    combn_ELISpot() |>
+    lapply(FUN = santosT.ELISpot, x = x@e2@data)
+  n0 <- length(tm0)
   
   ### actually [`-`('santosT', 'santosT')]
   d1. <- tm1 |>
@@ -157,8 +144,8 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
     message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
     T. <- T.[, !id]
   }
-  ### but using [santosT2] is too slow on \emph{permutation-of-permutation}
-  ### have to manually vectorize [santosT2] !!
+  ### but [`-`('santosT', 'santosT')] is too slow on \emph{permutation-of-permutation}
+  ### have to manually vectorize !!
   
   # combine `x@e1@data` and `x@e2@data` for output
   d1 <- x@e1@data@design
@@ -171,13 +158,6 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
   }, c1 = d1, c0 = d0, SIMPLIFY = FALSE)
   tmp <- lapply(d, FUN = unique.default)
   
-  #ag0 <- list(...)[c('two.sided')]
-  #return(do.call(new, args = c(list(
-  #  Class = 'maxT', 
-  #  t. = t_, T. = T.,
-  #  design = as.data.frame.list(d),
-  #  name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
-  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   new(
     Class = 'maxT', 
     t. = t_, T. = T.,

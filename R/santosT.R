@@ -18,15 +18,6 @@
 #' 
 #' @slot data ..
 #' 
-#' @param x,x0 \link[base]{numeric} \link[base]{matrix}-es, 
-#' treatment \eqn{x_1} and control responses \eqn{x_0}, respectively
-#' 
-#' @param null.value see **Slots**
-#' 
-#' @param s4 \link[base]{logical} scalar
-#' 
-#' @param ... additional parameters, currently not in use
-#' 
 #' @references
 #' The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
@@ -60,14 +51,41 @@ setClass(Class = 'santosT_diff', contains = 'numeric', slots = c(
 
 
 #' @rdname santosT
+#' 
+#' @param x see **Usage**
+#' 
+#' @param x0 \link[base]{numeric} \link[base]{matrix},
+#' control responses \eqn{x_0}
+#' 
+#' @param id1 (optional) \link[base]{integer} \link[base]{vector},
+#' permuted indices for treatment
+#' 
+#' @param null.value see **Slots**
+#' 
+#' @param s4 \link[base]{logical} scalar
+#' 
+#' @param ... additional parameters, currently not in use
+#' 
 #' @export
 santosT <- function(x, ...) UseMethod(generic = 'santosT')
 
 #' @rdname santosT
 #' @export santosT.ELISpot
 #' @export
-santosT.ELISpot <- function(x, ...) {
-  santosT.matrix(x = x@x1, x0 = x@x0, data = x, ...)
+santosT.ELISpot <- function(x, id1, s4 = TRUE, ...) {
+  
+  if (missing(id1)) {
+    return(santosT.matrix(x = x@x1, x0 = x@x0, data = x, s4 = TRUE, ...))
+  }
+  
+  z <- cbind(x@x1, x@x0)
+  return(santosT.matrix(
+    x = z[, id1, drop = FALSE], 
+    x0 = z[, -id1, drop = FALSE], 
+    s4 = FALSE, # let `data` missing : very likely to be internal use!!!  
+    ...
+  ))
+  
 }
 
 

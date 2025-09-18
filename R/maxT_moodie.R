@@ -85,13 +85,6 @@ maxT_moodie <- function(
     
   }
 
-  #ag0 <- list(...)[c('two.sided')]
-  
-  #return(do.call(new, args = c(list(
-  #  Class = 'maxT', 
-  #  t. = t_, T. = T_,
-  #  design = data@design
-  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
   new(
     Class = 'maxT', 
     t. = t_, T. = T_,
