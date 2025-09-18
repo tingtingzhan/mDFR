@@ -6,17 +6,18 @@
 \alias{maxT.santosT_diff}
 \title{Modified Distribution Free Resampling}
 \usage{
-maxT(x, ...)
+maxT(x, two.sided, ...)
 
-\method{maxT}{santosT}(x, ...)
+\method{maxT}{santosT}(x, two.sided = TRUE, ...)
 
-\method{maxT}{santosT_diff}(x, ...)
+\method{maxT}{santosT_diff}(x, two.sided = TRUE, ...)
 }
 \arguments{
 \item{x}{an \linkS4class{ELISpot}}
 
-\item{...}{additional parameters, such as \code{null.value} in function \link{santosT},
-and \code{two.sided} for \linkS4class{maxT}}
+\item{two.sided}{\link[base]{logical} scalar, see \linkS4class{maxT}}
+
+\item{...}{additional parameters, currently not in use}
 }
 \description{
 ..

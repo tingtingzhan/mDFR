@@ -5,8 +5,9 @@
 #' 
 #' @param x an \linkS4class{ELISpot}
 #' 
-#' @param ... additional parameters, such as `null.value` in function [santosT],
-#' and `two.sided` for \linkS4class{maxT}
+#' @param two.sided \link[base]{logical} scalar, see \linkS4class{maxT}
+#' 
+#' @param ... additional parameters, currently not in use
 #' 
 #' @references 
 #' 
@@ -15,13 +16,13 @@
 #' @keywords internal
 #' @name maxT
 #' @export
-maxT <- function(x, ...) UseMethod(generic = 'maxT')
+maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
 
 
 #' @rdname maxT
 #' @export maxT.santosT
 #' @export
-maxT.santosT <- function(x, ...) {
+maxT.santosT <- function(x, two.sided = TRUE, ...) {
   
   x1 <- x@x1
   x0 <- x@x0
@@ -41,15 +42,22 @@ maxT.santosT <- function(x, ...) {
       unique(i)
     })
   
-  ag0 <- list(...)[c('two.sided')]
+  #ag0 <- list(...)[c('two.sided')]
   
-  return(do.call(new, args = c(list(
+  #return(do.call(new, args = c(list(
+  #  Class = 'maxT', 
+  #  t. = x@.Data, T. = T_,
+  #  design = x@data@design,
+  #  name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
+  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
+  
+  new(
     Class = 'maxT', 
     t. = x@.Data, T. = T_,
     design = x@data@design,
-    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
-  ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
-  
+    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    two.sided = two.sided
+  )
 }
 
 
@@ -65,10 +73,7 @@ maxT.santosT <- function(x, ...) {
 #' @importFrom matrixStats colAnys
 #' @export maxT.santosT_diff
 #' @export
-maxT.santosT_diff <- function(
-    x, 
-    ...
-) {
+maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
   
   if (nrow(x@e1@data@design) != nrow(x@e2@data@design)) {
     # timepoint1 and timepoint2 may not have same subjects!!
@@ -166,13 +171,20 @@ maxT.santosT_diff <- function(
   }, c1 = d1, c0 = d0, SIMPLIFY = FALSE)
   tmp <- lapply(d, FUN = unique.default)
   
-  ag0 <- list(...)[c('two.sided')]
-  return(do.call(new, args = c(list(
+  #ag0 <- list(...)[c('two.sided')]
+  #return(do.call(new, args = c(list(
+  #  Class = 'maxT', 
+  #  t. = t_, T. = T.,
+  #  design = as.data.frame.list(d),
+  #  name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
+  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
+  new(
     Class = 'maxT', 
     t. = t_, T. = T.,
     design = as.data.frame.list(d),
-    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; ')
-  ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
+    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    two.sided = two.sided
+  )
   
 }
 

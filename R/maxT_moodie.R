@@ -10,7 +10,7 @@
 #' whether to use bootstrap samples.
 #' Default `FALSE` indicating the use of permuted samples.
 #' 
-#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \bar{X}_1 - \bar{X}_0 = \mu_0}
+#' @param null.value \link[base]{numeric} scalar \eqn{\mu_0}, as in \eqn{H_0: \log\mu_1 - \log\mu_0 = \mu_0}
 #' 
 #' @param R \link[base]{integer} scalar \eqn{R}, number of bootstrap copies if `bootstrap = TRUE`
 #' 
@@ -19,6 +19,8 @@
 #' Howwever, Moodie uses a same seed for all analysis, which is a *bad* practice!
 #' The purpose of this parameter is solely to re-create Moodie's results.
 #' The end user is advised to leave this parameter missing.
+#' 
+#' @param two.sided \link[base]{logical} scalar, see \linkS4class{maxT}
 #' 
 #' @param ... potential parameters
 #' 
@@ -37,6 +39,7 @@ maxT_moodie <- function(
     data, bootstrap = FALSE,
     null.value,
     R = 1e3L, seed_, # only if (bootstrap)
+    two.sided = TRUE, 
     ...
 ) {
   
@@ -47,16 +50,16 @@ maxT_moodie <- function(
   if (!bootstrap) { # moodie's [elsdfreq]
     dd <- cbind(data@x1, data@x0)
     ids <- combn_ELISpot(data)
-    prm1. <- ids |>
+    prm1 <- ids |>
       lapply(FUN = \(i) rowMeans(dd[, i, drop = FALSE], na.rm = TRUE)) |> # permutation of treatment
       unlist(use.names = FALSE)
-    prm0. <- ids |>
+    prm0 <- ids |>
       lapply(FUN = \(i) rowMeans(dd[, -i, drop = FALSE], na.rm = TRUE)) |> # permutation of control
       unlist(use.names = FALSE)
-    prm. <- prm1. - prm0.
-    dim(prm.) <- c(nrow(data@design), length(ids))
-    #T_ <- prm. # moodie's
-    T_ <- prm. - null.value # Tingting's
+    prm <- prm1 - prm0
+    dim(prm) <- c(nrow(data@design), length(ids))
+    #T_ <- prm # moodie's
+    T_ <- prm - null.value # Tingting's
     # moodie's [elsdfreq] example has `null.value = 0`
     # Tingting thinks moodie's code is wrong
     
@@ -82,14 +85,19 @@ maxT_moodie <- function(
     
   }
 
-  ag0 <- list(...)[c('two.sided')]
+  #ag0 <- list(...)[c('two.sided')]
   
-  return(do.call(new, args = c(list(
+  #return(do.call(new, args = c(list(
+  #  Class = 'maxT', 
+  #  t. = t_, T. = T_,
+  #  design = data@design
+  #), ag0[lengths(ag0, use.names = FALSE) > 0L])))
+  new(
     Class = 'maxT', 
     t. = t_, T. = T_,
-    design = data@design
-  ), ag0[lengths(ag0, use.names = FALSE) > 0L])))
-  
+    design = data@design,
+    two.sided = two.sided
+  )
 }
 
 
