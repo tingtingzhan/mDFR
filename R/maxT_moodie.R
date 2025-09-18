@@ -96,5 +96,5 @@ maxT_moodie <- function(
 
 
 
-
+# call moodie's statistic `free_d`
 

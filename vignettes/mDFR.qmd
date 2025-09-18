@@ -132,7 +132,7 @@ ds = d0 |>
 
 ```{r}
 ds$Wk5.Ad5 |> 
-  santosT() |>
+  free_t() |>
   maxT() |>
   reactable_maxT(
     rownames = FALSE, defaultPageSize = 6L
@@ -141,7 +141,7 @@ ds$Wk5.Ad5 |>
 
 ```{r}
 ds$Wk5.Ad5 |> 
-  santosT(null.value = 2) |>
+  free_t(null.value = 2) |>
   maxT() |>
   reactable_maxT(
     rownames = FALSE, defaultPageSize = 6L
@@ -151,7 +151,7 @@ ds$Wk5.Ad5 |>
 ```{r}
 Wk5.Ad5 = ds |>
   with.default(expr = {
-    santosT(Wk5.Ad5, null.value = 2) - santosT(Wk1.Ad5, null.value = 2)   
+    free_t(Wk5.Ad5, null.value = 2) - free_t(Wk1.Ad5, null.value = 2)   
   }) |>
   maxT()
 ```
@@ -232,7 +232,7 @@ st1 = santos1 |>
 
 ```{r}
 st1 |>
-  lapply(FUN = santosT, null.value = 1) |>
+  lapply(FUN = free_t, null.value = 1) |>
   lapply(FUN = maxT) |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
@@ -243,7 +243,7 @@ st1 |>
 
 ```{r}
 st1 |>
-  lapply(FUN = santosT, null.value = 2) |>
+  lapply(FUN = free_t, null.value = 2) |>
   lapply(FUN = maxT) |>
   lapply(FUN = as.data.frame.maxT) |>
   do.call(what = rbind.data.frame, args = _) |>
@@ -257,7 +257,7 @@ to recreate Figure 2B
 ```{r}
 st1 |> 
   with.default(expr = {
-    santosT(`18.CEF`) - santosT(`0.CEF`)   
+    free_t(`18.CEF`) - free_t(`0.CEF`)   
   }) |>
   maxT() |>
   reactable_maxT()
@@ -266,7 +266,7 @@ st1 |>
 ```{r}
 st1 |> 
   with.default(expr = {
-    santosT(`18.CEF`) - santosT(`0.CEF`)   
+    free_t(`18.CEF`) - free_t(`0.CEF`)   
   }) |>
   maxT(two.sided = FALSE) |>
   reactable_maxT()
@@ -275,30 +275,30 @@ st1 |>
 ```{r}
 st1 |> 
   with.default(expr = {
-    santosT(`18.CEF`, null.value = 10) - santosT(`0.CEF`, null.value = 10)    }) |>
+    free_t(`18.CEF`, null.value = 10) - free_t(`0.CEF`, null.value = 10)    }) |>
   maxT() |>
   reactable_maxT()
 ```
 
 ## Distribution Free Test Statistic
 
-Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic (function `santosT()`)
+Let $\mu_1$ and $\mu_0$ be the population means of treatment and control, respectively. To test the hypothesis $H_0: \mu_1 - c\mu_0 = 0$, let $(\bar{x}_1, s^2_1, n_1)$ and $(\bar{x}_0, s^2_0, n_0)$ be the sample mean, sample standard deviation and sample size of treatment and control, respectively, and consider a distribution free test statistic (function `free_t()`)
 
 $$
 t = \dfrac{\bar{x}_1 - c\bar{x}_0}{s_{\bar\Delta}}
-$$ {#eq-santosT}
+$$ {#eq-freeT}
 
 The standard deviation $s^2_{\bar\Delta}= s^2_1/n_1 + c^2s^2_0/n_0$ has degree of freedom [@Welch47; @Satterthwaite46] $$
 \text{df} = \dfrac{\left(\dfrac{s^2_1}{n_1}+\dfrac{c^2s^2_0}{n_0}\right)^2}{\dfrac{\left(s^2_1/n_1\right)^2}{n_1-1}+\dfrac{\left(c^2s^2_0/n_0\right)^2}{n_0-1}}
 $$ {#eq-santosT_df}
 
-Function `santosT()` returns a `numeric` `vector` of distribution free test statistic (@eq-santosT), with `attributes`,
+Function `free_t()` returns a `numeric` `vector` of distribution free test statistic (@eq-freeT), with `attributes`,
 
--   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-santosT),
--   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-santosT),
+-   `attr(.,'delta')`, $\bar{x}_1 - c\bar{x}_0$, i.e., the numerator of (@eq-freeT),
+-   `attr(.,'stderr')`, standard error $s_{\bar\Delta}$, i.e., the denominator of (@eq-freeT),
 -   `attr(.,'df')`, degree of freedom (@eq-santosT_df).
 
-We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
+We apply Westfall-Young max-$T$ correction [@Dudoit03; @WestfallYoung93] to multiple hypotheses $H_j$, $j=1,\cdots,m$. Let $t_j$ be the distribution free test statistic (@eq-freeT) of hypothesis $H_j$ in the original data, $j=1,\cdots,m$. Let $r_1,\cdots,r_m$ be the decreasing order statistics, such that
 
 $$
 \begin{cases}
@@ -307,7 +307,7 @@ t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m} & \text{for one-sided test}
 \end{cases}
 $$
 
-Let $t_{j,b}$ be the distribution free test statistic (@eq-santosT) of hypothesis $H_j$ in the $b$-th permutation of the treatment and control subjects, $j=1,\cdots,m$, $b=1,\cdots,B$.
+Let $t_{j,b}$ be the distribution free test statistic (@eq-freeT) of hypothesis $H_j$ in the $b$-th permutation of the treatment and control subjects, $j=1,\cdots,m$, $b=1,\cdots,B$.
 
 The successive maxima (@eq-successM2) for two-sided test, or (@eq-successM1) for one-sided test
 

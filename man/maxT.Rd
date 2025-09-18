@@ -2,15 +2,15 @@
 % Please edit documentation in R/maxT.R
 \name{maxT}
 \alias{maxT}
-\alias{maxT.santosT}
-\alias{maxT.santosT_diff}
+\alias{maxT.free_t}
+\alias{maxT.free_t_diff}
 \title{Modified Distribution Free Resampling}
 \usage{
 maxT(x, two.sided, ...)
 
-\method{maxT}{santosT}(x, two.sided = TRUE, ...)
+\method{maxT}{free_t}(x, two.sided = TRUE, ...)
 
-\method{maxT}{santosT_diff}(x, two.sided = TRUE, ...)
+\method{maxT}{free_t_diff}(x, two.sided = TRUE, ...)
 }
 \arguments{
 \item{x}{an \linkS4class{ELISpot}}

@@ -1,6 +1,6 @@
 
 
-#' @title Distribution Free Test Statistic \linkS4class{santosT}
+#' @title Distribution Free Test Statistic \linkS4class{free_t}
 #' 
 #' @description
 #' Distribution free test statistic to compare a treatment against a control.
@@ -22,10 +22,10 @@
 #' The distribution free test statistic \eqn{T} is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
 #' @keywords internal
-#' @name santosT
-#' @aliases santosT-class
+#' @name free_t
+#' @aliases free_t-class
 #' @export
-setClass(Class = 'santosT', contains = 'numeric', slots = c(
+setClass(Class = 'free_t', contains = 'numeric', slots = c(
   null.value = 'numeric',
   delta = 'numeric',
   stderr = 'numeric',
@@ -34,23 +34,23 @@ setClass(Class = 'santosT', contains = 'numeric', slots = c(
 ))
 
 
-#' @title Distribution Free Test Statistic, Difference of Difference \linkS4class{santosT_diff}
+#' @title Distribution Free Test Statistic, Difference of Difference \linkS4class{free_t_diff}
 #' 
 #' @slot .Data \link[base]{numeric} \link[base]{vector}
 #' 
-#' @slot e1,e2 \linkS4class{santosT}
+#' @slot e1,e2 \linkS4class{free_t}
 #' 
-#' @name santosT_diff
-#' @aliases santosT_diff-class
+#' @name free_t_diff
+#' @aliases free_t_diff-class
 #' @export
-setClass(Class = 'santosT_diff', contains = 'numeric', slots = c(
-  e1 = 'santosT',
-  e2 = 'santosT'
+setClass(Class = 'free_t_diff', contains = 'numeric', slots = c(
+  e1 = 'free_t',
+  e2 = 'free_t'
 ))
 
 
 
-#' @rdname santosT
+#' @rdname free_t
 #' 
 #' @param x see **Usage**
 #' 
@@ -67,19 +67,19 @@ setClass(Class = 'santosT_diff', contains = 'numeric', slots = c(
 #' @param ... additional parameters, currently not in use
 #' 
 #' @export
-santosT <- function(x, ...) UseMethod(generic = 'santosT')
+free_t <- function(x, ...) UseMethod(generic = 'free_t')
 
-#' @rdname santosT
-#' @export santosT.ELISpot
+#' @rdname free_t
+#' @export free_t.ELISpot
 #' @export
-santosT.ELISpot <- function(x, id1, ...) {
+free_t.ELISpot <- function(x, id1, ...) {
   
   if (missing(id1)) {
-    return(santosT.matrix(x = x@x1, x0 = x@x0, data = x, ...))
+    return(free_t.matrix(x = x@x1, x0 = x@x0, data = x, ...))
   }
   
   z <- cbind(x@x1, x@x0)
-  return(santosT.matrix(
+  return(free_t.matrix(
     x = z[, id1, drop = FALSE], 
     x0 = z[, -id1, drop = FALSE], 
     ...
@@ -88,12 +88,12 @@ santosT.ELISpot <- function(x, id1, ...) {
 }
 
 
-#' @rdname santosT
+#' @rdname free_t
 #' @importFrom matrixStats rowVars
 #' @importFrom stats var
-#' @export santosT.matrix
+#' @export free_t.matrix
 #' @export
-santosT.matrix <- function(
+free_t.matrix <- function(
     x, x0, 
     data,
     null.value = 1,
@@ -139,7 +139,7 @@ santosT.matrix <- function(
   attr(out, which = 'x1') <- x1
   attr(out, which = 'x0') <- x0
   attr(out, which = 'data') <- if (!missing(data)) data # else NULL
-  if (s4) return(new(Class = 'santosT', out)) # `slot`s are `attr`s !
+  if (s4) return(new(Class = 'free_t', out)) # `slot`s are `attr`s !
   return(out)
   
 }
@@ -148,7 +148,7 @@ santosT.matrix <- function(
 
 #' @title Distribution Free Test Statistic, Difference of Difference
 #' 
-#' @param e1,e2 \linkS4class{santosT}
+#' @param e1,e2 \linkS4class{free_t}
 #' 
 #' @references
 #' The distribution free test statistic \eqn{T} is not exactly the same as 
@@ -156,7 +156,7 @@ santosT.matrix <- function(
 #' 
 #' @keywords internal
 #' @export
-setMethod(f = '-', signature = c(e1 = 'santosT', e2 = 'santosT'), definition = \(e1, e2) {
+setMethod(f = '-', signature = c(e1 = 'free_t', e2 = 'free_t'), definition = \(e1, e2) {
   
   if (!all.equal.numeric(e1@null.value, e2@null.value)) stop('`@null.value` must be the same')
   
@@ -170,7 +170,7 @@ setMethod(f = '-', signature = c(e1 = 'santosT', e2 = 'santosT'), definition = \
   sd_pooled <- sqrt( (df1*sd1^2 + df2*sd2^2) / (df1+df2) )
   
   new(
-    Class = 'santosT_diff',
+    Class = 'free_t_diff',
     (d1 - d2) / sd_pooled,
     e1 = e1, e2 = e2
   )

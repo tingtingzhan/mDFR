@@ -20,9 +20,9 @@ maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
 
 
 #' @rdname maxT
-#' @export maxT.santosT
+#' @export maxT.free_t
 #' @export
-maxT.santosT <- function(x, two.sided = TRUE, ...) {
+maxT.free_t <- function(x, two.sided = TRUE, ...) {
   
   x1 <- x@x1
   x0 <- x@x0
@@ -30,7 +30,7 @@ maxT.santosT <- function(x, two.sided = TRUE, ...) {
   dd <- cbind(x1, x0)
   ids <- combn_ELISpot(x)
   tmp <- lapply(ids, FUN = \(i) {
-    santosT.matrix(x = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
+    free_t.matrix(x = dd[, i, drop = FALSE], x0 = dd[, -i, drop = FALSE], ...)
   })
   T_ <- unlist(tmp, use.names = FALSE)
   dim(T_) <- c(nrow(x@data@design), length(ids))
@@ -58,13 +58,13 @@ maxT.santosT <- function(x, two.sided = TRUE, ...) {
 
 
 # @title Modified Distribution Free Resampling, at Two Timepoints
-# @param ... additional parameters, such as `null.value` in function [santosT] and `two.sided` for \linkS4class{maxT}
+# @param ... additional parameters, such as `null.value` in function [free_t] and `two.sided` for \linkS4class{maxT}
 
 #' @rdname maxT
 #' @importFrom matrixStats colAnys
-#' @export maxT.santosT_diff
+#' @export maxT.free_t_diff
 #' @export
-maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
+maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   
   if (nrow(x@e1@data@design) != nrow(x@e2@data@design)) {
     # timepoint1 and timepoint2 may not have same subjects!!
@@ -95,20 +95,20 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
   x01 <- x@e2@data@x1
   x00 <- x@e2@data@x0
   
-  t_ <- santosT.matrix(x = x11, x0 = x10, ...) - 
-    santosT.matrix(x = x01, x0 = x00, ...)
+  t_ <- free_t.matrix(x = x11, x0 = x10, ...) - 
+    free_t.matrix(x = x01, x0 = x00, ...)
   
   # based on permutation
   tm1 <- x@e1@data |>
     combn_ELISpot() |>
-    lapply(FUN = santosT.ELISpot, x = x@e1@data, s4 = FALSE)
+    lapply(FUN = free_t.ELISpot, x = x@e1@data, s4 = FALSE)
   n1 <- length(tm1)
   tm0 <- x@e2@data |> 
     combn_ELISpot() |>
-    lapply(FUN = santosT.ELISpot, x = x@e2@data, s4 = FALSE)
+    lapply(FUN = free_t.ELISpot, x = x@e2@data, s4 = FALSE)
   n0 <- length(tm0)
   
-  ### actually [`-`('santosT', 'santosT')]
+  ### actually [`-`('free_t', 'free_t')]
   d1. <- tm1 |>
     lapply(FUN = attr, which = 'delta', exact = TRUE) |>
     #lapply(FUN = \(i) i@delta) |>
@@ -144,7 +144,7 @@ maxT.santosT_diff <- function(x, two.sided = TRUE, ...) {
     message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
     T. <- T.[, !id]
   }
-  ### but [`-`('santosT', 'santosT')] is too slow on \emph{permutation-of-permutation}
+  ### but [`-`('free_t', 'free_t')] is too slow on \emph{permutation-of-permutation}
   ### have to manually vectorize !!
   
   # combine `x@e1@data` and `x@e2@data` for output
