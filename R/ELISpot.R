@@ -183,66 +183,23 @@ combn_ELISpot <- function(x) {
 
 
 
-#' @title \link[base]{log} of \linkS4class{ELISpot}
-#' 
-#' @description
-#' \linkS4class{ELISpot} dispatches for S3 generics \link[base]{log}.
+#' @title `Math` \link[base]{groupGeneric} of \linkS4class{ELISpot}
 #' 
 #' @param x an \linkS4class{ELISpot} object
 #' 
-#' @param base \link[base]{numeric} scalar, see \link[base]{log}
-#' 
-#' @note
-#' The `S3` generic function \link[base]{log1p} does not have `base` parameter.
+#' @param ... additional parameters
 #' 
 #' @returns
-#' 
-#' Function [log.ELISpot()] returns an `ELISpot`.
+#' Function [Math.ELISpot()] returns an \linkS4class{ELISpot} object.
 #' 
 #' @keywords internal
-#' @name log_ELISpot
-#' @export log.ELISpot
+#' @export Math.ELISpot
 #' @export
-log.ELISpot <- function(x, base = exp(1)) {
-  if (any(x@x1 == 0, x@x0 == 0, na.rm = TRUE)) {
-    x@x1 <- x@x1 + 1
-    x@x0 <- x@x0 + 1
-  }
-  x@x0 <- log(x@x0, base = base)
-  x@x1 <- log(x@x1, base = base)
+Math.ELISpot <- function(x, ...) {
+  x@x1 <- do.call(what = .Generic, args = list(x = x@x1, ...))
+  x@x0 <- do.call(what = .Generic, args = list(x = x@x0, ...))
   return(x)
 }
-
-
-#' @rdname log_ELISpot
-#' @export log1p.ELISpot
-#' @export
-log1p.ELISpot <- function(x) {
-  x@x0 <- log1p(x@x0)
-  x@x1 <- log1p(x@x1)
-  return(x)
-}
-
-#' @rdname log_ELISpot
-#' @export log10.ELISpot
-#' @export
-log10.ELISpot <- function(x) {
-  x@x0 <- log10(x@x0)
-  x@x1 <- log10(x@x1)
-  return(x)
-}
-
-#' @rdname log_ELISpot
-#' @export log2.ELISpot
-#' @export
-log2.ELISpot <- function(x) {
-  x@x0 <- log2(x@x0)
-  x@x1 <- log2(x@x1)
-  return(x)
-}
-
-
-
 
 
 
