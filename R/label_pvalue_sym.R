@@ -1,7 +1,7 @@
 
 
 #' Function [label_pvalue_sym()] is used so extensively, 
-#' therefore tzh keeps it in \pkg{rmd.tzh} instead of \pkg{scales.tzh}.
+#' therefore tzh keeps it in \pkg{fastmd} instead of \pkg{scales.tzh}.
 
 
 

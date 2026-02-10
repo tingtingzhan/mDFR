@@ -17,7 +17,7 @@ Label \eqn{p}-values with significance symbol.
 }
 \details{
 Function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
-therefore tzh keeps it in \pkg{rmd.tzh} instead of \pkg{scales.tzh}.
+therefore tzh keeps it in \pkg{fastmd} instead of \pkg{scales.tzh}.
 
 Pipeline:
 
