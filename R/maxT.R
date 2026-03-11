@@ -30,7 +30,7 @@ maxT.free_d <- function(x, two.sided = TRUE, ...) {
       Class = 'maxT', 
       t. = x@.Data, T. = _,
       design = x@data@design,
-      name = labels(x@data),
+      label = labels(x@data),
       two.sided = two.sided
     )
 
@@ -51,7 +51,7 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
       Class = 'maxT', 
       t. = x@.Data, T. = _,
       design = x@data@design,
-      name = labels(x@data),
+      label = labels(x@data),
       two.sided = two.sided
     )
 
@@ -129,7 +129,7 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
     Class = 'maxT', 
     t. = t_, T. = T.,
     design = new_design,
-    name = labels_design(new_design),
+    label = labels_design(new_design),
     two.sided = two.sided
   )
   

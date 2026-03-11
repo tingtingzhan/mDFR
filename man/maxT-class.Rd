@@ -36,7 +36,7 @@ while Moodie's (\url{https://rundfr.fredhutch.org}) use \code{FALSE}}
 
 \item{\code{design}}{(optional) \link[base]{data.frame}, study design}
 
-\item{\code{name}}{(optional) \link[base]{character} scalar, study name}
+\item{\code{label}}{(optional) \link[base]{character} scalar, study name}
 }}
 
 \note{

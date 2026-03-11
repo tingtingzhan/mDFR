@@ -36,7 +36,7 @@
 #' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
 #' 
 #' @slot design (optional) \link[base]{data.frame}, study design
-#' @slot name (optional) \link[base]{character} scalar, study name
+#' @slot label (optional) \link[base]{character} scalar, study name
 #' 
 #' @references
 #' Peter H. Westfall, S. Stanley Young (1993). *Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment*. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
@@ -56,7 +56,7 @@ setClass(Class = 'maxT', slots = c(
   p. = 'numeric',
   two.sided = 'logical',
   design = 'data.frame',
-  name = 'character'
+  label = 'character'
 ), prototype = prototype(
   two.sided = TRUE
 ))
