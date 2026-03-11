@@ -8,6 +8,8 @@
 #' 
 #' @slot e1,e2 \linkS4class{free_t} objects
 #' 
+#' @slot design \link[base]{data.frame}, study design showing the difference-of-difference
+#' 
 #' @references 
 #' \url{https://tingtingzhan-maxt.netlify.app/S4/free_t.html#sec-free_t_diff}
 #' 
@@ -15,7 +17,8 @@
 #' @export
 setClass(Class = 'free_t_diff', contains = 'numeric', slots = c(
   e1 = 'free_t',
-  e2 = 'free_t'
+  e2 = 'free_t',
+  design = 'data.frame'
 ))
 
 
@@ -57,10 +60,30 @@ setMethod(f = '-', signature = c(e1 = 'free_t', e2 = 'free_t'), definition = \(e
   df2 <- e2@df
   sd_pooled <- sqrt( (df1*sd1^2 + df2*sd2^2) / (df1+df2) )
   
-  new(
-    Class = 'free_t_diff',
-    (e1@delta - e2@delta) / sd_pooled,
-    e1 = e1, e2 = e2
-  )
-  
+  mapply(
+    FUN = \(c1, c0) { # operation per-*c*olumn
+      if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
+      if (all(c1 == c0)) return(c1)
+      return(paste(c1, c0, sep = ' vs. '))
+    }, 
+    c1 = e1@data@design, 
+    c0 = e2@data@design, 
+    SIMPLIFY = FALSE
+  ) |>
+    as.data.frame.list() |>
+    new(
+      Class = 'free_t_diff',
+      (e1@delta - e2@delta) / sd_pooled,
+      e1 = e1, e2 = e2,
+      design = _
+    )
+
 })
+
+
+#' @export
+labels.free_t_diff <- function(object, ...) {
+  object@design |>
+    labels_design()
+}
+

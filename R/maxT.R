@@ -30,7 +30,7 @@ maxT.free_d <- function(x, two.sided = TRUE, ...) {
       Class = 'maxT', 
       t. = x@.Data, T. = _,
       design = x@data@design,
-      label = labels(x@data),
+      label = labels(x@data), # [labels.ELISpot()], etc
       two.sided = two.sided
     )
 
@@ -51,7 +51,7 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
       Class = 'maxT', 
       t. = x@.Data, T. = _,
       design = x@data@design,
-      label = labels(x@data),
+      label = labels(x@data), # [labels.ELISpot()], etc
       two.sided = two.sided
     )
 
@@ -113,23 +113,11 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   ### but [`-`('free_t', 'free_t')] is too slow on \emph{permutation-of-permutation}
   ### have to manually vectorize !!
   
-  new_design <- mapply(
-    FUN = \(c1, c0) { # operation per-*c*olumn
-      if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
-      if (all(c1 == c0)) return(c1)
-      return(paste(c1, c0, sep = ' vs. '))
-    }, 
-    c1 = x@e1@data@design, 
-    c0 = x@e2@data@design, 
-    SIMPLIFY = FALSE
-  ) |>
-    as.data.frame.list()
-  
   new(
     Class = 'maxT', 
     t. = t_, T. = T.,
-    design = new_design,
-    label = labels_design(new_design),
+    design = x@design,
+    label = labels(x), # [labels.free_t_diff()]
     two.sided = two.sided
   )
   

@@ -139,11 +139,7 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 
 #' @method as.data.frame maxT
 #' @export
-as.data.frame.maxT <- function(
-    x,
-    ..., 
-    check.names = FALSE
-) {
+as.data.frame.maxT <- function(x, ..., check.names = FALSE) {
   
   tmp <- list(
     if (length(x@design)) x@design, #  else NULL

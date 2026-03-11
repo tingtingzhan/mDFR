@@ -13,6 +13,8 @@ The \code{S4} class \linkS4class{free_t_diff}.
 \item{\code{.Data}}{\link[base]{numeric} \link[base]{vector}}
 
 \item{\code{e1,e2}}{\linkS4class{free_t} objects}
+
+\item{\code{design}}{\link[base]{data.frame}, study design showing the difference-of-difference}
 }}
 
 \references{

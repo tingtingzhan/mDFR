@@ -217,6 +217,8 @@ labels.ELISpot <- function(object, ...) {
 }
 
 
+
+
 labels_design <- function(x) {
   tmp <- x |>
     lapply(FUN = \(i) {
