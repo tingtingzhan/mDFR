@@ -15,13 +15,13 @@ confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})}
 \item{...}{additional parameters, currently not in use}
 }
 \value{
-Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} returns a \link[ggplot2]{ggplot} object.
+The function \code{\link[=autoplot.maxT]{autoplot.maxT()}} returns a \link[ggplot2]{ggplot} object.
 }
 \description{
 To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
 }
 \details{
-Function \code{\link[=autoplot.maxT]{autoplot.maxT()}} plots
+The function \code{\link[=autoplot.maxT]{autoplot.maxT()}} plots
 \itemize{
 \item the successive maxima
 \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and

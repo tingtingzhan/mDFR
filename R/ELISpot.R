@@ -1,7 +1,7 @@
 
 #' @title S4 class \linkS4class{ELISpot}
 #' 
-#' @slot design \link[base]{data.frame}, experimental design
+#' @slot design \link[base]{data.frame}, study design
 #' 
 #' @slot x1 \link[base]{matrix}
 #' 
@@ -70,7 +70,7 @@ setMethod(f = initialize, signature = 'ELISpot', definition = function(.Object, 
 #' @param ... potential parameters, currently not in use
 #' 
 #' @returns 
-#' Functions [as.ELISpot()] both return an \linkS4class{ELISpot} object
+#' The function [as.ELISpot()] returns an \linkS4class{ELISpot} object.
 #' 
 #' @keywords internal
 #' @importFrom zoo na.locf
@@ -167,7 +167,7 @@ as.ELISpot <- function(
 #' @param x an \linkS4class{ELISpot} object
 #' 
 #' @returns 
-#' Function [combn_ELISpot()] returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
+#' The function [combn_ELISpot()] returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
 #' 
 #' @keywords internal
 #' @importFrom utils combn
@@ -190,7 +190,7 @@ combn_ELISpot <- function(x) {
 #' @param ... additional parameters
 #' 
 #' @returns
-#' Function [Math.ELISpot()] returns an \linkS4class{ELISpot} object.
+#' The function [Math.ELISpot()] returns an \linkS4class{ELISpot} object.
 #' 
 #' @keywords internal
 #' @export Math.ELISpot

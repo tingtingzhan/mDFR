@@ -18,7 +18,7 @@ as.ELISpot(formula, data, pattern0, pattern1, ...)
 \item{...}{potential parameters, currently not in use}
 }
 \value{
-Functions \code{\link[=as.ELISpot]{as.ELISpot()}} both return an \linkS4class{ELISpot} object
+The function \code{\link[=as.ELISpot]{as.ELISpot()}} returns an \linkS4class{ELISpot} object.
 }
 \description{
 ..

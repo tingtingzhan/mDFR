@@ -10,7 +10,7 @@ combn_ELISpot(x)
 \item{x}{an \linkS4class{ELISpot} object}
 }
 \value{
-Function \code{\link[=combn_ELISpot]{combn_ELISpot()}} returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
+The function \code{\link[=combn_ELISpot]{combn_ELISpot()}} returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
 }
 \description{
 Permuted indices of treatment in an \linkS4class{ELISpot} object

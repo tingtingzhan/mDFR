@@ -74,7 +74,7 @@ for permutation \eqn{b=1,\cdots,B}}
 
 \item{\code{p.}}{\link[base]{double} \link[base]{vector}, \eqn{\tilde{p}^*_{r_j}} restored in the order of original test statistics \eqn{t_1,\cdots,t_m}}
 
-\item{\code{two.sided}}{two.sided \link[base]{logical} scalar,
+\item{\code{two.sided}}{\link[base]{logical} scalar,
 whether to perform a two sided test.
 Default \code{TRUE} as in \doi{10.1214/ss/1056397487},
 while Moodie's (\url{https://rundfr.fredhutch.org}) use \code{FALSE}}

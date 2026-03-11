@@ -11,7 +11,7 @@ S4 class \linkS4class{ELISpot}
 \section{Slots}{
 
 \describe{
-\item{\code{design}}{\link[base]{data.frame}, experimental design}
+\item{\code{design}}{\link[base]{data.frame}, study design}
 
 \item{\code{x1}}{\link[base]{matrix}}
 

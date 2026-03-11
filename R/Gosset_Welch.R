@@ -43,7 +43,7 @@
 #' 
 #' @returns 
 #' 
-#' Function [Gosset_Welch()] returns a \link[base]{numeric} scalar or \link[base]{vector} 
+#' The function [Gosset_Welch()] returns a \link[base]{numeric} scalar or \link[base]{vector} 
 #' of the degree of freedom, with \link[base]{attributes},
 #' \describe{
 #' \item{`attr(., 'stderr')`}{\link[base]{numeric} scalar or \link[base]{vector}, standard error \eqn{s_{\bar\Delta}}}

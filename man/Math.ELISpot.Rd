@@ -12,7 +12,7 @@
 \item{...}{additional parameters}
 }
 \value{
-Function \code{\link[=Math.ELISpot]{Math.ELISpot()}} returns an \linkS4class{ELISpot} object.
+The function \code{\link[=Math.ELISpot]{Math.ELISpot()}} returns an \linkS4class{ELISpot} object.
 }
 \description{
 \code{Math} \link[base]{groupGeneric} of \linkS4class{ELISpot}

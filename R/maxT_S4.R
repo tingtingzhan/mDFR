@@ -1,5 +1,4 @@
 
-#setOldClass('gtable')
 
 #' @title Westfall & Young's \linkS4class{maxT} Algorithm
 #' 
@@ -76,7 +75,7 @@
 #' @slot p_mono \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
 #' @slot p. \link[base]{double} \link[base]{vector}, \eqn{\tilde{p}^*_{r_j}} restored in the order of original test statistics \eqn{t_1,\cdots,t_m}
 #' 
-#' @slot two.sided two.sided \link[base]{logical} scalar,
+#' @slot two.sided \link[base]{logical} scalar,
 #' whether to perform a two sided test.
 #' Default `TRUE` as in \doi{10.1214/ss/1056397487},
 #' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
@@ -181,19 +180,7 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 
 
 
-#' @title Convert \linkS4class{maxT} to a \link[base]{data.frame}
-#' 
-#' @param x a \linkS4class{maxT} object
-#' 
-#' @param check.names see function \link[base]{as.data.frame}
-#' 
-#' @param ... additional parameters, currently not in use
-#' 
-#' @returns 
-#' Function [as.data.frame.maxT()] returns a \link[base]{data.frame}.
-#' 
 #' @method as.data.frame maxT
-#' @export as.data.frame.maxT
 #' @export
 as.data.frame.maxT <- function(
     x,
@@ -232,7 +219,7 @@ as.data.frame.maxT <- function(
 #' @param ... additional parameters of function \link[reactable]{reactable}
 #' 
 #' @returns
-#' Function [reactable_maxT()] returns a \link[reactable]{reactable} object.
+#' The function [reactable_maxT()] returns a \link[reactable]{reactable} object.
 #' 
 #' @keywords internal
 #' @importFrom reactable reactable
@@ -273,7 +260,7 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' @param ... additional parameters, currently not in use
 #' 
 #' @details
-#' Function [autoplot.maxT()] plots 
+#' The function [autoplot.maxT()] plots 
 #' \itemize{
 #' \item the successive maxima 
 #' \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and 
@@ -291,7 +278,7 @@ setMethod(f = show, signature = 'maxT', definition = function(object) {
 #' See full details of these notations in \linkS4class{maxT}.
 #' 
 #' @returns
-#' Function [autoplot.maxT()] returns a \link[ggplot2]{ggplot} object.
+#' The function [autoplot.maxT()] returns a \link[ggplot2]{ggplot} object.
 #' 
 #' @keywords internal
 #' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme element_text
@@ -363,7 +350,7 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
 #' indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}
 #' 
 #' @details
-#' Function `[.maxT` performs Westfall & Young's \linkS4class{maxT} algorithm  
+#' The function `[.maxT` performs Westfall & Young's \linkS4class{maxT} algorithm  
 #' on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
 #' and their corresponding test statistics 
 #' \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
@@ -373,7 +360,7 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
 #' **not** of permutations copies \eqn{b=1,\cdots,B}.
 #' 
 #' @returns 
-#' Function `[.maxT` returns a \linkS4class{maxT} object.
+#' The function `[.maxT` returns a \linkS4class{maxT} object.
 #' 
 #' @keywords internal
 #' @export

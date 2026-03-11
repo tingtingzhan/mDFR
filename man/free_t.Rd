@@ -50,6 +50,6 @@ as in \eqn{H_0: \mu_1 - c\mu_0 = 0}}
 }}
 
 \references{
-Function \code{\link[=free_t]{free_t()}} return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
+The function \code{\link[=free_t]{free_t()}} return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 }
 \keyword{internal}

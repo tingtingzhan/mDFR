@@ -19,7 +19,7 @@
 #' @slot data ..
 #' 
 #' @references
-#' Function [free_t()] return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
+#' The function [free_t()] return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
 #' 
 #' @keywords internal
 #' @name free_t

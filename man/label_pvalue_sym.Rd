@@ -10,13 +10,13 @@ label_pvalue_sym(...)
 \item{...}{parameters of function \link[scales]{label_pvalue}}
 }
 \value{
-Function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} returns a \link[base]{function}.
+The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} returns a \link[base]{function}.
 }
 \description{
 Label \eqn{p}-values with significance symbol.
 }
 \details{
-Function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
+The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
 therefore tzh keeps it in \pkg{fastmd} instead of \pkg{scales.tzh}.
 
 Pipeline:
@@ -28,7 +28,7 @@ Step 2: Drop leading zeros.
 Step 3: Apply function \link[stats]{symnum} (also see function \link[stats]{printCoefmat}).
 }
 \note{
-Function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
+The function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
 }
 \examples{
 p = c(a = pi^-100, b = .02, c = .05, d = .1, e = .9999, f = NA_real_)
