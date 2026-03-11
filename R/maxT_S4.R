@@ -9,53 +9,8 @@
 #' 
 # @param ... additional parameters, currently not in use
 #' 
-#' @details
-#' In the original data, obtain the test statistics \eqn{t_1,\cdots,t_m} 
-#' for each hypothesis \eqn{H_j}, \eqn{j=1,\cdots,m},
-#' as well as the *decreasing order statistics* \eqn{\mathbf{r} = (r_1,\cdots,r_m)^t}, such that 
-#' \deqn{
-#' \begin{cases}
-#' |t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}| & \text{for two-sided test}\\
-#' t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m} & \text{for one-sided test}
-#' \end{cases}
-#' } 
-#' 
-#' In each permuted copy \eqn{b}, \eqn{b=1,\cdots,B},
-#' obtain the test statistics \eqn{t_{1,b},\cdots,t_{m,b}}
-#' and their **successive maxima** for two-sided test
-#' \deqn{
-#' \begin{cases}
-#' u_{m,b} & = |t_{r_m,b}|\\
-#' u_{j,b} & = \text{max}\left\{u_{j+1,b}, |t_{r_j,b}|\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
-#' \end{cases}
-#' }
-#' or for one-sided test
-#' \deqn{
-#' \begin{cases}
-#' u_{m,b} & = t_{r_m,b}\\
-#' u_{j,b} & = \text{max}\left\{u_{j+1,b}, t_{r_j,b}\right\}, \quad \text{for}\ j = m−1,\cdots,1\\
-#' \end{cases}
-#' }
-#' 
-#' The permutation adjusted \eqn{p}-values are
-#' \deqn{
-#' \tilde{p}_{r_j} = 
-#' \begin{cases}
-#' \dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq|t_{r_j}|\right) & \text{for two-sided test}\\
-#' \dfrac{1}{B}\displaystyle\sum_{b=1}^B I\left(u_{j,b}\geq t_{r_j}\right) & \text{for one-sided test}
-#' \end{cases}
-#' }
-#' 
-#' To enforce the monotonicity constraints,
-#' \deqn{
-#' \begin{cases}
-#' \tilde{p}^*_{r_1} & = \tilde{p}_{r_1}\\
-#' \tilde{p}^*_{r_j} & = \text{max}\left\{\tilde{p}_{r_j}, \tilde{p}^*_{r_j-1}\right\}, \quad \text{for}\ j = 2,\cdots,m\\
-#' \end{cases}
-#' }
-#' 
 #' @note
-#' The altorithm described in **Details** is implemented in an unexported
+#' The algorithm is implemented in an unexported
 #' \link[methods]{initialize} method, which could be revealed by 
 #' `getMethod(initialize, signature = 'maxT')` to curious eyes.
 #' 
@@ -88,6 +43,8 @@
 #' 
 #' S. Dudoit, J. P. Shaffer, J. C. Boldrick (2003). *Multiple Hypothesis Testing in Microarray Experiments*, 
 #' \doi{10.1214/ss/1056397487}
+#' 
+#' \url{https://tingtingzhan-maxt.netlify.app/appendix/westfall_yang.html}
 #' 
 # @name maxT
 # @aliases maxT-class

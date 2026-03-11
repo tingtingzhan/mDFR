@@ -5,7 +5,7 @@
 \alias{maxT.free_d}
 \alias{maxT.free_t}
 \alias{maxT.free_t_diff}
-\title{Modified Distribution Free Resampling}
+\title{\linkS4class{maxT} of Distribution Free Statistics}
 \usage{
 maxT(x, two.sided, ...)
 
@@ -16,7 +16,7 @@ maxT(x, two.sided, ...)
 \method{maxT}{free_t_diff}(x, two.sided = TRUE, ...)
 }
 \arguments{
-\item{x}{an \linkS4class{ELISpot}}
+\item{x}{see \strong{Usage}}
 
 \item{two.sided}{\link[base]{logical} scalar, see \linkS4class{maxT}}
 
@@ -26,6 +26,6 @@ maxT(x, two.sided, ...)
 ..
 }
 \references{
-Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
+\url{https://tingtingzhan-maxt.netlify.app/appendix/westfall_yang.html}
 }
 \keyword{internal}

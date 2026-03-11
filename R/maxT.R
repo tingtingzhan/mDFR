@@ -1,17 +1,16 @@
 
-#' @title Modified Distribution Free Resampling
+#' @title \linkS4class{maxT} of Distribution Free Statistics
 #' 
 #' @description ..
 #' 
-#' @param x an \linkS4class{ELISpot}
+#' @param x see **Usage**
 #' 
 #' @param two.sided \link[base]{logical} scalar, see \linkS4class{maxT}
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
 #' @references 
-#' 
-#' Radleigh Santos's 2015 paper \doi{10.3390/cells4010001}
+#' \url{https://tingtingzhan-maxt.netlify.app/appendix/westfall_yang.html}
 #' 
 #' @keywords internal
 #' @name maxT
@@ -24,28 +23,21 @@ maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
 #' @export
 maxT.free_d <- function(x, two.sided = TRUE, ...) {
   
-  T_ <- x@data |>
-    combn_ELISpot() |>
-    lapply(FUN = free_d.ELISpot, x = x@data, s4 = FALSE) |>
+  T_ <- x@data |> # supported: 'ELISpot'
+    permID() |>
+    lapply(FUN = free_d, x = x@data, s4 = FALSE) |>
     unlist(use.names = FALSE)
   nr <- nrow(x@data@design)
   dim(T_) <- c(nr, length(T_)/nr)
-  
-  tmp <- x@data@design |>
-    lapply(FUN = \(i) {
-      if (is.factor(i)) i <- as.character.factor(i)
-      unique(i)
-    })
   
   new(
     Class = 'maxT', 
     t. = x@.Data, T. = T_,
     design = x@data@design,
-    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    name = labels(x@data),
     two.sided = two.sided
   )
 }
-
 
 
 
@@ -56,23 +48,17 @@ maxT.free_d <- function(x, two.sided = TRUE, ...) {
 maxT.free_t <- function(x, two.sided = TRUE, ...) {
   
   T_ <- x@data |>
-    combn_ELISpot() |>
-    lapply(FUN = free_t.ELISpot, x = x@data, s4 = FALSE) |>
+    permID() |>
+    lapply(FUN = free_t, x = x@data, s4 = FALSE) |>
     unlist(use.names = FALSE)
   nr <- nrow(x@data@design)
   dim(T_) <- c(nr, length(T_)/nr)
-  
-  tmp <- x@data@design |>
-    lapply(FUN = \(i) {
-      if (is.factor(i)) i <- as.character.factor(i)
-      unique(i)
-    })
   
   new(
     Class = 'maxT', 
     t. = x@.Data, T. = T_,
     design = x@data@design,
-    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    name = labels(x@data),
     two.sided = two.sided
   )
 }
@@ -116,16 +102,16 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   
   nr <- nrow(x@e1@data@design) # now `nrow(x@e1@data) == nrow(data0)`
   
-  t_ <- free_t.ELISpot(x@e1@data) - free_t.ELISpot(x@e2@data)
+  t_ <- free_t(x@e1@data) - free_t(x@e2@data)
 
   # based on permutation
   tm1 <- x@e1@data |>
-    combn_ELISpot() |>
-    lapply(FUN = free_t.ELISpot, x = x@e1@data, s4 = FALSE)
+    permID() |>
+    lapply(FUN = free_t, x = x@e1@data, s4 = FALSE)
   n1 <- length(tm1)
   tm0 <- x@e2@data |> 
-    combn_ELISpot() |>
-    lapply(FUN = free_t.ELISpot, x = x@e2@data, s4 = FALSE)
+    permID() |>
+    lapply(FUN = free_t, x = x@e2@data, s4 = FALSE)
   n0 <- length(tm0)
   
   ### actually [`-`('free_t', 'free_t')]
@@ -181,27 +167,6 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   )
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

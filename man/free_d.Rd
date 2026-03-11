@@ -5,29 +5,19 @@
 \alias{free_d}
 \alias{free_d-class}
 \alias{free_d.ELISpot}
-\alias{free_d.matrix}
 \title{Distribution \linkS4class{free_d}-Statistic}
 \usage{
 free_d(x, ...)
 
-\method{free_d}{ELISpot}(x, id1, ...)
-
-\method{free_d}{matrix}(x, x0, data, null.value = 0, s4 = TRUE, ...)
+\method{free_d}{ELISpot}(x, pid1, ...)
 }
 \arguments{
 \item{x}{see \strong{Usage}}
 
 \item{...}{additional parameters, currently not in use}
 
-\item{id1}{(optional) \link[base]{integer} \link[base]{vector},
-permuted indices for treatment}
-
-\item{x0}{\link[base]{numeric} \link[base]{matrix},
-control responses \eqn{x_0}}
-
-\item{null.value}{see \strong{Slots}}
-
-\item{s4}{\link[base]{logical} scalar}
+\item{pid1}{(optional) \link[base]{integer} \link[base]{vector},
+permuted indices for treatment (via the function \code{\link[=permID]{permID()}})}
 }
 \description{
 Distribution \linkS4class{free_d} statistic to compare a treatment against a control.
@@ -35,12 +25,15 @@ Distribution \linkS4class{free_d} statistic to compare a treatment against a con
 \section{Slots}{
 
 \describe{
-\item{\code{.Data}}{..}
+\item{\code{.Data}}{\link[base]{numeric} \link[base]{vector}, distribution-free \eqn{d}-statistic}
 
-\item{\code{null.value}}{\link[base]{numeric} scalar \eqn{c},
-as in \eqn{H_0: \mu_1 - c\mu_0 = 0}}
+\item{\code{null.value}}{\link[base]{numeric} scalar \eqn{c}}
 
-\item{\code{data}}{..}
+\item{\code{data}}{any R object, the input data, for downstream analysis}
 }}
 
+\references{
+\url{https://tingtingzhan-maxt.netlify.app/appendix/statistic.html#sec-free_d_math}
+\url{https://tingtingzhan-maxt.netlify.app/S4/free.html#sec-free_d}
+}
 \keyword{internal}

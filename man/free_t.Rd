@@ -5,29 +5,19 @@
 \alias{free_t}
 \alias{free_t-class}
 \alias{free_t.ELISpot}
-\alias{free_t.matrix}
 \title{Distribution \linkS4class{free_t}-Statistic}
 \usage{
 free_t(x, ...)
 
-\method{free_t}{ELISpot}(x, id1, ...)
-
-\method{free_t}{matrix}(x, x0, data, null.value = 1, s4 = TRUE, ...)
+\method{free_t}{ELISpot}(x, pid1, ...)
 }
 \arguments{
 \item{x}{see \strong{Usage}}
 
 \item{...}{additional parameters, currently not in use}
 
-\item{id1}{(optional) \link[base]{integer} \link[base]{vector},
+\item{pid1}{(optional) \link[base]{integer} \link[base]{vector},
 permuted indices for treatment}
-
-\item{x0}{\link[base]{numeric} \link[base]{matrix},
-control responses \eqn{x_0}}
-
-\item{null.value}{see \strong{Slots}}
-
-\item{s4}{\link[base]{logical} scalar}
 }
 \description{
 Distribution \linkS4class{free_t} statistic to compare a treatment against a control.
@@ -35,21 +25,21 @@ Distribution \linkS4class{free_t} statistic to compare a treatment against a con
 \section{Slots}{
 
 \describe{
-\item{\code{.Data}}{..}
+\item{\code{.Data}}{\link[base]{numeric} \link[base]{vector}, distribution-free \eqn{t}-statistic}
 
-\item{\code{null.value}}{\link[base]{numeric} scalar \eqn{c},
-as in \eqn{H_0: \mu_1 - c\mu_0 = 0}}
+\item{\code{null.value}}{\link[base]{numeric} scalar \eqn{c}}
 
-\item{\code{delta}}{..}
+\item{\code{delta}}{\link[base]{numeric} \link[base]{vector}}
 
-\item{\code{stderr}}{..}
+\item{\code{stderr}}{\link[base]{numeric} \link[base]{vector}}
 
-\item{\code{df}}{..}
+\item{\code{df}}{\link[base]{numeric} \link[base]{vector}}
 
-\item{\code{data}}{..}
+\item{\code{data}}{any R object, the input data, for downstream analysis}
 }}
 
 \references{
-The function \code{\link[=free_t]{free_t()}} return is not exactly equation (1) and (2) of Santos' 2015 cell paper \doi{10.3390/cells4010001}.
+\url{https://tingtingzhan-maxt.netlify.app/appendix/statistic.html#sec-free_t_math}
+\url{https://tingtingzhan-maxt.netlify.app/s4/free_t#sec-free_t}
 }
 \keyword{internal}
