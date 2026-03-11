@@ -19,48 +19,42 @@ maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
 
 
 #' @rdname maxT
-#' @export maxT.free_d
 #' @export
 maxT.free_d <- function(x, two.sided = TRUE, ...) {
   
-  T_ <- x@data |> # supported: 'ELISpot'
+  x@data |> # supported: 'ELISpot'
     permID() |>
     lapply(FUN = free_d, x = x@data, s4 = FALSE) |>
-    unlist(use.names = FALSE)
-  nr <- nrow(x@data@design)
-  dim(T_) <- c(nr, length(T_)/nr)
-  
-  new(
-    Class = 'maxT', 
-    t. = x@.Data, T. = T_,
-    design = x@data@design,
-    name = labels(x@data),
-    two.sided = two.sided
-  )
+    do.call(what = cbind, args = _) |>
+    new(
+      Class = 'maxT', 
+      t. = x@.Data, T. = _,
+      design = x@data@design,
+      name = labels(x@data),
+      two.sided = two.sided
+    )
+
 }
 
 
 
 
 #' @rdname maxT
-#' @export maxT.free_t
 #' @export
 maxT.free_t <- function(x, two.sided = TRUE, ...) {
   
-  T_ <- x@data |>
+  x@data |>
     permID() |>
     lapply(FUN = free_t, x = x@data, s4 = FALSE) |>
-    unlist(use.names = FALSE)
-  nr <- nrow(x@data@design)
-  dim(T_) <- c(nr, length(T_)/nr)
-  
-  new(
-    Class = 'maxT', 
-    t. = x@.Data, T. = T_,
-    design = x@data@design,
-    name = labels(x@data),
-    two.sided = two.sided
-  )
+    do.call(what = cbind, args = _) |>
+    new(
+      Class = 'maxT', 
+      t. = x@.Data, T. = _,
+      design = x@data@design,
+      name = labels(x@data),
+      two.sided = two.sided
+    )
+
 }
 
 
@@ -74,21 +68,11 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
 
 #' @rdname maxT
 #' @importFrom matrixStats colAnys
-#' @export maxT.free_t_diff
 #' @export
 maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   
   if (nrow(x@e1@data@design) != nrow(x@e2@data@design)) {
     # timepoint1 and timepoint2 may not have same subjects!!
-    
-    # before 2025-09
-    #d_1 <- x@e1@data; d_1$x1 <- d_1$x0 <- NULL
-    #d_0 <- x@e2@data; d_0$x1 <- d_0$x0 <- NULL
-    #tmp <- mapply(FUN = intersect, d_1, d_0)
-    #d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
-    #data1 <- merge.data.frame(d_share, x@e1@data, by = names(d_share), all.x = TRUE)
-    #data0 <- merge.data.frame(d_share, x@e2@data, by = names(d_share), all.x = TRUE)
-    # end of before 2025-09
     
     #d_1 <- x@e1@data@design
     #d_0 <- x@e2@data@design

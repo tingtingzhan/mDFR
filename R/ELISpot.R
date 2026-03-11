@@ -164,25 +164,6 @@ as.ELISpot <- function(
 
 
 
-#' @title `Math` \link[base]{groupGeneric} of \linkS4class{ELISpot}
-#' 
-#' @param x an \linkS4class{ELISpot} object
-#' 
-#' @param ... additional parameters
-#' 
-#' @returns
-#' The function [Math.ELISpot()] returns an \linkS4class{ELISpot} object.
-#' 
-#' @keywords internal
-#' @export Math.ELISpot
-#' @export
-Math.ELISpot <- function(x, ...) {
-  x@x1 <- do.call(what = .Generic, args = list(x = x@x1, ...))
-  x@x0 <- do.call(what = .Generic, args = list(x = x@x0, ...))
-  return(x)
-}
-
-
 
 
 
@@ -219,6 +200,13 @@ split.ELISpot <- function(x, f, drop = TRUE, ...) {
 }
 
 
+# Math-groupGeneric
+#' @export
+Math.ELISpot <- function(x, ...) {
+  x@x1 <- do.call(what = .Generic, args = list(x = x@x1, ...))
+  x@x0 <- do.call(what = .Generic, args = list(x = x@x0, ...))
+  return(x)
+}
 
 
 # base::labels
