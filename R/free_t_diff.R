@@ -37,6 +37,19 @@ setMethod(f = '-', signature = c(e1 = 'free_t', e2 = 'free_t'), definition = \(e
   
   if (!all.equal.numeric(e1@null.value, e2@null.value)) stop('`@null.value` must be the same')
   
+  if (nrow(e1@data@design) != nrow(e2@data@design)) {
+    # timepoint1 and timepoint2 may not have same subjects!!
+    #d_1 <- x@e1@data@design
+    #d_0 <- x@e2@data@design
+    #tmp <- mapply(FUN = intersect, d_1, d_0)
+    #d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
+    stop('um, tzh needs to think about how to write this beautifully..')
+    #data1 <- merge.data.frame(d_share, x@e1@data, by = names(d_share), all.x = TRUE)
+    #data0 <- merge.data.frame(d_share, x@e2@data, by = names(d_share), all.x = TRUE)
+  }
+  
+  if (!identical(names(e1@data@design), names(e2@data@design))) stop('`@design` at two time points must be the same')
+  
   # `@` much faster than ?base::attr !!!
   sd1 <- e1@stderr
   sd2 <- e2@stderr

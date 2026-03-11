@@ -212,7 +212,13 @@ Math.ELISpot <- function(x, ...) {
 # base::labels
 #' @export
 labels.ELISpot <- function(object, ...) {
-  tmp <- object@design |>
+  object@design |>
+    labels_design()
+}
+
+
+labels_design <- function(x) {
+  tmp <- x |>
     lapply(FUN = \(i) {
       if (is.factor(i)) i <- as.character.factor(i)
       unique(i)
@@ -221,4 +227,3 @@ labels.ELISpot <- function(object, ...) {
     unlist(use.names = FALSE) |>
     paste(collapse = '; ')
 }
-

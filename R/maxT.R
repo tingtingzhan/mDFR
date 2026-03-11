@@ -61,30 +61,12 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
 
 
 
-
-
-# @title Modified Distribution Free Resampling, at Two Timepoints
-# @param ... additional parameters, such as `null.value` in function [free_t] and `two.sided` for \linkS4class{maxT}
-
 #' @rdname maxT
 #' @importFrom matrixStats colAnys
 #' @export
 maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   
-  if (nrow(x@e1@data@design) != nrow(x@e2@data@design)) {
-    # timepoint1 and timepoint2 may not have same subjects!!
-    
-    #d_1 <- x@e1@data@design
-    #d_0 <- x@e2@data@design
-    #tmp <- mapply(FUN = intersect, d_1, d_0)
-    #d_share <- as.data.frame.list(tmp[lengths(tmp) > 0L])
-    stop('um, tzh needs to think about how to write this beautifully..')
-    #data1 <- merge.data.frame(d_share, x@e1@data, by = names(d_share), all.x = TRUE)
-    #data0 <- merge.data.frame(d_share, x@e2@data, by = names(d_share), all.x = TRUE)
-    
-  }
-  
-  nr <- nrow(x@e1@data@design) # now `nrow(x@e1@data) == nrow(data0)`
+  nr <- nrow(x@e1@data@design) # `nrow(x@e1@data) == nrow(data0)` enforced in [`-`('free_t', 'free_t')]
   
   t_ <- free_t(x@e1@data) - free_t(x@e2@data)
 
@@ -131,22 +113,23 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
   ### but [`-`('free_t', 'free_t')] is too slow on \emph{permutation-of-permutation}
   ### have to manually vectorize !!
   
-  # combine `x@e1@data` and `x@e2@data` for output
-  d1 <- x@e1@data@design
-  d0 <- x@e2@data@design
-  if (!identical(names(d1), names(d0))) stop('`ELISpot` at two time points must have same design')
-  d <- mapply(FUN = \(c1, c0) {
-    if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
-    if (all(c1 == c0)) return(c1)
-    return(paste(c1, c0, sep = ' vs. '))
-  }, c1 = d1, c0 = d0, SIMPLIFY = FALSE)
-  tmp <- lapply(d, FUN = unique.default)
+  new_design <- mapply(
+    FUN = \(c1, c0) { # operation per-*c*olumn
+      if (anyNA(c1) || anyNA(c0)) stop('does not allow NA in experiment design')
+      if (all(c1 == c0)) return(c1)
+      return(paste(c1, c0, sep = ' vs. '))
+    }, 
+    c1 = x@e1@data@design, 
+    c0 = x@e2@data@design, 
+    SIMPLIFY = FALSE
+  ) |>
+    as.data.frame.list()
   
   new(
     Class = 'maxT', 
     t. = t_, T. = T.,
-    design = as.data.frame.list(d),
-    name = paste(unlist(tmp[lengths(tmp) == 1L], use.names = FALSE), collapse = '; '),
+    design = new_design,
+    name = labels_design(new_design),
     two.sided = two.sided
   )
   
