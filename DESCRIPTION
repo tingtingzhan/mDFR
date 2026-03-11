@@ -14,4 +14,4 @@ Encoding: UTF-8
 License: GPL-2
 Depends: R (>= 4.5)
 Imports: methods, cli, ggplot2, matrixStats, 
-    reactable, scales, zoo
+    scales, zoo
