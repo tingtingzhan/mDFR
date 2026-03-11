@@ -249,7 +249,6 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
   p_mono <- object@p_mono
   tr <- object@tr
   U <- object@U
-  two.sided <- object@two.sided
   
   dm <- dim(U)
   
@@ -258,11 +257,13 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
   
   tseq <- seq_along(tr)
   
-  mp_jitter <- aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U)))
   mp_point <- aes(y = tseq, x = tr)
   
   ggplot() + 
-    geom_jitter(mapping = mp_jitter, color = rep(col, each = dm[2L]), width = .25, height = .25, size = 1e-5, alpha = .1, show.legend = FALSE) + 
+    geom_jitter(
+      mapping = aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U))), 
+      color = rep(col, each = dm[2L]), width = .25, height = .25, size = 1e-5, alpha = .1, show.legend = FALSE
+    ) + 
     geom_point(mapping = mp_point, color = col, size = 1.5, show.legend = FALSE) + 
     geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE) +
     scale_y_continuous(
@@ -272,7 +273,9 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
       labels = sprintf(fmt = '%.3f \u27a4 %.3f', p_perm, p_mono),
       sec.axis = sec_axis(
         transform = ~.,
-        name = sprintf(fmt = 'Original Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One')),
+        name = object@two.sided |>
+          ifelse(test = _, yes = 'Two', no = 'One') |>
+          sprintf(fmt = 'Original Test-Statistic, %s Sided'),
         breaks = tseq,
         labels = tr |> 
           sprintf(fmt = '%.2f') # |> 
@@ -280,48 +283,23 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
       )
     ) + 
     labs(
-      x = sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided', ifelse(two.sided, 'Two', 'One'))
-    ) + 
-    theme(
-      ## https://github.com/kassambara/survminer/pull/503
-      ## 'the function ?ggtext::element_markdown is now used in place of ?ggplot2::element_text to handle vectorized colors'
-      ## \CRANpkg{ggtext} works great on Fall 2024 (pdf in inst/tzh folder)
-      ## but Aug 2025 (ggplot2 v3.5.2) it seems no longer works ..
-      # axis.text.y.left = element_markdown(colour = col),
-      # axis.text.y.right = element_markdown(colour = col)
-      
-      ## ggplot2 (v4.0.0): element_text(hjust = .) does not work!! (but performs the way tzh likes) 
-      ## https://stackoverflow.com/questions/37488075/align-axis-label-on-the-right-with-ggplot2
-      # axis.text.y.right = element_text(hjust = 1) 
+      x = object@two.sided |>
+        ifelse(test = _, yes = 'Two', no = 'One') |>
+        sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided')
     )
   
 }
 
 
 
-#' @title Subset of Hypothesis in Westfall & Young's \linkS4class{maxT} Algorithm
-#' 
-#' @param x a \linkS4class{maxT} object
-#' 
-#' @param i \link[base]{logical} or \link[base]{integer} \link[base]{vector},
-#' indices of a subset of hypothesis \eqn{\{i_1,\cdots,i_n\}\subset\{1,\cdots,m\}}
-#' 
-#' @details
-#' The function `[.maxT` performs Westfall & Young's \linkS4class{maxT} algorithm  
-#' on a subset of test statistics \eqn{\{t_{i_1},\cdots t_{i_n}\}\subset\{t_1,\cdots t_m\}}
-#' and their corresponding test statistics 
-#' \eqn{\{t_{i_1,b},\cdots,t_{i_n,b}\}\subset\{t_{1,b},\cdots,t_{m,b}\}}
-#' in each permuted copy \eqn{b}, \eqn{b=1,\cdots,B}.
-#' 
-#' In other words, we take the subset of hypothesis \eqn{j=1,\cdots,m},
-#' **not** of permutations copies \eqn{b=1,\cdots,B}.
-#' 
-#' @returns 
-#' The function `[.maxT` returns a \linkS4class{maxT} object.
-#' 
-#' @keywords internal
+
 #' @export
 '[.maxT' <- function(x, i) {
-  new(Class = 'maxT', t. = x@t.[i], T. = x@T.[i, , drop = FALSE], two.sided = x@two.sided)
+  new(
+    Class = 'maxT', 
+    t. = x@t.[i], 
+    T. = x@T.[i, , drop = FALSE], 
+    two.sided = x@two.sided
+  )
 }
 
