@@ -12,7 +12,7 @@ of \link[base]{length}-\code{2L} to denote the significance levels.
 For example, to use \link[stats]{printCoefmat}-style of significance notation,
 users should let \code{star = c('*', '.')}}
 
-\item{...}{parameters of function \link[scales]{label_pvalue}}
+\item{...}{parameters of the function \link[scales]{label_pvalue}}
 }
 \value{
 The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} returns a \link[base]{function}.
@@ -31,9 +31,6 @@ Step 3: Apply function \link[stats]{symnum} (also see function \link[stats]{prin
 }
 \note{
 The function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
-
-The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
-therefore tzh keeps it in package \pkg{fastmd} instead of package \pkg{scales.tzh}.
 }
 \examples{
 p = c(a = pi^-100, b = .02, c = .05, d = .1, e = .9999, f = NA_real_)

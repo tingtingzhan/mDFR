@@ -1,5 +1,8 @@
 
 
+# The function [label_pvalue_sym()] is used so extensively, 
+# therefore tzh keeps it in package \pkg{fastmd} instead of package \pkg{scales.tzh}.
+ 
 
 
 
@@ -13,7 +16,7 @@
 #' For example, to use \link[stats]{printCoefmat}-style of significance notation,
 #' users should let `star = c('*', '.')`
 #' 
-#' @param ... parameters of function \link[scales]{label_pvalue}
+#' @param ... parameters of the function \link[scales]{label_pvalue}
 #' 
 #' @details
 #' 
@@ -27,9 +30,6 @@
 #' 
 #' @note
 #' The function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
-#' 
-#' The function [label_pvalue_sym()] is used so extensively, 
-#' therefore tzh keeps it in package \pkg{fastmd} instead of package \pkg{scales.tzh}.
 #' 
 #' @returns 
 #' The function [label_pvalue_sym()] returns a \link[base]{function}.
@@ -47,6 +47,7 @@
 #' double() |> label_pvalue_sym()() # nice!
 #' @keywords internal
 #' @importFrom scales label_pvalue
+#' @importFrom stats symnum
 #' @export
 label_pvalue_sym <- function(star = c('\u2b51', '\u2b52'), ...) {
   
