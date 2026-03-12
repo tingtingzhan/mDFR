@@ -10,33 +10,40 @@ Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 
 \section{Slots}{
 
 \describe{
-\item{\code{t.}}{\link[base]{double} \link[base]{vector},
+\item{\code{t.}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
 test statistics \eqn{t_1,\cdots,t_m}
 for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 in the original data}
 
-\item{\code{T.}}{\link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
-test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
+\item{\code{T.}}{\link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
+test statistics \eqn{t_{j,b}}
 for permutation \eqn{b=1,\cdots,B}}
 
-\item{\code{tr}}{\link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test}
+\item{\code{tr}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
+ordered test statistics
+\eqn{t_{r_1}\geq\cdots\geq t_{r_m}} for one-sided test, or
+\eqn{|t_{r_1}|\geq\cdots\geq|t_{r_m}|} for two-sided test}
 
-\item{\code{U}}{\link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)}, successive maxima \eqn{u_{j,b}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}}
+\item{\code{U}}{\link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
+the successive maxima \eqn{u_{j,b}}}
 
-\item{\code{p_perm}}{\link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}}
+\item{\code{p_perm}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
+permutation adjusted \eqn{p}-values \eqn{p_{r_j}}}
 
-\item{\code{p_mono}}{\link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}}
+\item{\code{p_mono}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
+permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}_{r_j}}}
 
-\item{\code{p.}}{\link[base]{double} \link[base]{vector}, \eqn{\tilde{p}^*_{r_j}} restored in the order of original test statistics \eqn{t_1,\cdots,t_m}}
+\item{\code{p.}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
+\eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}}
 
-\item{\code{two.sided}}{\link[base]{logical} scalar,
-whether to perform a two sided test.
-Default \code{TRUE} as in \doi{10.1214/ss/1056397487},
-while Moodie's (\url{https://rundfr.fredhutch.org}) use \code{FALSE}}
+\item{\code{alternative}}{\link[base]{character} scalar, either
+\code{'two.sided'} (default value), \code{'greater'} or \code{'less'}}
 
-\item{\code{design}}{(optional) \link[base]{data.frame}, study design}
+\item{\code{design}}{(optional) \link[base]{data.frame},
+the study design}
 
-\item{\code{label}}{(optional) \link[base]{character} scalar, study name}
+\item{\code{label}}{(optional) \link[base]{character} scalar,
+the study name}
 }}
 
 \note{

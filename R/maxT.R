@@ -5,7 +5,7 @@
 #' 
 #' @param x see **Usage**
 #' 
-#' @param two.sided \link[base]{logical} scalar, see \linkS4class{maxT}
+# @param alternative \link[base]{logical} scalar, see \linkS4class{maxT}
 #' 
 #' @param ... additional parameters, currently not in use
 #' 
@@ -15,12 +15,12 @@
 #' @keywords internal
 #' @name maxT
 #' @export
-maxT <- function(x, two.sided, ...) UseMethod(generic = 'maxT')
+maxT <- function(x, ...) UseMethod(generic = 'maxT')
 
 
 #' @rdname maxT
 #' @export
-maxT.free_d <- function(x, two.sided = TRUE, ...) {
+maxT.free_d <- function(x, ...) {
   
   x@data |> # supported: 'ELISpot'
     permID() |>
@@ -31,7 +31,7 @@ maxT.free_d <- function(x, two.sided = TRUE, ...) {
       t. = x@.Data, T. = _,
       design = x@data@design,
       label = labels(x@data), # [labels.ELISpot()], etc
-      two.sided = two.sided
+      ...
     )
 
 }
@@ -41,7 +41,7 @@ maxT.free_d <- function(x, two.sided = TRUE, ...) {
 
 #' @rdname maxT
 #' @export
-maxT.free_t <- function(x, two.sided = TRUE, ...) {
+maxT.free_t <- function(x, ...) {
   
   x@data |>
     permID() |>
@@ -52,7 +52,7 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
       t. = x@.Data, T. = _,
       design = x@data@design,
       label = labels(x@data), # [labels.ELISpot()], etc
-      two.sided = two.sided
+      ...
     )
 
 }
@@ -64,7 +64,7 @@ maxT.free_t <- function(x, two.sided = TRUE, ...) {
 #' @rdname maxT
 #' @importFrom matrixStats colAnys
 #' @export
-maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
+maxT.free_t_diff <- function(x, ...) {
   
   nr <- nrow(x@e1@data@design) # `nrow(x@e1@data) == nrow(data0)` enforced in [`-`('free_t', 'free_t')]
   
@@ -118,7 +118,7 @@ maxT.free_t_diff <- function(x, two.sided = TRUE, ...) {
     t. = t_, T. = T.,
     design = x@design,
     label = labels(x), # [labels.free_t_diff()]
-    two.sided = two.sided
+    ...
   )
   
 }

@@ -7,18 +7,16 @@
 \alias{maxT.free_t_diff}
 \title{\linkS4class{maxT} of Distribution Free Statistics}
 \usage{
-maxT(x, two.sided, ...)
+maxT(x, ...)
 
-\method{maxT}{free_d}(x, two.sided = TRUE, ...)
+\method{maxT}{free_d}(x, ...)
 
-\method{maxT}{free_t}(x, two.sided = TRUE, ...)
+\method{maxT}{free_t}(x, ...)
 
-\method{maxT}{free_t_diff}(x, two.sided = TRUE, ...)
+\method{maxT}{free_t_diff}(x, ...)
 }
 \arguments{
 \item{x}{see \strong{Usage}}
-
-\item{two.sided}{\link[base]{logical} scalar, see \linkS4class{maxT}}
 
 \item{...}{additional parameters, currently not in use}
 }

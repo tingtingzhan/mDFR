@@ -15,28 +15,40 @@
 #' `getMethod(initialize, signature = 'maxT')` to curious eyes.
 #' 
 #' 
-#' @slot t. \link[base]{double} \link[base]{vector},
+#' @slot t. \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
 #' test statistics \eqn{t_1,\cdots,t_m} 
 #' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
 #' in the original data
 #' 
-#' @slot T. \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)},
-#' test statistics \eqn{t_{j,b}}, \eqn{j = 1,\cdots,m},
+#' @slot T. \link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
+#' test statistics \eqn{t_{j,b}}
 #' for permutation \eqn{b=1,\cdots,B}
 #' 
-#' @slot tr \link[base]{double} \link[base]{vector}, ordered test statistics \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test, or \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test
-#' @slot U \link[base]{double} \link[base]{matrix} of dimension \eqn{(m,B)}, successive maxima \eqn{u_{j,b}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}
-#' @slot p_perm \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}
-#' @slot p_mono \link[base]{double} \link[base]{vector}, permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
-#' @slot p. \link[base]{double} \link[base]{vector}, \eqn{\tilde{p}^*_{r_j}} restored in the order of original test statistics \eqn{t_1,\cdots,t_m}
+#' @slot tr \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
+#' ordered test statistics 
+#' \eqn{t_{r_1}\geq\cdots\geq t_{r_m}} for one-sided test, or 
+#' \eqn{|t_{r_1}|\geq\cdots\geq|t_{r_m}|} for two-sided test
 #' 
-#' @slot two.sided \link[base]{logical} scalar,
-#' whether to perform a two sided test.
-#' Default `TRUE` as in \doi{10.1214/ss/1056397487},
-#' while Moodie's (\url{https://rundfr.fredhutch.org}) use `FALSE`
+#' @slot U \link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)}, 
+#' the successive maxima \eqn{u_{j,b}}
 #' 
-#' @slot design (optional) \link[base]{data.frame}, study design
-#' @slot label (optional) \link[base]{character} scalar, study name
+#' @slot p_perm \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
+#' permutation adjusted \eqn{p}-values \eqn{p_{r_j}}
+#' 
+#' @slot p_mono \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
+#' permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}_{r_j}}
+#' 
+#' @slot p. \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
+#' \eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}
+#' 
+#' @slot alternative \link[base]{character} scalar, either 
+#' `'two.sided'` (default value), `'greater'` or `'less'`
+#' 
+#' @slot design (optional) \link[base]{data.frame}, 
+#' the study design
+#' 
+#' @slot label (optional) \link[base]{character} scalar, 
+#' the study name
 #' 
 #' @references
 #' Peter H. Westfall, S. Stanley Young (1993). *Resampling-Based Multiple Testing: Examples and Methods for p-Value Adjustment*. \url{https://www.wiley.com/en-us/Resampling-Based+Multiple+Testing%3A+Examples+and+Methods+for+p-Value+Adjustment-p-9780471557616}
@@ -54,11 +66,11 @@ setClass(Class = 'maxT', slots = c(
   tr = 'numeric', U = 'matrix',
   p_perm = 'numeric', p_mono = 'numeric', 
   p. = 'numeric',
-  two.sided = 'logical',
+  alternative = 'character',
   design = 'data.frame',
   label = 'character'
 ), prototype = prototype(
-  two.sided = TRUE
+  alternative = 'two.sided'
 ))
 
 
@@ -66,10 +78,9 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   
   x <- callNextMethod(.Object, ...)
   
-  t. <- x@t. # t.orig <- 
-  T. <- x@T. # T.orig <- 
-  two.sided <- x@two.sided
-  
+  t. <- x@t. 
+  T. <- x@T.
+
   m <- length(t.)
   if (!is.matrix(T.)) stop('`T.` must be matrix')
   dm <- dim(T.)
@@ -78,57 +89,52 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
   if (anyNA(T.)) stop('Does not allow missingness in `T.`')
   if (anyNA(t.)) stop('Does not allow missingness in `t.`')
   
-  # I am not sure if parameter `two.sided` is appropriate
-  # Moodie's code does *not* have ?base::abs
-  # \doi{10.1214/ss/1056397487} has ?base::abs
-  if (two.sided) {
+  switch(x@alternative, 'two.sided' = {
     t. <- abs(t.)
     T. <- abs(T.)
-  }
+  }, 'greater' = {
+    # do nothing
+  }, 'less' = {
+    t. <- - t.
+    T. <- - T.
+  })
   
-  r <- order(t., decreasing = TRUE)
+  o <- order(t., decreasing = TRUE)
   # \eqn{(r_1, \cdots, r_m)^t}
   
   # ordered `t.`
-  tr <- t.[r] 
-  # \eqn{|t_{r_1}| \geq \cdots \geq |t_{r_m}|}
+  tr <- t.[o] 
   
-  # Step 3: successive maxima
+  # successive maxima
   # `U`: matrix of dimension \eqn{(m,B)}
   U <- if (m == 1L) T. else {
-    # order rows of `T.` by `r`
-    Tr <- T.[r, , drop = FALSE] # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
+    # order rows of `T.` by `o`
+    Tr <- T.[o, , drop = FALSE] # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
     apply(Tr, MARGIN = 2L, FUN = \(x) {
       # 'successive maxima'
-      rev.default(cummax(rev.default(x)))
+      x |>
+        rev.default() |>
+        cummax() |>
+        rev.default()
       # \eqn{u_{m,b}} and recursive \eqn{u_{j,b}}
     })
   }
   
   # permutation adjusted p-values
-  # \eqn{\tilde{p}_{r_j}}
+  # \eqn{p_{r_j}}
   p_perm <- .rowMeans(U >= tr, m = m, n = dm[2L], na.rm = TRUE)
   
   # monotonicity constraints enforced
-  # \eqn{\tilde{p}^*_{r_j}}
+  # \eqn{\tilde{p}_{r_j}}
   p_mono <- cummax(p_perm)
-  
-  # restore the order of `t.`
-  if (FALSE) {
-    set.seed(13134); x = rnorm(10L)
-    o = order(x)
-    s = sort(x)
-    identical(x[order(x)], s)
-    # Q: if I have `s` and `o`, how to restore `x`?
-    identical(s[order(o)], x) # solution!
-  } # R intro 101
   
   x@tr <- tr 
   x@U <- U
   x@p_perm <- p_perm
   x@p_mono <- p_mono
-  x@p. <- p_mono[order(r)]
+  x@p. <- p_mono[order(o)]
   return(x)
+  
 })
 
 
@@ -143,13 +149,19 @@ as.data.frame.maxT <- function(x, ..., check.names = FALSE) {
   
   tmp <- list(
     if (length(x@design)) x@design, #  else NULL
-    tstat = x@t. |> 
-      round(digits = 3L),
-    'abs(tstat)' = if (x@two.sided) {
+    't' = if (x@alternative == 'greater') {
+      x@t. |> 
+        round(digits = 3L)
+    }, # else NULL
+    'negative.t' = if (x@alternative == 'less') {
+      (- x@t.) |> 
+        round(digits = 3L)
+    }, # else NULL
+    'abs(t)' = if (x@alternative == 'two.sided') {
       abs(x@t.) |> 
         round(digits = 3L)
     }, # else NULL
-    adjp = x@p. |> 
+    p.adj = x@p. |> 
       label_pvalue_sym()()
   )
   
@@ -230,7 +242,7 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
   dm <- dim(U)
   
   col0 <- pal_hue()(n = 2L)
-  col <- ifelse(p_mono <= (1-conf.level), yes = col0[1L], no = col0[2L])
+  col <- ifelse(p_mono <= (1 - conf.level), yes = col0[1L], no = col0[2L])
   
   tseq <- seq_along(tr)
   
@@ -239,7 +251,9 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
   ggplot() + 
     geom_jitter(
       mapping = aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U))), 
-      color = rep(col, each = dm[2L]), width = .25, height = .25, size = 1e-5, alpha = .1, show.legend = FALSE
+      color = rep(col, each = dm[2L]), 
+      width = 0, height = .25, # no need to jitter on width!
+      size = 1e-5, alpha = .1, show.legend = FALSE
     ) + 
     geom_point(mapping = mp_point, color = col, size = 1.5, show.legend = FALSE) + 
     geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE) +
@@ -247,12 +261,14 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
       name = 'Permutation Adjusted p-values \u27a4 Monotonicity Constraints',
       breaks = tseq, 
       minor_breaks = NULL, 
-      labels = sprintf(fmt = '%.3f \u27a4 %.3f', p_perm, p_mono),
+      labels = sprintf(
+        fmt = '%s \u27a4 %s', 
+        p_perm |> sprintf(fmt = '%.3f') |> substring(first = 2L), 
+        p_mono |> sprintf(fmt = '%.3f') |> substring(first = 2L)
+      ),
       sec.axis = sec_axis(
         transform = ~.,
-        name = object@two.sided |>
-          ifelse(test = _, yes = 'Two', no = 'One') |>
-          sprintf(fmt = 'Original Test-Statistic, %s Sided'),
+        name = 'Test-Statistic',
         breaks = tseq,
         labels = tr |> 
           sprintf(fmt = '%.2f') # |> 
@@ -260,9 +276,7 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
       )
     ) + 
     labs(
-      x = object@two.sided |>
-        ifelse(test = _, yes = 'Two', no = 'One') |>
-        sprintf(fmt = 'Successive Maxima of Permuted Test-Statistic, %s Sided')
+      x = 'Successive Maxima of Permuted Test-Statistic'
     )
   
 }
