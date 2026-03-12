@@ -4,9 +4,14 @@
 \alias{label_pvalue_sym}
 \title{Label \eqn{p}-values with Significance Symbol}
 \usage{
-label_pvalue_sym(...)
+label_pvalue_sym(star = c("⭑", "⭒"), ...)
 }
 \arguments{
+\item{star}{\link[base]{character} \link[base]{vector}
+of \link[base]{length}-\code{2L} to denote the significance levels.
+For example, to use \link[stats]{printCoefmat}-style of significance notation,
+users should let \code{star = c('*', '.')}}
+
 \item{...}{parameters of function \link[scales]{label_pvalue}}
 }
 \value{
@@ -16,9 +21,6 @@ The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} returns a \link
 Label \eqn{p}-values with significance symbol.
 }
 \details{
-The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
-therefore tzh keeps it in \pkg{fastmd} instead of \pkg{scales.tzh}.
-
 Pipeline:
 
 Step 1: Apply function \link[scales]{label_pvalue}.
@@ -29,10 +31,15 @@ Step 3: Apply function \link[stats]{symnum} (also see function \link[stats]{prin
 }
 \note{
 The function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
+
+The function \code{\link[=label_pvalue_sym]{label_pvalue_sym()}} is used so extensively,
+therefore tzh keeps it in package \pkg{fastmd} instead of package \pkg{scales.tzh}.
 }
 \examples{
 p = c(a = pi^-100, b = .02, c = .05, d = .1, e = .9999, f = NA_real_)
-p |> label_pvalue_sym()()
+p |> label_pvalue_sym()() # star
+p |> label_pvalue_sym(star = c('\u2605', '\u2606'))() # small star
+p |> label_pvalue_sym(star = c('*', '.'))() # ?stats::printCoefmat
 p |> label_pvalue_sym(add_p = TRUE)()
 
 # below: exception handling

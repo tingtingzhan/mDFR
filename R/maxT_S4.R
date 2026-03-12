@@ -5,10 +5,6 @@
 #' @description
 #' Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 #' 
-# @param .Object the \linkS4class{maxT} object to be \link[methods]{initialize}d
-#' 
-# @param ... additional parameters, currently not in use
-#' 
 #' @note
 #' The algorithm is implemented in an unexported
 #' \link[methods]{initialize} method, which could be revealed by 
@@ -74,7 +70,12 @@ setClass(Class = 'maxT', slots = c(
 ))
 
 
-setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...) {
+# @param .Object the \linkS4class{maxT} object to be \link[methods]{initialize}d
+#' 
+# @param ... additional parameters, currently not in use
+#' 
+
+setMethod(f = initialize, signature = 'maxT', definition = \(.Object, ...) {
   
   x <- callNextMethod(.Object, ...)
   
@@ -148,21 +149,27 @@ setMethod(f = initialize, signature = 'maxT', definition = function(.Object, ...
 as.data.frame.maxT <- function(x, ..., check.names = FALSE) {
   
   tmp <- list(
+    
     if (length(x@design)) x@design, #  else NULL
+    
     't' = if (x@alternative == 'greater') {
       x@t. |> 
         round(digits = 3L)
     }, # else NULL
+    
     'negative.t' = if (x@alternative == 'less') {
       (- x@t.) |> 
         round(digits = 3L)
     }, # else NULL
+    
     'abs(t)' = if (x@alternative == 'two.sided') {
       abs(x@t.) |> 
         round(digits = 3L)
     }, # else NULL
+    
     p.adj = x@p. |> 
       label_pvalue_sym()()
+    
   )
   
   tmp[lengths(tmp) > 0L] |>
@@ -181,7 +188,7 @@ as.data.frame.maxT <- function(x, ..., check.names = FALSE) {
 
 
 
-setMethod(f = show, signature = 'maxT', definition = function(object) {
+setMethod(f = show, signature = 'maxT', definition = \(object) {
   object |>
     as.data.frame.maxT() |>
     print()

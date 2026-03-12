@@ -19,7 +19,7 @@ setClass(Class = 'ELISpot', slots = c(
 
 
 
-setMethod(f = initialize, signature = 'ELISpot', definition = function(.Object, ...) {
+setMethod(f = initialize, signature = 'ELISpot', definition = \(.Object, ...) {
   
   x <- callNextMethod(.Object, ...)
   

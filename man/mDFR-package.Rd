@@ -11,5 +11,10 @@ Need to think more..
 \author{
 \strong{Maintainer}: Tingting Zhan \email{tingtingzhan@gmail.com} (\href{https://orcid.org/0000-0001-9971-4844}{ORCID})
 
+Other contributors:
+\itemize{
+  \item Adam Snook (\href{https://orcid.org/0000-0002-9104-4505}{ORCID}) [contributor]
+}
+
 }
 \keyword{internal}

@@ -5,7 +5,8 @@ Version: 0.1.0
 Description: Need to think more..
 Authors@R: c(person(given = "Tingting", family = "Zhan", role =
         c("aut", "cre"), email = "tingtingzhan@gmail.com", comment = c(ORCID =
-        '0000-0001-9971-4844')))
+        '0000-0001-9971-4844')), person(given = 'Adam', family = 'Snook', 
+        role = "ctb", comment = c(ORCID = '0000-0002-9104-4505')))
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)

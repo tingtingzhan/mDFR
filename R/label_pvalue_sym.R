@@ -1,7 +1,5 @@
 
 
-#' The function [label_pvalue_sym()] is used so extensively, 
-#' therefore tzh keeps it in \pkg{fastmd} instead of \pkg{scales.tzh}.
 
 
 
@@ -9,6 +7,11 @@
 #' 
 #' @description
 #' Label \eqn{p}-values with significance symbol.
+#' 
+#' @param star \link[base]{character} \link[base]{vector} 
+#' of \link[base]{length}-`2L` to denote the significance levels. 
+#' For example, to use \link[stats]{printCoefmat}-style of significance notation,
+#' users should let `star = c('*', '.')`
 #' 
 #' @param ... parameters of function \link[scales]{label_pvalue}
 #' 
@@ -25,12 +28,17 @@
 #' @note
 #' The function \link[scales]{label_pvalue} is much prettier and more flexible than function \link[base]{format.pval}.
 #' 
+#' The function [label_pvalue_sym()] is used so extensively, 
+#' therefore tzh keeps it in package \pkg{fastmd} instead of package \pkg{scales.tzh}.
+#' 
 #' @returns 
 #' The function [label_pvalue_sym()] returns a \link[base]{function}.
 #' 
 #' @examples 
 #' p = c(a = pi^-100, b = .02, c = .05, d = .1, e = .9999, f = NA_real_)
-#' p |> label_pvalue_sym()()
+#' p |> label_pvalue_sym()() # star
+#' p |> label_pvalue_sym(star = c('\u2605', '\u2606'))() # small star
+#' p |> label_pvalue_sym(star = c('*', '.'))() # ?stats::printCoefmat
 #' p |> label_pvalue_sym(add_p = TRUE)()
 #' 
 #' # below: exception handling
@@ -39,11 +47,10 @@
 #' double() |> label_pvalue_sym()() # nice!
 #' @keywords internal
 #' @importFrom scales label_pvalue
-#' @importFrom stats symnum
 #' @export
-label_pvalue_sym <- function(...) {
+label_pvalue_sym <- function(star = c('\u2b51', '\u2b52'), ...) {
   
-  function(x) { # see ?scales::label_pvalue; `...` no need to be in the args
+  \(x) { # see ?scales::label_pvalue; parameters no need to be in the args!!
     
     ret <- x
     storage.mode(ret) <- 'character'
@@ -53,19 +60,22 @@ label_pvalue_sym <- function(...) {
     
     ret[] <- x |> 
       label_pvalue(...)() |>
-      sub(pattern = '([-]?)0[.]', replacement = '\\1.') # http://stackoverflow.com/questions/12643391
+      sub(pattern = '([-]?)0[.]', replacement = '\\1.', x = _) # http://stackoverflow.com/questions/12643391
     
     if (getOption('show.signif.stars')) { # see ?stats::printCoefmat
       sym <- symnum(
         x, corr = FALSE, na = FALSE, 
         cutpoints = c(0, .001, .01, .05, .1, 1), 
-        symbols = 
-          # c("***", "**", "*", ".", " ")
-          # c('\u2605\u2605\u2605', '\u2605\u2605', '\u2605', '\u2606', '') # star
-          c('\u2b51\u2b51\u2b51', '\u2b51\u2b51', '\u2b51', '\u2b52', '') # small star
-      ) # see ?stats::printCoefmat
+        symbols = c( # do not want to import ?stringi::stri_dup
+          star[1L] |> rep(times = 3L) |> paste0(collapse = ''),
+          star[1L] |> rep(times = 2L) |> paste0(collapse = ''),
+          star[1L],
+          star[2L],
+          ''
+        )
+      )
       ret[] <- ret |> 
-        paste(sym) |> 
+        paste(. = _, sym) |> 
         trimws()
     }
     
