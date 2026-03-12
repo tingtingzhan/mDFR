@@ -200,46 +200,39 @@ setMethod(f = show, signature = 'maxT', definition = \(object) {
 
 
 
-#' @title Visualize Westfall & Young's \linkS4class{maxT} Algorithm
-#' 
-#' @description
-#' To visualize Westfall & Young's \linkS4class{maxT} algorithm using package \CRANpkg{ggplot2}.
-#' 
-#' @param object a \linkS4class{maxT} object
-#' 
-#' @param conf.level \link[base]{double} scalar, 
-#' confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
-#' 
-#' @param ... additional parameters, currently not in use
-#' 
-#' @details
-#' The function [autoplot.maxT()] plots 
-#' \itemize{
-#' \item the successive maxima 
-#' \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and 
-#' \item the decreasing-ordered statistics \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test,
-#' or \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test
-#' }
-#' Printed on opposing axis are
-#' \itemize{
-#' \item values of the decreasing-ordered statistics
-#' \item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
-#' }
-#' Tests with \eqn{\tilde{p}^*_{r_j}\leq\alpha} is considered significant
-#' and colored pink (hex color `#F8766D`), otherwise non-significant and colored blue (hex color `#00BFC4`)
-#' 
-#' See full details of these notations in \linkS4class{maxT}.
-#' 
-#' @returns
-#' The function [autoplot.maxT()] returns a \link[ggplot2]{ggplot} object.
-#' 
-#' @keywords internal
-#' @importFrom ggplot2 autoplot ggplot aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme element_text
-# @importFrom ggtext element_markdown
-#' @importFrom scales pal_hue
-#' @export autoplot.maxT
+#' @importFrom ggplot2 autoplot ggplot
 #' @export
-autoplot.maxT <- function(object, conf.level = .95, ...) {
+autoplot.maxT <- function(object, ...) {
+  suppressWarnings(expr = {
+    ggplot() + autolayer.maxT(object, ...)
+  })
+  # Vectorized input to `element_text()` is not officially supported.
+  # Results may be unexpected or may change in future versions of ggplot2. 
+}
+
+
+
+# @param conf.level \link[base]{double} scalar, 
+# confidence level, or \eqn{1-\alpha}. Default .95 (or \eqn{\alpha=.05})
+# @details
+# The function [autoplot.maxT()] plots 
+# \itemize{
+# \item the successive maxima 
+# \eqn{u_{jb}}, \eqn{j=1,\cdots,m}, \eqn{b=1,\cdots,B}, and 
+# \item the decreasing-ordered statistics \eqn{|t_{r_1}|\geq|t_{r_2}|\geq\cdots\geq|t_{r_m}|} for two-sided test,
+# or \eqn{t_{r_1}\geq t_{r_2}\geq\cdots\geq t_{r_m}} for one-sided test
+# }
+# Printed on opposing axis are
+# \itemize{
+# \item values of the decreasing-ordered statistics
+# \item permutation adjusted \eqn{p}-values \eqn{\tilde{p}_{r_j}}, as well as under monotonicity constraints \eqn{\tilde{p}^*_{r_j}}
+# }
+# Tests with \eqn{\tilde{p}_{r_j}\leq\alpha} is considered significant
+# and colored pink (hex color `#F8766D`), otherwise non-significant and colored blue (hex color `#00BFC4`)
+#' @importFrom ggplot2 autolayer aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme element_text
+#' @importFrom scales pal_hue
+#' @export
+autolayer.maxT <- function(object, conf.level = .95, ...) {
 
   p_perm <- object@p_perm 
   p_mono <- object@p_mono
@@ -255,24 +248,23 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
   
   mp_point <- aes(y = tseq, x = tr)
   
-  ggplot() + 
+  list(
     geom_jitter(
       mapping = aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U))), 
       color = rep(col, each = dm[2L]), 
       width = 0, height = .25, # no need to jitter on width!
       size = 1e-5, alpha = .1, show.legend = FALSE
-    ) + 
-    geom_point(mapping = mp_point, color = col, size = 1.5, show.legend = FALSE) + 
-    geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE) +
+    ),
+    
+    geom_point(mapping = mp_point, color = col, size = 1.5, show.legend = FALSE),
+    
+    geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE),
+    
     scale_y_continuous(
       name = 'Permutation Adjusted p-values \u27a4 Monotonicity Constraints',
       breaks = tseq, 
       minor_breaks = NULL, 
-      labels = sprintf(
-        fmt = '%s \u27a4 %s', 
-        p_perm |> sprintf(fmt = '%.3f') |> substring(first = 2L), 
-        p_mono |> sprintf(fmt = '%.3f') |> substring(first = 2L)
-      ),
+      labels = sprintf(fmt = '%.3f \u27a4 %.3f', p_perm, p_mono),
       sec.axis = sec_axis(
         transform = ~.,
         name = 'Test-Statistic',
@@ -281,10 +273,14 @@ autoplot.maxT <- function(object, conf.level = .95, ...) {
           sprintf(fmt = '%.2f') # |> 
           # format(justify = 'right') # no need!
       )
-    ) + 
+    ),
+    
+    theme(axis.text.y = element_text(colour = col)),
+    
     labs(
       x = 'Successive Maxima of Permuted Test-Statistic'
     )
+  )
   
 }
 
