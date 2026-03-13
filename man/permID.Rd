@@ -10,7 +10,8 @@ permID(x)
 \item{x}{see \strong{Usage}}
 }
 \value{
-The \code{S3} generic function \code{\link[=permID]{permID()}} returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
+The \code{S3} generic function \code{\link[=permID]{permID()}} returns
+a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
 }
 \description{
 Permuted indices of treatment.

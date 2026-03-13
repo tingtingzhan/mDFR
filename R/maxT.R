@@ -71,41 +71,41 @@ maxT.free_t_diff <- function(x, ...) {
   t_ <- free_t(x@e1@data) - free_t(x@e2@data)
 
   # based on permutation
-  tm1 <- x@e1@data |>
+  e1 <- x@e1@data |>
     permID() |>
     lapply(FUN = free_t, x = x@e1@data, s4 = FALSE)
-  n1 <- length(tm1)
-  tm0 <- x@e2@data |> 
+  n1 <- length(e1)
+  e2 <- x@e2@data |> 
     permID() |>
     lapply(FUN = free_t, x = x@e2@data, s4 = FALSE)
-  n0 <- length(tm0)
+  n0 <- length(e2)
   
   ### actually [`-`('free_t', 'free_t')]
-  d1. <- tm1 |>
+  d1. <- e1 |>
     lapply(FUN = attr, which = 'delta', exact = TRUE) |>
     unlist(use.names = FALSE)
-  df1. <- tm1 |>
+  df1. <- e1 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
     unlist(use.names = FALSE)
-  stderr1. <- tm1 |>
+  stderr1. <- e1 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
     unlist(use.names = FALSE)
   dim(d1.) <- dim(df1.) <- dim(stderr1.) <- c(nr, n1)
   
-  d0. <- tm0 |> 
+  d2. <- e2 |> 
     lapply(FUN = attr, which = 'delta', exact = TRUE) |>
     unlist(use.names = FALSE)
-  df0. <- tm0 |>
+  df2. <- e2 |>
     lapply(FUN = attr, which = 'df', exact = TRUE) |>
     unlist(use.names = FALSE)
-  stderr0. <- tm0 |>
+  stderr2. <- e2 |>
     lapply(FUN = attr, which = 'stderr', exact = TRUE) |>
     unlist(use.names = FALSE)
-  dim(d0.) <- dim(df0.) <- dim(stderr0.) <- c(nr, n0)
+  dim(d2.) <- dim(df2.) <- dim(stderr2.) <- c(nr, n0)
   
-  id_ <- expand.grid(tm0 = seq_len(n0), tm1 = seq_len(n1))
-  var_pooled <- ((df1.*stderr1.^2)[,id_$tm1] + (df0.*stderr0.^2)[,id_$tm0]) / (df1.[,id_$tm1] + df0.[,id_$tm0])
-  T. <- (d1.[,id_$tm1] - d0.[,id_$tm0]) / sqrt(var_pooled)
+  id_ <- expand.grid(e2 = seq_len(n0), e1 = seq_len(n1))
+  var_pooled <- ((df1.*stderr1.^2)[,id_$e1] + (df2.*stderr2.^2)[,id_$e2]) / (df1.[,id_$e1] + df2.[,id_$e2])
+  T. <- (d1.[,id_$e1] - d2.[,id_$e2]) / sqrt(var_pooled)
   if (any(id <- colAnys(is.na(T.)))) {
     message(sprintf(fmt = '%.1f%% permutations with NA test-statistics are omitted', 1e2*mean.default(id)))
     T. <- T.[, !id]

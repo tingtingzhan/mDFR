@@ -9,7 +9,8 @@
 #' @param x see **Usage**
 #' 
 #' @returns 
-#' The `S3` generic function [permID()] returns a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
+#' The `S3` generic function [permID()] returns 
+#' a \link[base]{list} of \link[base]{integer} \link[base]{vector}s.
 #' 
 #' @note
 #' Westfall & Young's \linkS4class{maxT} algorithm
