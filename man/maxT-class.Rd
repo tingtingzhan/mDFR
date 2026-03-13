@@ -19,21 +19,10 @@ in the original data}
 test statistics \eqn{t_{j,b}}
 for permutation \eqn{b=1,\cdots,B}}
 
-\item{\code{tr}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
-ordered test statistics
-\eqn{t_{r_1}\geq\cdots\geq t_{r_m}} for one-sided test, or
-\eqn{|t_{r_1}|\geq\cdots\geq|t_{r_m}|} for two-sided test}
-
 \item{\code{U}}{\link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
 the successive maxima \eqn{u_{j,b}}}
 
-\item{\code{p_perm}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
-permutation adjusted \eqn{p}-values \eqn{p_{r_j}}}
-
-\item{\code{p_mono}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
-permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}_{r_j}}}
-
-\item{\code{p.}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
+\item{\code{p.value}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
 \eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}}
 
 \item{\code{alternative}}{\link[base]{character} scalar, either

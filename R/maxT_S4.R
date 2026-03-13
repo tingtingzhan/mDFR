@@ -20,21 +20,10 @@
 #' test statistics \eqn{t_{j,b}}
 #' for permutation \eqn{b=1,\cdots,B}
 #' 
-#' @slot tr \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
-#' ordered test statistics 
-#' \eqn{t_{r_1}\geq\cdots\geq t_{r_m}} for one-sided test, or 
-#' \eqn{|t_{r_1}|\geq\cdots\geq|t_{r_m}|} for two-sided test
-#' 
 #' @slot U \link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)}, 
 #' the successive maxima \eqn{u_{j,b}}
 #' 
-#' @slot p_perm \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
-#' permutation adjusted \eqn{p}-values \eqn{p_{r_j}}
-#' 
-#' @slot p_mono \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
-#' permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}_{r_j}}
-#' 
-#' @slot p. \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
+#' @slot p.value \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
 #' \eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}
 #' 
 #' @slot alternative \link[base]{character} scalar, either 
@@ -59,9 +48,8 @@
 #' @export
 setClass(Class = 'maxT', slots = c(
   t. = 'numeric', T. = 'matrix',
-  tr = 'numeric', U = 'matrix',
-  p_perm = 'numeric', p_mono = 'numeric', 
-  p. = 'numeric',
+  U = 'matrix',
+  p.value = 'numeric',
   alternative = 'character',
   design = 'data.frame',
   label = 'character'
@@ -79,61 +67,57 @@ setMethod(f = initialize, signature = 'maxT', definition = \(.Object, ...) {
   
   x <- callNextMethod(.Object, ...)
   
+  if (anyNA(x@t.)) stop('Does not allow missingness in `@t.`')
+  m <- length(x@t.)
+  
+  if (!is.matrix(x@T.)) stop('`@T.` must be matrix')
+  if (anyNA(x@T.)) stop('Does not allow missingness in `@T.`')
+  dm <- dim(x@T.)
+  if (dm[1L] != m) stop('nrow(@T.) need to be length(@t.)')
+  
   t. <- x@t. 
   T. <- x@T.
 
-  m <- length(t.)
-  if (!is.matrix(T.)) stop('`T.` must be matrix')
-  dm <- dim(T.)
-  if (dm[1L] != m) stop('nrow(T.) need to be length(t.)')
-  
-  if (anyNA(T.)) stop('Does not allow missingness in `T.`')
-  if (anyNA(t.)) stop('Does not allow missingness in `t.`')
-  
   switch(x@alternative, 'two.sided' = {
-    t. <- abs(t.)
-    T. <- abs(T.)
+    x@t. <- abs(x@t.)
+    x@T. <- abs(x@T.)
   }, 'greater' = {
     # do nothing
   }, 'less' = {
-    t. <- - t.
-    T. <- - T.
+    x@t. <- - x@t.
+    x@T. <- - x@T.
   })
   
-  o <- order(t., decreasing = TRUE)
+  o <- order(x@t., decreasing = TRUE)
   # \eqn{(r_1, \cdots, r_m)^t}
   
-  # ordered `t.`
-  tr <- t.[o] 
+  # t.[o]; # ordered `t.`
   
   # successive maxima
   # `U`: matrix of dimension \eqn{(m,B)}
-  U <- if (m == 1L) T. else {
+  U <- if (m == 1L) x@T. else {
     # order rows of `T.` by `o`
-    Tr <- T.[o, , drop = FALSE] # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
-    apply(Tr, MARGIN = 2L, FUN = \(x) {
-      # 'successive maxima'
-      x |>
-        rev.default() |>
-        cummax() |>
-        rev.default()
-      # \eqn{u_{m,b}} and recursive \eqn{u_{j,b}}
-    })
+    x@T.[o, , drop = FALSE] |> # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
+      apply(MARGIN = 2L, FUN = \(x) {
+        # 'successive maxima'
+        x |>
+          rev.default() |>
+          cummax() |>
+          rev.default()
+        # \eqn{u_{m,b}} and recursive \eqn{u_{j,b}}
+      })
   }
   
   # permutation adjusted p-values
   # \eqn{p_{r_j}}
-  p_perm <- .rowMeans(U >= tr, m = m, n = dm[2L], na.rm = TRUE)
+  p_perm <- .rowMeans(U >= x@t.[o], m = m, n = dm[2L], na.rm = TRUE)
   
   # monotonicity constraints enforced
   # \eqn{\tilde{p}_{r_j}}
   p_mono <- cummax(p_perm)
   
-  x@tr <- tr 
   x@U <- U
-  x@p_perm <- p_perm
-  x@p_mono <- p_mono
-  x@p. <- p_mono[order(o)]
+  x@p.value <- p_mono[order(o)]
   return(x)
   
 })
@@ -167,7 +151,7 @@ as.data.frame.maxT <- function(x, ..., check.names = FALSE) {
         round(digits = 3L)
     }, # else NULL
     
-    p.adj = x@p. |> 
+    p = x@p.value |> 
       label_pvalue_sym()()
     
   )
@@ -234,23 +218,24 @@ autoplot.maxT <- function(object, ...) {
 #' @export
 autolayer.maxT <- function(object, conf.level = .95, ...) {
 
-  p_perm <- object@p_perm 
-  p_mono <- object@p_mono
-  tr <- object@tr
-  U <- object@U
+  dm <- dim(object@U)
   
-  dm <- dim(U)
+  tseq <- seq_along(object@t.)
+  o <- order(object@t., decreasing = TRUE)
+  t.o <- object@t.[o] #sort.int(object@t., decreasing = TRUE)
   
+  # `p_mono` !!
+  p.o <- object@p.value[o] 
+  # permutation adjusted \eqn{p}-values under monotonicity constraints \eqn{\tilde{p}_{r_j}}
+    
   col0 <- pal_hue()(n = 2L)
-  col <- ifelse(p_mono <= (1 - conf.level), yes = col0[1L], no = col0[2L])
+  col <- ifelse(p.o <= (1 - conf.level), yes = col0[1L], no = col0[2L])
   
-  tseq <- seq_along(tr)
-  
-  mp_point <- aes(y = tseq, x = tr)
+  mp_point <- aes(y = tseq, x = t.o)
   
   list(
     geom_jitter(
-      mapping = aes(y = rep(tseq, each = dm[2L]), x = c(t.default(U))), 
+      mapping = aes(y = rep(tseq, each = dm[2L]), x = c(t.default(object@U))), 
       color = rep(col, each = dm[2L]), 
       width = 0, height = .25, # no need to jitter on width!
       size = 1e-5, alpha = .1, show.legend = FALSE
@@ -261,15 +246,17 @@ autolayer.maxT <- function(object, conf.level = .95, ...) {
     geom_line(mapping = mp_point, color = rev.default(col), linewidth = .5, show.legend = FALSE),
     
     scale_y_continuous(
-      name = 'Permutation Adjusted p-values \u27a4 Monotonicity Constraints',
+      name = 
+        # 'Permutation Adjusted p-values \u27a4 Monotonicity Constraints',
+        'Permutation Adjusted p-values under Monotonicity Constraints',
       breaks = tseq, 
       minor_breaks = NULL, 
-      labels = sprintf(fmt = '%.3f \u27a4 %.3f', p_perm, p_mono),
+      labels = sprintf(fmt = '%.3f', p.o),
       sec.axis = sec_axis(
         transform = ~.,
         name = 'Test-Statistic',
         breaks = tseq,
-        labels = tr |> 
+        labels = t.o |> 
           sprintf(fmt = '%.2f') # |> 
           # format(justify = 'right') # no need!
       )
