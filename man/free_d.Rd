@@ -17,7 +17,7 @@ free_d(x, ...)
 \item{...}{additional parameters, currently not in use}
 
 \item{pid1}{(optional) \link[base]{integer} \link[base]{vector},
-permuted indices for treatment (via the function \code{\link[=permID]{permID()}})}
+permuted indices for treatment (via the function \code{\link[=combn_]{combn_()}})}
 }
 \description{
 Distribution \linkS4class{free_d} statistic to compare a treatment against a control.

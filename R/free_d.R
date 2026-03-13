@@ -32,7 +32,7 @@ setClass(Class = 'free_d', contains = 'numeric', slots = c(
 #' @param x see **Usage**
 #' 
 #' @param pid1 (optional) \link[base]{integer} \link[base]{vector},
-#' permuted indices for treatment (via the function [permID()])
+#' permuted indices for treatment (via the function [combn_()])
 #' 
 #' @param ... additional parameters, currently not in use
 #' 

@@ -23,7 +23,7 @@ maxT <- function(x, ...) UseMethod(generic = 'maxT')
 maxT.free_d <- function(x, ...) {
   
   x@data |> # supported: 'ELISpot'
-    permID() |>
+    combn_() |>
     lapply(FUN = free_d, x = x@data, s4 = FALSE) |>
     do.call(what = cbind, args = _) |>
     new(
@@ -44,7 +44,7 @@ maxT.free_d <- function(x, ...) {
 maxT.free_t <- function(x, ...) {
   
   x@data |>
-    permID() |>
+    combn_() |>
     lapply(FUN = free_t, x = x@data, s4 = FALSE) |>
     do.call(what = cbind, args = _) |>
     new(
@@ -72,11 +72,11 @@ maxT.free_t_diff <- function(x, ...) {
 
   # based on permutation
   e1 <- x@e1@data |>
-    permID() |>
+    combn_() |>
     lapply(FUN = free_t, x = x@e1@data, s4 = FALSE)
   n1 <- length(e1)
   e2 <- x@e2@data |> 
-    permID() |>
+    combn_() |>
     lapply(FUN = free_t, x = x@e2@data, s4 = FALSE)
   n0 <- length(e2)
   
