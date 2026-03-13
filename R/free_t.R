@@ -34,6 +34,29 @@ setClass(Class = 'free_t', contains = 'numeric', slots = c(
 ))
 
 
+setMethod(f = show, signature = 'free_t', definition = \(object) {
+  
+  'Distribution Free t-Statistic' |>
+    message()
+  
+  object@null.value |> 
+    col_blue() |> style_bold() |>
+    sprintf(fmt = 'H0: \u03bc1 = c \u03bc0; where c = %s') |>
+    message()
+  
+  object@.Data |>
+    print()
+  
+  'Obtained From' |>
+    style_bold() |>
+    message()
+  object@data |>
+    show()
+  
+})
+
+
+
 
 
 #' @rdname free_t

@@ -1,30 +1,32 @@
 
 
-#' @title Westfall & Young's \linkS4class{maxT} Algorithm
+#' @title Westfall & Young's \linkS4class{maxT}
 #' 
 #' @description
-#' Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
+#' Westfall & Young's \linkS4class{maxT} algorithm, 
+#' as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 #' 
 #' @note
-#' The algorithm is implemented in an unexported
-#' \link[methods]{initialize} method, which could be revealed by 
+#' The algorithm is implemented in the
+#' \link[methods]{initialize} method, 
+#' which could be revealed by 
 #' `getMethod(initialize, signature = 'maxT')` to curious eyes.
-#' 
 #' 
 #' @slot t. \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
 #' test statistics \eqn{t_1,\cdots,t_m} 
 #' for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
-#' in the original data
+#' in the original data. 
+#' The slot name `@t.` is not to be confused with the function name \link[base]{t}
 #' 
 #' @slot T. \link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
-#' test statistics \eqn{t_{j,b}}
-#' for permutation \eqn{b=1,\cdots,B}
+#' permutated test statistics \eqn{t_{j,b}}.
+#' The slot name `@T.` is not to be confused with the \link[base]{logical} value `TRUE`
 #' 
 #' @slot U \link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)}, 
 #' the successive maxima \eqn{u_{j,b}}
 #' 
 #' @slot p.value \link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector}, 
-#' \eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}
+#' \eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{j = 1,\cdots,m}
 #' 
 #' @slot alternative \link[base]{character} scalar, either 
 #' `'two.sided'` (default value), `'greater'` or `'less'`
@@ -58,10 +60,6 @@ setClass(Class = 'maxT', slots = c(
 ))
 
 
-# @param .Object the \linkS4class{maxT} object to be \link[methods]{initialize}d
-#' 
-# @param ... additional parameters, currently not in use
-#' 
 
 setMethod(f = initialize, signature = 'maxT', definition = \(.Object, ...) {
   
@@ -87,6 +85,7 @@ setMethod(f = initialize, signature = 'maxT', definition = \(.Object, ...) {
     x@t. <- - x@t.
     x@T. <- - x@T.
   })
+  x@alternative <- 'greater' # important!!!
   
   o <- order(x@t., decreasing = TRUE)
   # \eqn{(r_1, \cdots, r_m)^t}
@@ -94,12 +93,10 @@ setMethod(f = initialize, signature = 'maxT', definition = \(.Object, ...) {
   # t.[o]; # ordered `t.`
   
   # successive maxima
-  # `U`: matrix of dimension \eqn{(m,B)}
+  # matrix of dimension \eqn{(m,B)}
   U <- if (m == 1L) x@T. else {
-    # order rows of `T.` by `o`
     x@T.[o, , drop = FALSE] |> # \eqn{|t_{r_1,b}|, \cdots, |t_{r_m,b}|}
       apply(MARGIN = 2L, FUN = \(x) {
-        # 'successive maxima'
         x |>
           rev.default() |>
           cummax() |>
@@ -214,7 +211,7 @@ autoplot.maxT <- function(object, ...) {
 # Tests with \eqn{\tilde{p}_{r_j}\leq\alpha} is considered significant
 # and colored pink (hex color `#F8766D`), otherwise non-significant and colored blue (hex color `#00BFC4`)
 #' @importFrom ggplot2 autolayer aes geom_jitter geom_point geom_line sec_axis scale_x_continuous scale_y_continuous labs theme element_text
-#' @importFrom scales pal_hue
+#' @importFrom scales pal_hue label_number
 #' @export
 autolayer.maxT <- function(object, conf.level = .95, ...) {
 
@@ -265,7 +262,9 @@ autolayer.maxT <- function(object, conf.level = .95, ...) {
     theme(axis.text.y = element_text(colour = col)),
     
     labs(
-      x = 'Successive Maxima of Permuted Test-Statistic'
+      x = dm[2L] |> 
+        label_number(big.mark = ',')() |>
+        sprintf(fmt = 'Successive Maxima of %s Permuted Test-Statistic')
     )
   )
   
@@ -280,7 +279,7 @@ autolayer.maxT <- function(object, conf.level = .95, ...) {
     Class = 'maxT', 
     t. = x@t.[i], 
     T. = x@T.[i, , drop = FALSE], 
-    two.sided = x@two.sided
+    alternative = x@alternative
   )
 }
 

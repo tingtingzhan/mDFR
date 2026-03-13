@@ -22,6 +22,29 @@ setClass(Class = 'free_t_diff', contains = 'numeric', slots = c(
 ))
 
 
+setMethod(f = show, signature = 'free_t_diff', definition = \(object) {
+  
+  'Distribution Free t-Statistic for Difference-of-Difference' |>
+    message()
+  
+  object@e1@null.value |> 
+    col_blue() |> style_bold() |>
+    sprintf(fmt = 'H0: (\u03bc1(\u03d5) - c \u03bc0(\u03d5)) - (\u03bc1(\u03c8) - c \u03bc0(\u03c8)) = 0; where c = %s') |>
+    message()
+  
+  object@.Data |>
+    print()
+  
+  'Obtained From Two' |>
+    style_bold() |>
+    message()
+  object@e1@data |>
+    show()
+  object@e2@data |>
+    show()
+  
+})
+
 
 
 #' @title Difference of \linkS4class{free_t} Objects

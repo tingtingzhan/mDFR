@@ -25,7 +25,26 @@ setClass(Class = 'free_d', contains = 'numeric', slots = c(
 ))
 
 
-
+setMethod(f = show, signature = 'free_d', definition = \(object) {
+  
+  'Distribution Free d-Statistic' |>
+    message()
+  
+  object@null.value |> 
+    col_blue() |> style_bold() |>
+    sprintf(fmt = 'H0: \u03bc1 - \u03bc0 = c; where c = %s') |>
+    message()
+  
+  object@.Data |>
+    print()
+  
+  'Obtained From' |>
+    style_bold() |>
+    message()
+  object@data |>
+    show()
+  
+})
 
 #' @rdname free_d
 #' 

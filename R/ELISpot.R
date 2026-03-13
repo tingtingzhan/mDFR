@@ -51,6 +51,30 @@ setMethod(f = initialize, signature = 'ELISpot', definition = \(.Object, ...) {
 })
 
 
+setMethod(f = show, signature = 'ELISpot', definition = \(object) {
+  
+  'ELISpot' |>
+    col_red() |> style_bold() |>
+    sprintf(fmt = '%s Experiment') |>
+    message()
+  
+  nrow(object@x1) |> 
+    col_magenta() |> style_bold() |>
+    sprintf(fmt = 'Number of Hypotheses (m): %s') |>
+    message()
+  
+  ncol(object@x1) |> 
+    col_blue() |> style_bold() |>
+    sprintf(fmt = 'Max. Sample Size of Treatment (n1): %s') |>
+    message()
+  
+  ncol(object@x0) |> 
+    col_blue() |> style_bold() |>
+    sprintf(fmt = 'Max. Sample Size of Control (n0): %s') |>
+    message()
+  
+})
+
 
 
 

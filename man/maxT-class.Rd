@@ -3,9 +3,10 @@
 \docType{class}
 \name{maxT-class}
 \alias{maxT-class}
-\title{Westfall & Young's \linkS4class{maxT} Algorithm}
+\title{Westfall & Young's \linkS4class{maxT}}
 \description{
-Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
+Westfall & Young's \linkS4class{maxT} algorithm,
+as described in Box 2, page 82 of \doi{10.1214/ss/1056397487}.
 }
 \section{Slots}{
 
@@ -13,17 +14,18 @@ Westfall & Young's \linkS4class{maxT} algorithm, as described in Box 2, page 82 
 \item{\code{t.}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
 test statistics \eqn{t_1,\cdots,t_m}
 for each hypothesis \eqn{H_j}, \eqn{j = 1,\cdots,m},
-in the original data}
+in the original data.
+The slot name \verb{@t.} is not to be confused with the function name \link[base]{t}}
 
 \item{\code{T.}}{\link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
-test statistics \eqn{t_{j,b}}
-for permutation \eqn{b=1,\cdots,B}}
+permutated test statistics \eqn{t_{j,b}}.
+The slot name \verb{@T.} is not to be confused with the \link[base]{logical} value \code{TRUE}}
 
 \item{\code{U}}{\link[base]{double} \link[base]{matrix} of \link[base]{dim}ension \eqn{(m,B)},
 the successive maxima \eqn{u_{j,b}}}
 
 \item{\code{p.value}}{\link[base]{length}-\eqn{m} \link[base]{double} \link[base]{vector},
-\eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{1,\cdots,m}}
+\eqn{\tilde{p}_{r_j}} restored in the order of original hypotheses \eqn{j = 1,\cdots,m}}
 
 \item{\code{alternative}}{\link[base]{character} scalar, either
 \code{'two.sided'} (default value), \code{'greater'} or \code{'less'}}
@@ -36,8 +38,9 @@ the study name}
 }}
 
 \note{
-The algorithm is implemented in an unexported
-\link[methods]{initialize} method, which could be revealed by
+The algorithm is implemented in the
+\link[methods]{initialize} method,
+which could be revealed by
 \code{getMethod(initialize, signature = 'maxT')} to curious eyes.
 }
 \references{
